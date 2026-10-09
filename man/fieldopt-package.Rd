@@ -29,5 +29,10 @@ Authors:
   \item Cristiano Ferraz \email{cferraz@castlab.org} (\href{https://orcid.org/0000-0002-6838-6734}{ORCID})
 }
 
+Other contributors:
+\itemize{
+  \item The authors of the dependency Rust crates (see inst/AUTHORS file for details) [contributor]
+}
+
 }
 \keyword{internal}
