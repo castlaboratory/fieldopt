@@ -71,4 +71,4 @@ the allocation treats the frames as strata of a single design.
 
 ## References
 
-Cochran, W. G. (1977). *Sampling Techniques*, 3rd ed. Wiley.
+Cochran, W. G. (1977). *Sampling Techniques*, third edition. Wiley.

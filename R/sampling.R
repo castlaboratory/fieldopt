@@ -232,7 +232,17 @@ expected_hits <- function(areas, sample, points_per_cell, cell_size) {
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
   for (col in c("establishment", "unit", "area")) if (!col %in% names(areas)) cli::cli_abort("{.arg areas} needs a column {.field {col}}.")
   if (length(cell_size) == 1L) cell_size <- c(cell_size, cell_size)
-  m <- if (is.character(points_per_cell)) as.numeric(sample[[points_per_cell]]) else if (!is.null(names(points_per_cell))) as.numeric(points_per_cell[as.character(sample[[attr(sample, "strata")]])]) else rep(as.numeric(points_per_cell), nrow(sample))
+  m <- if (is.character(points_per_cell)) {
+    if (!points_per_cell %in% names(sample)) cli::cli_abort("Column {.field {points_per_cell}} not found.")
+    as.numeric(sample[[points_per_cell]])
+  } else if (!is.null(names(points_per_cell))) {
+    st <- attr(sample, "strata")
+    if (is.null(st)) cli::cli_abort("A named {.arg points_per_cell} needs a stratified sample.")
+    lev <- as.character(sample[[st]])
+    if (!all(lev %in% names(points_per_cell))) cli::cli_abort("{.arg points_per_cell} must name every stratum.")
+    as.numeric(points_per_cell[lev])
+  } else rep(as.numeric(points_per_cell), nrow(sample))
+  if (anyNA(m) || any(m < 1)) cli::cli_abort("Points per cell must be positive.")
   dens <- stats::setNames(sample$pi * m / prod(cell_size), sample$unit)
   miss <- setdiff(unique(areas$unit), names(dens))
   if (length(miss)) cli::cli_abort("Cell{?s} {.val {miss}} not in the frame.")
@@ -352,8 +362,10 @@ ht_variance <- function(sample, z) {
 #' spatially balanced samples (it needs no joint inclusion probabilities),
 #' the variance among replicate estimates for replicated systematic samples,
 #' and the simple-random-sampling formula for equal-probability simple random
-#' samples. The simple-random-sampling variance of the same sample is always
-#' reported as a reference.
+#' samples. A systematic sample drawn as a single replicate has no unbiased
+#' design-based variance estimator; the local-mean estimator is used as the
+#' customary approximation. The simple-random-sampling variance of the same
+#' sample is always reported as a reference.
 #'
 #' @param sample A `fieldopt_sample`.
 #' @param y Column of the study variable (observed on the sampled units; other

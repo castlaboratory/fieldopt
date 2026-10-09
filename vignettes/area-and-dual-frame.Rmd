@@ -11,15 +11,16 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 6.5, fig.height = 4.5, dpi = 96)
 ```
 
-National agricultural surveys increasingly combine an **area frame** (a grid
-of square cells classified by intensity of agricultural use from satellite
-imagery, with sample points inside the selected cells identifying the fields
-and so the establishments) and a **list frame** (large and specialised
-establishments, cheap to reach). This vignette walks through such a design
-with `fieldopt`: stratified selection of cells, points inside them, the
-multiplicity estimator, the cost of the field work, and the dual-frame and
-two-stage allocations that put the pieces together. The data are synthetic;
-the structure follows the design of a national survey with 1 km² cells.
+Agricultural surveys often combine an **area frame** (a grid of square cells
+classified by intensity of agricultural use from satellite imagery, with
+sample points inside the selected cells identifying the fields and so the
+establishments) and a **list frame** (large and specialised establishments,
+cheap to reach). This vignette walks through such a design with `fieldopt`:
+stratified selection of cells, points inside them, the multiplicity
+estimator, the cost of the field work, and the dual-frame and two-stage
+allocations that put the pieces together. The data are synthetic; the
+structure is the usual one of area frames built on a regular grid (square
+segments of about 1 km²) with a list of large producers alongside.
 
 ## The area frame: cells with intensity classes
 
@@ -162,7 +163,7 @@ pilot. The allocation is a planning tool: the cost per area unit changes with
 
 ## References
 
-Cochran, W. G. (1977). *Sampling Techniques*, 3rd ed. Wiley.
+Cochran, W. G. (1977). *Sampling Techniques*, third edition. Wiley.
 
 Hartley, H. O. (1974). Multiple frame methodology and selected applications.
 *Sankhya C*, 36, 99--118.
