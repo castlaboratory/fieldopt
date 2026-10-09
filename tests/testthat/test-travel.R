@@ -37,3 +37,55 @@ test_that("the cost model prices travel, units and interviews", {
   expect_error(field_cost_model(per_travel = -1), "non-negative")
   expect_message(print(cm), "BRL")
 })
+
+test_that("the detour factor scales straight-line distances", {
+  pts <- data.frame(unit = c("d", "a"), x = c(0, 3), y = c(0, 4))
+  m1 <- travel_matrix(pts, method = "euclidean")
+  m13 <- travel_matrix(pts, method = "euclidean", detour = 1.3)
+  expect_equal(unclass(m13)[1, 2], 6.5)
+  expect_equal(attr(m13, "detour"), 1.3)
+  expect_message(print(m13), "x 1.3")
+  expect_error(travel_matrix(pts, method = "euclidean", detour = 0.8), "at least 1")
+  expect_warning(travel_matrix(pts, method = "euclidean", matrix = matrix(c(0, 1, 1, 0), 2), detour = 1.2), "ignored")
+})
+
+test_that("the OSRM connector assembles blocks, sets units and reports snapping", {
+  skip_if_not_installed("osrm")
+  pts <- data.frame(unit = paste0("u", 1:7), lat = -8 - (1:7) / 100, lon = -35 + (1:7) / 100)
+  calls <- 0
+  fake <- function(src, dst = src, loc, exclude, measure = "duration", osrm.server = NULL, osrm.profile = NULL) {
+    calls <<- calls + 1
+    i <- as.integer(sub("u", "", rownames(src))); j <- as.integer(sub("u", "", rownames(dst)))
+    d <- outer(i, j, function(a, b) abs(a - b) * 10)
+    list(durations = if (measure == "duration") d else NULL, distances = if (measure == "distance") d / 1000 * 60 else NULL,
+         sources = data.frame(lon = src$lon, lat = src$lat, snap = i / 10))
+  }
+  testthat::local_mocked_bindings(osrmTable = fake, .package = "osrm")
+  m <- travel_matrix(pts, method = "osrm", block = 3)
+  expect_equal(calls, 9)
+  expect_equal(unclass(m)[2, 6], 40)
+  expect_equal(unclass(m)["u7", "u1"], 60)
+  expect_equal(diag(unclass(m)), rep(0, 7), ignore_attr = TRUE)
+  expect_equal(attr(m, "unit"), "min")
+  expect_equal(attr(m, "method"), "osrm")
+  expect_equal(attr(m, "snap"), (1:7) / 10)
+  expect_message(print(m), "0.7 km")
+  md <- travel_matrix(pts, method = "osrm", measure = "distance", block = 10)
+  expect_equal(attr(md, "unit"), "km")
+  expect_equal(unclass(md)[1, 2], 0.6)
+  expect_warning(travel_matrix(pts, method = "osrm", detour = 1.2, block = 10), "ignored")
+  # unreachable pair
+  fake_na <- function(src, dst = src, ...) { d <- matrix(1, nrow(src), nrow(dst)); d[1, ] <- NA; list(durations = d, sources = data.frame(snap = 0)) }
+  testthat::local_mocked_bindings(osrmTable = fake_na, .package = "osrm")
+  expect_error(travel_matrix(pts, method = "osrm", block = 10), "no route")
+  expect_error(travel_matrix(pts[, c("unit", "lat")], method = "osrm"), "lon")
+})
+
+test_that("the OSRM demo server answers a tiny query", {
+  skip_on_cran(); skip_if_not_installed("osrm"); skip_if_offline()
+  pts <- data.frame(unit = c("a", "b"), lat = c(-8.0476, -8.0631), lon = c(-34.8770, -34.8711))
+  m <- tryCatch(travel_matrix(pts, method = "osrm"), error = function(e) NULL)
+  skip_if(is.null(m), "OSRM demo server not reachable")
+  expect_gt(unclass(m)[1, 2], 0)
+  expect_equal(attr(m, "unit"), "min")
+})

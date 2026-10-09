@@ -24,7 +24,7 @@
 #'                  iterations = 20)
 routed_unit_cost <- function(frame, depot, cost_model, n, size = NULL, strata = NULL,
                              selection = c("lpm", "systematic", "srs"), replicates = 1, matrix = NULL,
-                             method = c("haversine", "euclidean"), max_length = Inf, max_stops = Inf,
+                             method = c("haversine", "euclidean", "osrm"), max_length = Inf, max_stops = Inf,
                              n_rep = 10, iterations = 100, seed = 1) {
   f <- cost_variance_frontier(frame, depot, cost_model, n_grid = list(n), size = size, strata = strata,
                               selection = selection, replicates = replicates, matrix = matrix, method = method,
@@ -67,7 +67,7 @@ two_stage_design <- function(frame, depot, cost_model, m_secondary, s2_between, 
                              target_variance = NULL, target_cv = NULL, budget = NULL, mean = NULL,
                              c1_start = NULL, max_iter = 6, size = NULL, strata = NULL,
                              selection = c("lpm", "systematic", "srs"), matrix = NULL,
-                             method = c("haversine", "euclidean"), max_length = Inf, max_stops = Inf,
+                             method = c("haversine", "euclidean", "osrm"), max_length = Inf, max_stops = Inf,
                              n_rep = 5, iterations = 100, seed = 1) {
   if (!inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
   frame <- tibble::as_tibble(frame)
@@ -132,7 +132,7 @@ dual_frame_design <- function(frame, depot, cost_model, domains, cost_b, deff_a 
                               target_variance = NULL, target_cv = NULL, budget = NULL,
                               interviews_per_unit = NULL, cost_a_start = NULL, max_iter = 6,
                               size = NULL, strata = NULL, selection = c("lpm", "systematic", "srs"), matrix = NULL,
-                              method = c("haversine", "euclidean"), max_length = Inf, max_stops = Inf,
+                              method = c("haversine", "euclidean", "osrm"), max_length = Inf, max_stops = Inf,
                               n_rep = 5, iterations = 100, seed = 1) {
   if (!inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
   frame <- tibble::as_tibble(frame)

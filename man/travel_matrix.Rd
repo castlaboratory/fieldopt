@@ -6,38 +6,78 @@
 \usage{
 travel_matrix(
   coords,
-  method = c("haversine", "euclidean"),
+  method = c("haversine", "euclidean", "osrm"),
   matrix = NULL,
-  unit = NULL
+  unit = NULL,
+  detour = 1,
+  measure = c("duration", "distance"),
+  server = getOption("osrm.server"),
+  profile = getOption("osrm.profile"),
+  block = 100
 )
 }
 \arguments{
 \item{coords}{Data frame or matrix with two coordinate columns: \code{lat}, \code{lon}
-(degrees) for \code{method = "haversine"}, or \code{x}, \code{y} (planar, any unit) for
-\code{method = "euclidean"}. Row names, or a column \code{unit}, name the units.}
+(degrees) for \code{"haversine"} and \code{"osrm"}, or \code{x}, \code{y} (planar, any unit)
+for \code{"euclidean"}. Row names, or a column \code{unit}, name the units.}
 
-\item{method}{\code{"haversine"} (great-circle distance in kilometres) or
-\code{"euclidean"}.}
+\item{method}{\code{"haversine"}, \code{"euclidean"} or \code{"osrm"}.}
 
 \item{matrix}{Optional square numeric matrix of travel costs already
-computed; when given, \code{coords} is only used for names and plotting.}
+computed; when given, \code{method} is ignored except for the coordinate
+columns it implies.}
 
 \item{unit}{Label of the travel unit (\code{"km"}, \code{"min"}, ...), kept for
-reports.}
+reports; set automatically unless a matrix is supplied.}
+
+\item{detour}{Multiplier applied to straight-line distances (\verb{>= 1}).
+Ignored, with a warning, for \code{"osrm"} and supplied matrices.}
+
+\item{measure}{For \code{"osrm"}: \code{"duration"} (minutes) or \code{"distance"}
+(kilometres on the network).}
+
+\item{server, profile}{For \code{"osrm"}: the base URL of the routing server and
+the profile (\code{"car"}, \code{"bike"}, \code{"foot"}); default to the \code{osrm} package
+options.}
+
+\item{block}{For \code{"osrm"}: number of origins and of destinations per
+request (\code{block^2} cells each).}
 }
 \value{
 A square numeric matrix of class \code{fieldopt_matrix} with unit names
-as dimnames and attributes \code{coords}, \code{method} and \code{unit}.
+as dimnames and attributes \code{coords}, \code{method}, \code{unit}, \code{detour} and, for
+\code{"osrm"}, \code{snap} (the distance in kilometres from each unit to the point
+of the network it was snapped to: large values flag units far from any
+road).
 }
 \description{
-Builds the dense matrix of travel distances (or times) between all units,
-depot included, from coordinates, or wraps a matrix computed elsewhere, for
-example on a road network with OSRM. Distances from coordinates are a first
-approximation; a network matrix is the honest input when it is available.
+Builds the dense matrix of travel distances or times between all units,
+depot included, in one of three ways:
+}
+\details{
+\itemize{
+\item from coordinates, as straight-line distances: great-circle (\code{"haversine"},
+kilometres) with \code{lat}/\code{lon}, or Euclidean with planar \code{x}/\code{y}. A
+\code{detour} factor (the ratio of road to straight-line distance, typically
+1.2 to 1.4 on rural road networks) turns them into a planning estimate of
+road distances when no network is available;
+\item from a road network, with \code{method = "osrm"}: durations (minutes) or
+distances (kilometres) from an OSRM server through the \code{osrm} package,
+requested in blocks so that the server's table limit is respected (the
+public demo server allows 10 000 cells per request, and is meant for
+small tests only: run your own server for a frame);
+\item from a matrix computed elsewhere (\code{matrix}), with the coordinates used
+only for names and plots.
+}
 }
 \examples{
 segments <- data.frame(unit = c("depot", "s1", "s2", "s3"),
                        lat = c(-8.05, -8.10, -8.00, -8.12),
                        lon = c(-34.90, -34.95, -34.85, -34.80))
 travel_matrix(segments)
+travel_matrix(segments, detour = 1.3)
+\dontrun{
+# road durations from the OSRM demo server (small frames only)
+travel_matrix(segments, method = "osrm", measure = "duration")
+}
 }

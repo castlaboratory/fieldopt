@@ -13,6 +13,10 @@
   Engine: `fieldopt-core` 0.2.2.
 * `cost_variance_frontier()` accepts `strata`, `selection` and `replicates`,
   a list of per-stratum allocations in `n_grid`, and reports `cost_per_unit`.
+* `travel_matrix()` gains a `detour` factor for straight-line distances and
+  `method = "osrm"`, road durations or distances from an OSRM server through
+  the `osrm` package, requested in blocks; the frontier and the routed designs
+  accept the same method.
 * `routed_unit_cost()`, `two_stage_design()` and `dual_frame_design()`
   iterate the allocation with the cost per area unit measured by routing;
   `point_design_effect()` simulates the area design and returns the bias,

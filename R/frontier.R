@@ -26,7 +26,8 @@
 #' @param replicates Replicates of a `"systematic"` selection.
 #' @param matrix Optional [travel_matrix()] of the frame (computed from the
 #'   coordinates otherwise).
-#' @param method Distance method when `matrix` is `NULL`.
+#' @param method Distance method of [travel_matrix()] when `matrix` is
+#'   `NULL` (`"osrm"` queries the road network once for the whole frame).
 #' @param max_length,max_stops Route limits passed to [route_fieldwork()].
 #' @param n_rep Replications per sample size.
 #' @param iterations GRASP iterations per routing.
@@ -50,7 +51,7 @@
 #'                        y = "crop", method = "euclidean", n_rep = 3, iterations = 20)
 cost_variance_frontier <- function(frame, depot, cost_model, n_grid, y = NULL, size = NULL, strata = NULL,
                                    selection = c("lpm", "systematic", "srs"), replicates = 1, matrix = NULL,
-                                   method = c("haversine", "euclidean"), max_length = Inf, max_stops = Inf,
+                                   method = c("haversine", "euclidean", "osrm"), max_length = Inf, max_stops = Inf,
                                    n_rep = 20, iterations = 100, seed = 1) {
   method <- rlang::arg_match(method)
   selection <- rlang::arg_match(selection)
@@ -62,7 +63,7 @@ cost_variance_frontier <- function(frame, depot, cost_model, n_grid, y = NULL, s
   if (!inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
   if (is.null(matrix)) matrix <- travel_matrix(frame, method = method)
   units_frame <- frame[frame$unit != depot, ]
-  coords <- if (method == "haversine") c("lat", "lon") else c("x", "y")
+  coords <- if (method == "euclidean") c("x", "y") else c("lat", "lon")
   rows <- lapply(seq_along(n_grid), function(k) {
     n <- n_grid[[k]]
     cost <- travel <- nr <- var <- cv <- numeric(n_rep)

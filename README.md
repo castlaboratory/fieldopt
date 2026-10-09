@@ -15,7 +15,9 @@ the pieces an agricultural survey with an area frame (grid cells, points
 inside them) and a list frame needs.
 
 - `travel_matrix()` builds the travel matrix between units from coordinates
-  (great-circle or planar distances) or wraps a road-network matrix.
+  (great-circle or planar distances, optionally times a detour factor), from
+  a road network through OSRM (durations or distances, in blocks), or wraps a
+  matrix computed elsewhere.
 - `field_cost_model()` turns travel, visits and interviews into money or time.
 - `route_fieldwork()` routes the field work from a depot through the selected
   units, for one team or several, under route-length and stop limits (GRASP

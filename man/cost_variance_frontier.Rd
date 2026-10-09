@@ -15,7 +15,7 @@ cost_variance_frontier(
   selection = c("lpm", "systematic", "srs"),
   replicates = 1,
   matrix = NULL,
-  method = c("haversine", "euclidean"),
+  method = c("haversine", "euclidean", "osrm"),
   max_length = Inf,
   max_stops = Inf,
   n_rep = 20,
@@ -52,7 +52,8 @@ selection.}
 \item{matrix}{Optional \code{\link[=travel_matrix]{travel_matrix()}} of the frame (computed from the
 coordinates otherwise).}
 
-\item{method}{Distance method when \code{matrix} is \code{NULL}.}
+\item{method}{Distance method of \code{\link[=travel_matrix]{travel_matrix()}} when \code{matrix} is
+\code{NULL} (\code{"osrm"} queries the road network once for the whole frame).}
 
 \item{max_length, max_stops}{Route limits passed to \code{\link[=route_fieldwork]{route_fieldwork()}}.}
 
