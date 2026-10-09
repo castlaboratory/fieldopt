@@ -76,7 +76,9 @@ point_design_effect(
 
 - method:
 
-  `"lpm"`, `"systematic"` or `"srs"`.
+  `"lpm"`, `"systematic"`, `"srs"` or `"cube"` (balanced sampling by the
+  cube method of Deville and Tillé 2004, with the fast flight phase and
+  landing by suppression of variables).
 
 - replicates:
 

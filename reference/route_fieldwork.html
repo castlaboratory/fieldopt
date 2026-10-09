@@ -71,6 +71,7 @@ heuristic; the gap to a lower bound is reported.</p>
 <span>  <span class="va">depot</span>,</span>
 <span>  max_length <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  max_stops <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  service_time <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  iterations <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -95,11 +96,19 @@ heuristic; the gap to a lower bound is reported.</p>
 
 
 <dt id="arg-max-length">max_length<a class="anchor" aria-label="anchor" href="#arg-max-length"></a></dt>
-<dd><p>Maximum travel per route, depot to depot; <code>Inf</code> for none.</p></dd>
+<dd><p>Maximum length of a route, depot to depot: travel plus
+the service time of its units when <code>service_time</code> is given; <code>Inf</code> for
+none.</p></dd>
 
 
 <dt id="arg-max-stops">max_stops<a class="anchor" aria-label="anchor" href="#arg-max-stops"></a></dt>
 <dd><p>Maximum units per route; <code>Inf</code> for none.</p></dd>
+
+
+<dt id="arg-service-time">service_time<a class="anchor" aria-label="anchor" href="#arg-service-time"></a></dt>
+<dd><p>Time spent at each unit (interviews, measurements), in
+the unit of the travel matrix: a single number, or a vector named by
+unit. It counts towards <code>max_length</code> and is reported in <code>durations</code>.</p></dd>
 
 
 <dt id="arg-iterations">iterations<a class="anchor" aria-label="anchor" href="#arg-iterations"></a></dt>
@@ -121,9 +130,10 @@ heuristic; the gap to a lower bound is reported.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class <code>fieldopt_routes</code>: <code>routes</code> (a tibble with
-columns <code>route</code>, <code>stop</code>, <code>unit</code>), <code>lengths</code>, <code>total</code>, <code>lower_bound</code>,
-<code>gap</code>, <code>best_iteration</code>, <code>cost</code> (when a model is given), the inputs and
-the travel matrix.</p>
+columns <code>route</code>, <code>stop</code>, <code>unit</code>), <code>lengths</code> (travel per route),
+<code>durations</code> (travel plus service), <code>total</code>, <code>lower_bound</code>, <code>gap</code>,
+<code>best_iteration</code>, <code>cost</code> (when a model is given), the inputs and the
+travel matrix.</p>
     </div>
 
     <div class="section level2">

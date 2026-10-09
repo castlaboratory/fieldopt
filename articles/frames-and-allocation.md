@@ -88,6 +88,46 @@ frame_allocation(strata, target_variance = 2.5e7)
 Overlap between the frames (farms present in both) is not modelled here;
 the allocation treats the frames as strata of a single design.
 
+## Several study variables
+
+A survey rarely has one target: crop area and cattle, or production and
+the number of holdings, each with its own precision.
+[`multivariate_allocation()`](https://castlaboratory.github.io/fieldopt/reference/multivariate_allocation.md)
+finds the cheapest allocation that meets every target at once (Bethel
+1989); the multipliers say which targets bind, and
+[`glance()`](https://generics.r-lib.org/reference/glance.html) shows the
+variance attained for each.
+
+``` r
+
+multi <- data.frame(stratum = c("list", "area-high", "area-low"),
+                    size = c(2000, 300, 500), cost = c(40, 200, 160),
+                    sd_crop = c(12, 35, 18), sd_cattle = c(30, 10, 25))
+ma <- multivariate_allocation(multi, sd = c("sd_crop", "sd_cattle"),
+                              target_cv = c(0.04, 0.06), totals = c(120000, 90000))
+ma
+#> 
+#> ── Multivariate allocation ─────────────────────────────────────────────────────
+#> Minimum cost 11200 for 2 targets.
+#> sd_crop: target 23040000, attained 22600000 (binding).
+#> sd_cattle: target 29160000, attained 28670000 (binding).
+#> # A tibble: 3 × 4
+#>   stratum    size  cost     n
+#>   <chr>     <dbl> <dbl> <int>
+#> 1 list       2000    40   169
+#> 2 area-high   300   200     7
+#> 3 area-low    500   160    19
+glance(ma)
+#> # A tibble: 2 × 7
+#>   variable    target  attained multiplier     n  cost bounded
+#>   <chr>        <dbl>     <dbl>      <dbl> <int> <dbl> <lgl>  
+#> 1 sd_crop   23040000 22603942.  0.0000616   195 11200 FALSE  
+#> 2 sd_cattle 29160000 28668674.  0.000305    195 11200 FALSE
+```
+
 ## References
+
+Bethel, J. (1989). Sample allocation in multivariate surveys. *Survey
+Methodology*, 15, 47–57.
 
 Cochran, W. G. (1977). *Sampling Techniques*, third edition. Wiley.

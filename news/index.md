@@ -2,6 +2,31 @@
 
 ## fieldopt 0.1.0
 
+- New tools (engine `fieldopt-core` 0.4.0):
+  [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
+  takes a `service_time` per unit that counts towards `max_length` and
+  reports route `durations`;
+  [`field_cost_model()`](https://castlaboratory.github.io/fieldopt/reference/field_cost_model.md)
+  gains `per_route` (the cost of a team-day);
+  [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
+  assigns units to bases, routes each base and builds the calendar of
+  teams and days;
+  [`dual_frame_estimator()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_estimator.md)
+  combines the area and list samples (Hartley with fixed, screening or
+  estimated `theta`; Fuller-Burmeister) with design-based variances;
+  `select_units(method = "cube", balance = )` draws balanced samples by
+  the cube method and
+  [`spatial_balance()`](https://castlaboratory.github.io/fieldopt/reference/spatial_balance.md)
+  is the Voronoi measure of Stevens and Olsen;
+  [`ratio_estimator()`](https://castlaboratory.github.io/fieldopt/reference/ratio_estimator.md)
+  uses a known auxiliary total;
+  [`multivariate_allocation()`](https://castlaboratory.github.io/fieldopt/reference/multivariate_allocation.md)
+  is the Bethel allocation for several study variables;
+  [`as_frame()`](https://castlaboratory.github.io/fieldopt/reference/as_frame.md)
+  and
+  [`as_sf()`](https://castlaboratory.github.io/fieldopt/reference/as_sf.md)
+  move between `sf` layers and frames.
+
 - Review round (engine `fieldopt-core` 0.3.0): the routing local search
   prices every move in the direction travelled, so asymmetric road
   matrices (one-way streets, durations by direction) no longer loop, and

@@ -263,6 +263,78 @@ dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$de
 #> Expected overlap units: 12.7 in the A sample, 125.8 in the B sample.
 ```
 
+## Estimating from both frames
+
+Once both samples are in,
+[`dual_frame_estimator()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_estimator.md)
+combines them. Each sampled unit carries its domain (`a` or `ab` on the
+area frame, `b` or `ab` on the list); Hartley’s estimator mixes the two
+estimates of the overlap with a weight `theta` that can be fixed, set to
+zero (screening) or estimated to minimise the variance, and the
+Fuller-Burmeister estimator adds the difference between the two
+estimates of the overlap size. The variances come from the variance
+estimator of each design.
+
+``` r
+
+cells$domain <- ifelse(cells$intensity == "high" & runif(nrow(cells)) < 0.6, "ab", "a")
+cells$crop_est <- ifelse(cells$domain == "ab", 60, 12) + rnorm(nrow(cells), sd = 3)
+ab <- cells[cells$domain == "ab", ]   # the overlap: the same holdings, seen from the list
+list_frame <- data.frame(unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:12)),
+                         x = runif(nrow(ab) + 12), y = runif(nrow(ab) + 12),
+                         domain = rep(c("ab", "b"), c(nrow(ab), 12)),
+                         crop_est = c(ab$crop_est, 90 + rnorm(12, sd = 5)))
+sa <- select_units(cells, n = 40, strata = "intensity", seed = 3)
+sb <- select_units(list_frame, n = 20, method = "srs", seed = 4)
+dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain")
+#> # A tibble: 1 × 13
+#>    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
+#> 1 18502.  230821.  480. 0.0260 hartley   0.177 FALSE       9561.  6720.  8584.
+#> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
+dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", theta = "screening")
+#> # A tibble: 1 × 13
+#>    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
+#> 1 18832.  394133.  628. 0.0333 hartley       0 TRUE        9561.  6720.  8584.
+#> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
+dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", estimator = "fuller-burmeister")
+#> # A tibble: 1 × 13
+#>    total variance    se     cv estimator beta_1 beta_2   y_a y_ab_a y_ab_b   y_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>      <dbl>  <dbl> <dbl>  <dbl>  <dbl> <dbl>
+#> 1 18450.  229424.  479. 0.0260 fuller-b…  0.498  -19.1 9561.  6720.  8584.  686.
+#> # ℹ 2 more variables: n_a <int>, n_b <int>
+```
+
+## Auxiliaries: the ratio estimator and balanced samples
+
+Area frames come with auxiliaries known for every cell: the area of
+farmland from the land-cover map, the number of holdings from the last
+census. The ratio estimator uses one such total at the estimation stage,
+and the cube method uses several at the selection stage, drawing a
+sample whose Horvitz-Thompson estimates of the auxiliaries match their
+totals.
+[`spatial_balance()`](https://castlaboratory.github.io/fieldopt/reference/spatial_balance.md)
+measures how evenly a sample covers the territory (Stevens and Olsen’s
+Voronoi measure: zero is perfect).
+
+``` r
+
+cells$farmland <- cells$size * runif(nrow(cells), 15, 35)
+cells$crop_r <- 0.5 * cells$farmland + rnorm(nrow(cells), sd = 3)
+s_lpm <- select_units(cells, n = 40, strata = "intensity", seed = 5)
+ratio_estimator(s_lpm, y = "crop_r", x = "farmland")[, c("total", "se", "variance", "variance_ht")]
+#> # A tibble: 1 × 4
+#>    total    se variance variance_ht
+#>    <dbl> <dbl>    <dbl>       <dbl>
+#> 1 23658.  453.  205339.    1039115.
+s_cube <- select_units(cells, n = 40, strata = "intensity", method = "cube", balance = "farmland", seed = 5)
+c(lpm = spatial_balance(s_lpm), cube = spatial_balance(s_cube),
+  srs = spatial_balance(select_units(cells, n = 40, strata = "intensity", method = "srs", seed = 5)))
+#>       lpm      cube       srs 
+#> 0.1231547 0.4083660 0.3075266
+```
+
 ## References
 
 Cochran, W. G. (1977). *Sampling Techniques*, third edition. Wiley.
@@ -276,3 +348,14 @@ surveys. *Journal of the American Statistical Association*, 101(475),
 
 Nealon, J. P. (1984). Review of the multiple and area frame estimators.
 USDA Statistical Reporting Service, Staff Report 80.
+
+Deville, J.-C. and Tillé, Y. (2004). Efficient balanced sampling: the
+cube method. *Biometrika*, 91(4), 893–912.
+
+Fuller, W. A. and Burmeister, L. F. (1972). Estimators for samples
+selected from two overlapping frames. *Proceedings of the Social
+Statistics Section, American Statistical Association*, 245–249.
+
+Stevens, D. L. and Olsen, A. R. (2004). Spatially balanced sampling of
+natural resources. *Journal of the American Statistical Association*,
+99, 262–278.

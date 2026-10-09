@@ -112,6 +112,11 @@ west to east.</p>
 <span><span class="co">#&gt; 4    s3 1.401400 4.3459731 21.79576</span></span>
 <span><span class="co">#&gt; 5    s4 2.857233 4.4013678 29.18513</span></span>
 <span><span class="co">#&gt; 6    s5 5.553690 0.8195683 34.99375</span></span></code></pre></div>
+<p>A real frame usually starts as a spatial object:
+<code><a href="../reference/as_frame.html">as_frame()</a></code> turns an <code>sf</code> layer of segments or
+points into this data frame (centroids in latitude and longitude, the
+area of each polygon), and <code><a href="../reference/as_sf.html">as_sf()</a></code> puts samples and results
+back on the geometries for maps.</p>
 </div>
 <div class="section level2">
 <h2 id="travel-and-cost">Travel and cost<a class="anchor" aria-label="anchor" href="#travel-and-cost"></a>
@@ -133,8 +138,8 @@ setting up) and a cost per interview.</p>
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/field_cost_model.html">field_cost_model</a></span><span class="op">(</span>per_travel <span class="op">=</span> <span class="fl">2</span>, per_unit <span class="op">=</span> <span class="fl">30</span>, per_interview <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>                          interviews_per_unit <span class="op">=</span> <span class="fl">4</span>, currency <span class="op">=</span> <span class="st">"BRL"</span><span class="op">)</span></span>
 <span><span class="va">model</span></span>
-<span><span class="co">#&gt; Field cost model (BRL): 2 per travel unit, 30 per visited unit, 10 per</span></span>
-<span><span class="co">#&gt; interview.</span></span></code></pre></div>
+<span><span class="co">#&gt; Field cost model (BRL): 2 per travel unit, 0 per route, 30 per visited unit, 10</span></span>
+<span><span class="co">#&gt; per interview.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="select-route-estimate">Select, route, estimate<a class="anchor" aria-label="anchor" href="#select-route-estimate"></a>
@@ -185,7 +190,7 @@ visible.</p>
 <span><span class="co">#&gt; Route 1 (13.93): s27 &gt; s15 &gt; s24 &gt; s20 &gt; s32</span></span>
 <span><span class="co">#&gt; Route 2 (17.02): s37 &gt; s19 &gt; s2 &gt; s14 &gt; s12</span></span>
 <span><span class="co">#&gt; Route 3 (7.786): s1 &gt; s35</span></span>
-<span><span class="co">#&gt; Cost (BRL): travel 77.47 + units 360 + interviews 480 = 917.5.</span></span>
+<span><span class="co">#&gt; Cost (BRL): travel 77.47 + routes 0 + units 360 + interviews 480 = 917.5.</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fieldopt_files/figure-html/route-1.png" class="r-plt" alt="" width="624"></p>
 <p><code><a href="../reference/design_variance.html">design_variance()</a></code> gives the Horvitz-Thompson estimate of

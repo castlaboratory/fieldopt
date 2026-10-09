@@ -21,6 +21,12 @@ glance(x, ...)
 
 # S3 method for class 'fieldopt_frontier'
 glance(x, ...)
+
+# S3 method for class 'fieldopt_schedule'
+tidy(x, ...)
+
+# S3 method for class 'fieldopt_schedule'
+glance(x, ...)
 ```
 
 ## Arguments

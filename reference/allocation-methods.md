@@ -8,6 +8,12 @@ with the totals.
 ## Usage
 
 ``` r
+# S3 method for class 'fieldopt_multi_allocation'
+tidy(x, ...)
+
+# S3 method for class 'fieldopt_multi_allocation'
+glance(x, ...)
+
 # S3 method for class 'fieldopt_allocation'
 tidy(x, ...)
 

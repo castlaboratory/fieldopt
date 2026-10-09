@@ -162,8 +162,44 @@ agree.</p>
 here; the allocation treats the frames as strata of a single design.</p>
 </div>
 <div class="section level2">
+<h2 id="several-study-variables">Several study variables<a class="anchor" aria-label="anchor" href="#several-study-variables"></a>
+</h2>
+<p>A survey rarely has one target: crop area and cattle, or production
+and the number of holdings, each with its own precision.
+<code><a href="../reference/multivariate_allocation.html">multivariate_allocation()</a></code> finds the cheapest allocation
+that meets every target at once (Bethel 1989); the multipliers say which
+targets bind, and <code><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance()</a></code> shows the variance attained for
+each.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>stratum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"list"</span>, <span class="st">"area-high"</span>, <span class="st">"area-low"</span><span class="op">)</span>,</span>
+<span>                    size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">300</span>, <span class="fl">500</span><span class="op">)</span>, cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">200</span>, <span class="fl">160</span><span class="op">)</span>,</span>
+<span>                    sd_crop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>, <span class="fl">35</span>, <span class="fl">18</span><span class="op">)</span>, sd_cattle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">10</span>, <span class="fl">25</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ma</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multivariate_allocation.html">multivariate_allocation</a></span><span class="op">(</span><span class="va">multi</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sd_crop"</span>, <span class="st">"sd_cattle"</span><span class="op">)</span>,</span>
+<span>                              target_cv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.04</span>, <span class="fl">0.06</span><span class="op">)</span>, totals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">120000</span>, <span class="fl">90000</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ma</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Multivariate allocation</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; Minimum cost 11200 for 2 targets.</span></span>
+<span><span class="co">#&gt; sd_crop: target 23040000, attained 22600000 (binding).</span></span>
+<span><span class="co">#&gt; sd_cattle: target 29160000, attained 28670000 (binding).</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 4</span></span></span>
+<span><span class="co">#&gt;   stratum    size  cost     n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> list       <span style="text-decoration: underline;">2</span>000    40   169</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> area-high   300   200     7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> area-low    500   160    19</span></span>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">ma</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 7</span></span></span>
+<span><span class="co">#&gt;   variable    target  attained multiplier     n  cost bounded</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> sd_crop   23<span style="text-decoration: underline;">040</span>000 22<span style="text-decoration: underline;">603</span>942.  0.000<span style="text-decoration: underline;">061</span>6   195 <span style="text-decoration: underline;">11</span>200 FALSE  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> sd_cattle 29<span style="text-decoration: underline;">160</span>000 28<span style="text-decoration: underline;">668</span>674.  0.000<span style="text-decoration: underline;">305</span>    195 <span style="text-decoration: underline;">11</span>200 FALSE</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
+<p>Bethel, J. (1989). Sample allocation in multivariate surveys.
+<em>Survey Methodology</em>, 15, 47–57.</p>
 <p>Cochran, W. G. (1977). <em>Sampling Techniques</em>, third edition.
 Wiley.</p>
 </div>

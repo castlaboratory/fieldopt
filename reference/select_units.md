@@ -13,9 +13,10 @@ select_units(
   size = NULL,
   coords = NULL,
   strata = NULL,
-  method = c("lpm", "systematic", "srs"),
+  method = c("lpm", "systematic", "srs", "cube"),
   replicates = 1,
-  seed = 1
+  seed = 1,
+  balance = NULL
 )
 ```
 
@@ -49,7 +50,9 @@ select_units(
 
 - method:
 
-  `"lpm"`, `"systematic"` or `"srs"`.
+  `"lpm"`, `"systematic"`, `"srs"` or `"cube"` (balanced sampling by the
+  cube method of Deville and Tillé 2004, with the fast flight phase and
+  landing by suppression of variables).
 
 - replicates:
 
@@ -60,6 +63,13 @@ select_units(
 - seed:
 
   Seed.
+
+- balance:
+
+  For `"cube"`: names of the columns to balance on (the inclusion
+  probabilities are always included, so the sample size is fixed). The
+  Horvitz-Thompson estimates of these columns match their population
+  totals as closely as the landing allows.
 
 ## Value
 

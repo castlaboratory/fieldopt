@@ -15,6 +15,7 @@ route_fieldwork(
   depot,
   max_length = Inf,
   max_stops = Inf,
+  service_time = 0,
   iterations = 200,
   alpha = 0.3,
   seed = 1,
@@ -39,11 +40,18 @@ route_fieldwork(
 
 - max_length:
 
-  Maximum travel per route, depot to depot; `Inf` for none.
+  Maximum length of a route, depot to depot: travel plus the service
+  time of its units when `service_time` is given; `Inf` for none.
 
 - max_stops:
 
   Maximum units per route; `Inf` for none.
+
+- service_time:
+
+  Time spent at each unit (interviews, measurements), in the unit of the
+  travel matrix: a single number, or a vector named by unit. It counts
+  towards `max_length` and is reported in `durations`.
 
 - iterations:
 
@@ -66,9 +74,9 @@ route_fieldwork(
 ## Value
 
 An object of class `fieldopt_routes`: `routes` (a tibble with columns
-`route`, `stop`, `unit`), `lengths`, `total`, `lower_bound`, `gap`,
-`best_iteration`, `cost` (when a model is given), the inputs and the
-travel matrix.
+`route`, `stop`, `unit`), `lengths` (travel per route), `durations`
+(travel plus service), `total`, `lower_bound`, `gap`, `best_iteration`,
+`cost` (when a model is given), the inputs and the travel matrix.
 
 ## Examples
 

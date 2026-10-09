@@ -14,17 +14,25 @@ frame (grid cells, points inside them) and a list frame needs.
   network through OSRM (durations or distances, in blocks), or wraps a
   matrix computed elsewhere.
 - [`field_cost_model()`](https://castlaboratory.github.io/fieldopt/reference/field_cost_model.md)
-  turns travel, visits and interviews into money or time.
+  turns travel, team-days, visits and interviews into money or time.
 - [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
   routes the field work from a depot through the selected units, for one
-  team or several, under route-length and stop limits (GRASP with 2-opt,
-  Or-opt and an optimal split of the tour), and reports the gap to a
-  lower bound.
+  team or several, under daily limits of length (travel plus the service
+  time at each unit) and stops (GRASP with 2-opt, Or-opt and an optimal
+  split of the tour, on symmetric or road-network matrices), and reports
+  the gap to a lower bound.
+- [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
+  assigns the units to several bases, routes each base and distributes
+  the routes over the teams and the days available: a calendar that says
+  whether the field work fits.
 - [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
   draws a probability sample of segments or cells, within strata, by the
   local pivotal method (spatially balanced), by spatially ordered
   systematic sampling along a Hilbert curve with interpenetrating
-  replicates, or by simple random sampling.
+  replicates, by the cube method balanced on auxiliaries, or by simple
+  random sampling;
+  [`spatial_balance()`](https://castlaboratory.github.io/fieldopt/reference/spatial_balance.md)
+  measures how evenly a sample covers the territory.
 - [`select_points()`](https://castlaboratory.github.io/fieldopt/reference/select_points.md),
   [`expected_hits()`](https://castlaboratory.github.io/fieldopt/reference/expected_hits.md)
   and
@@ -36,9 +44,16 @@ frame (grid cells, points inside them) and a list frame needs.
   gives the closed, open and weighted segment estimators;
   [`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
   the Horvitz-Thompson total with the variance estimator that matches
-  the design (local-mean, replicates, SRS).
+  the design (local-mean, replicates, SRS);
+  [`ratio_estimator()`](https://castlaboratory.github.io/fieldopt/reference/ratio_estimator.md)
+  uses a known auxiliary total;
+  [`dual_frame_estimator()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_estimator.md)
+  combines the area and the list samples (Hartley with a fixed,
+  screening or estimated weight; Fuller-Burmeister).
 - [`frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/frame_allocation.md)
   allocates across strata for a target variance or a budget;
+  [`multivariate_allocation()`](https://castlaboratory.github.io/fieldopt/reference/multivariate_allocation.md)
+  does it for several study variables at once (Bethel);
   [`dual_frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_allocation.md)
   is Hartley’s allocation for an area frame plus a list frame with
   overlap, with the optimal mixing weight or the screening design;
@@ -47,7 +62,7 @@ frame (grid cells, points inside them) and a list frame needs.
   `c1 n + c2 n m`.
   [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
   [`glance()`](https://generics.r-lib.org/reference/glance.html) read
-  all three.
+  them all.
 - [`routed_unit_cost()`](https://castlaboratory.github.io/fieldopt/reference/routed_unit_cost.md),
   [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
   and
@@ -62,6 +77,10 @@ frame (grid cells, points inside them) and a list frame needs.
 - [`cost_variance_frontier()`](https://castlaboratory.github.io/fieldopt/reference/cost_variance_frontier.md)
   simulates designs over a grid of sample sizes and returns the
   trade-off between field cost and variance.
+- [`as_frame()`](https://castlaboratory.github.io/fieldopt/reference/as_frame.md)
+  and
+  [`as_sf()`](https://castlaboratory.github.io/fieldopt/reference/as_sf.md)
+  move between `sf` layers and the plain frames the package works on.
 
 The numerical engine is the Rust crate
 [`fieldopt-core`](https://github.com/castlaboratory/fieldopt-core),

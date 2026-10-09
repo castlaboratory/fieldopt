@@ -65,9 +65,10 @@ within strata when given, by one of three methods:</p>
 <span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  coords <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  strata <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lpm"</span>, <span class="st">"systematic"</span>, <span class="st">"srs"</span><span class="op">)</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lpm"</span>, <span class="st">"systematic"</span>, <span class="st">"srs"</span>, <span class="st">"cube"</span><span class="op">)</span>,</span>
 <span>  replicates <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">1</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  balance <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -103,7 +104,9 @@ number of columns for <code>"lpm"</code>; exactly two for <code>"systematic"</co
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p><code>"lpm"</code>, <code>"systematic"</code> or <code>"srs"</code>.</p></dd>
+<dd><p><code>"lpm"</code>, <code>"systematic"</code>, <code>"srs"</code> or <code>"cube"</code> (balanced
+sampling by the cube method of Deville and Tillé 2004, with the fast
+flight phase and landing by suppression of variables).</p></dd>
 
 
 <dt id="arg-replicates">replicates<a class="anchor" aria-label="anchor" href="#arg-replicates"></a></dt>
@@ -114,6 +117,13 @@ units; replicates may share units). Ignored by the other methods.</p></dd>
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Seed.</p></dd>
+
+
+<dt id="arg-balance">balance<a class="anchor" aria-label="anchor" href="#arg-balance"></a></dt>
+<dd><p>For <code>"cube"</code>: names of the columns to balance on (the
+inclusion probabilities are always included, so the sample size is
+fixed). The Horvitz-Thompson estimates of these columns match their
+population totals as closely as the landing allows.</p></dd>
 
 </dl></div>
     <div class="section level2">

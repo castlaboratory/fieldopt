@@ -32,6 +32,13 @@ head(frame)
 #> 6    s5 5.553690 0.8195683 34.99375
 ```
 
+A real frame usually starts as a spatial object:
+[`as_frame()`](https://castlaboratory.github.io/fieldopt/reference/as_frame.md)
+turns an `sf` layer of segments or points into this data frame
+(centroids in latitude and longitude, the area of each polygon), and
+[`as_sf()`](https://castlaboratory.github.io/fieldopt/reference/as_sf.md)
+puts samples and results back on the geometries for maps.
+
 ## Travel and cost
 
 [`travel_matrix()`](https://castlaboratory.github.io/fieldopt/reference/travel_matrix.md)
@@ -57,8 +64,8 @@ cost per visited unit (access, setting up) and a cost per interview.
 model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
                           interviews_per_unit = 4, currency = "BRL")
 model
-#> Field cost model (BRL): 2 per travel unit, 30 per visited unit, 10 per
-#> interview.
+#> Field cost model (BRL): 2 per travel unit, 0 per route, 30 per visited unit, 10
+#> per interview.
 ```
 
 ## Select, route, estimate
@@ -115,7 +122,7 @@ r
 #> Route 1 (13.93): s27 > s15 > s24 > s20 > s32
 #> Route 2 (17.02): s37 > s19 > s2 > s14 > s12
 #> Route 3 (7.786): s1 > s35
-#> Cost (BRL): travel 77.47 + units 360 + interviews 480 = 917.5.
+#> Cost (BRL): travel 77.47 + routes 0 + units 360 + interviews 480 = 917.5.
 autoplot(r)
 ```
 
