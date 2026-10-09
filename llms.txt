@@ -1,0 +1,146 @@
+# fieldopt
+
+Field-survey design under real field cost. Survey samples are usually
+designed for precision alone; the cost that actually decides whether a
+survey happens is the field work: travelling between sampling units and
+interviewing. `fieldopt` puts that cost next to the variance of the
+estimator so that both are visible when the design is chosen.
+
+- [`travel_matrix()`](https://castlaboratory.github.io/fieldopt/reference/travel_matrix.md)
+  builds the travel matrix between units from coordinates (great-circle
+  or planar distances) or wraps a road-network matrix.
+- [`field_cost_model()`](https://castlaboratory.github.io/fieldopt/reference/field_cost_model.md)
+  turns travel, visits and interviews into money or time.
+- [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
+  routes the field work from a depot through the selected units, for one
+  team or several, under route-length and stop limits (GRASP with 2-opt,
+  Or-opt and an optimal split of the tour), and reports the gap to a
+  lower bound.
+- [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
+  draws a spatially balanced probability sample with the local pivotal
+  method, with equal or size-proportional inclusion probabilities.
+- [`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
+  gives the Horvitz-Thompson total and its local-mean variance estimate,
+  with the simple-random-sampling variance as a reference.
+- [`frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/frame_allocation.md)
+  allocates the sample across strata or frames for a target variance at
+  minimum cost, or for a budget at minimum variance.
+- [`cost_variance_frontier()`](https://castlaboratory.github.io/fieldopt/reference/cost_variance_frontier.md)
+  simulates designs over a grid of sample sizes and returns the
+  trade-off between field cost and variance.
+
+The numerical engine is the Rust crate
+[`fieldopt-core`](https://github.com/castlaboratory/fieldopt-core),
+usable on its own from Rust or from other languages.
+
+## Installation
+
+The development version needs a Rust toolchain (`cargo` and `rustc` 1.70
+or later, from <https://rustup.rs>):
+
+``` r
+
+# install.packages("pak")
+pak::pak("castlaboratory/fieldopt")
+```
+
+## Example
+
+``` r
+
+library(fieldopt)
+
+set.seed(1)
+frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
+                    x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
+frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40))
+
+model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
+                          interviews_per_unit = 4, currency = "BRL")
+
+# one design: select, route, price, estimate
+units <- frame[frame$unit != "depot", ]
+s <- select_units(units, n = 12)
+m <- travel_matrix(frame, method = "euclidean")
+r <- route_fieldwork(m, units = s$unit[s$sampled], depot = "depot",
+                     max_stops = 5, cost_model = model)
+r
+design_variance(s, y = "crop")
+
+# the frontier across sample sizes
+f <- cost_variance_frontier(frame, depot = "depot", cost_model = model,
+                            n_grid = c(8, 12, 16, 24), y = "crop",
+                            method = "euclidean", max_stops = 5, n_rep = 10)
+autoplot(f)
+```
+
+## Related work
+
+Spatially balanced sampling and its variance estimator follow Grafström,
+Lundström and Schelin (2012) and Grafström and Schelin (2014), as
+implemented in `BalancedSampling`; the allocation is Cochran’s (1977)
+cost-optimal allocation. What `fieldopt` adds is the routing and the
+cost model, so that the field cost of a design is computed instead of
+approximated by the sample size.
+
+## Authors
+
+André Leite (UFPE), Raydonal Ospina (UFBA) and Cristiano Ferraz (UFPE),
+CAST Lab. Licence GPL (\>= 3).
+
+# Package index
+
+## Travel and cost
+
+- [`travel_matrix()`](https://castlaboratory.github.io/fieldopt/reference/travel_matrix.md)
+  : Travel matrix between the units of a frame
+- [`field_cost_model()`](https://castlaboratory.github.io/fieldopt/reference/field_cost_model.md)
+  : Field cost model
+
+## Routing the field work
+
+- [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
+  : Route the field work
+- [`autoplot(`*`<fieldopt_routes>`*`)`](https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_routes.md)
+  : Plot the routes
+
+## Selecting units and estimating
+
+- [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
+  : Select units with a spatially balanced probability sample
+- [`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
+  : Design-based estimate of a total with its variance
+- [`frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/frame_allocation.md)
+  : Cost-aware allocation across strata or frames
+
+## The cost-variance frontier
+
+- [`cost_variance_frontier()`](https://castlaboratory.github.io/fieldopt/reference/cost_variance_frontier.md)
+  : Cost-variance frontier of a design by simulation
+- [`autoplot(`*`<fieldopt_frontier>`*`)`](https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_frontier.md)
+  : Plot the cost-variance frontier
+
+## Engine
+
+- [`core_version()`](https://castlaboratory.github.io/fieldopt/reference/core_version.md)
+  : Version of the Rust engine
+
+## Re-exports
+
+- [`reexports`](https://castlaboratory.github.io/fieldopt/reference/reexports.md)
+  [`autoplot`](https://castlaboratory.github.io/fieldopt/reference/reexports.md)
+  : Objects exported from other packages
+
+# Articles
+
+### Get started
+
+- [Get started with
+  fieldopt](https://castlaboratory.github.io/fieldopt/articles/fieldopt.md):
+
+### Practice
+
+- [Routing for one or several
+  teams](https://castlaboratory.github.io/fieldopt/articles/routing-teams.md):
+- [Frames, strata and cost-aware
+  allocation](https://castlaboratory.github.io/fieldopt/articles/frames-and-allocation.md):
