@@ -25,8 +25,8 @@ test_that("select_units returns a fixed-size sample with probabilities summing t
 
 test_that("select_units validates its inputs", {
   fr <- grid_frame()
-  expect_error(select_units(fr, n = 0), "between 1 and")
-  expect_error(select_units(fr, n = 100), "between 1 and")
+  expect_error(select_units(fr, n = 0), "at least 1")
+  expect_error(select_units(fr, n = 100), "exceeds")
   expect_error(select_units(fr, n = 4, size = "nope"), "Size column")
   expect_error(select_units(fr, n = 4, coords = c("x", "zz")), "not found")
   expect_error(select_units(data.frame(a = 1:5), n = 2), "coordinate")
@@ -66,7 +66,7 @@ test_that("design_variance estimates the total and its variance", {
   # and spatial balance beats simple random sampling on a trending variable
   expect_lt(mean(est[2, ]), mean(est[3, ]))
   d <- design_variance(select_units(fr, n = 20), y = "crop")
-  expect_named(d, c("total", "variance", "se", "cv", "variance_srs", "n", "N"))
+  expect_named(d, c("total", "variance", "se", "cv", "variance_srs", "n", "N", "variance_method"))
   expect_equal(d$se, sqrt(d$variance))
   fr$crop[1] <- NA
   s <- select_units(fr, n = 20, seed = 1)

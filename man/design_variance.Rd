@@ -14,14 +14,17 @@ rows may be \code{NA}).}
 }
 \value{
 A one-row tibble: \code{total}, \code{variance}, \code{se}, \code{cv}, \code{variance_srs},
-\code{n}, \code{N}.
+\code{n}, \code{N}, \code{variance_method}.
 }
 \description{
 Horvitz-Thompson estimate of the population total of \code{y} from a
-\code{\link[=select_units]{select_units()}} sample, with the local-mean variance estimator of
-Grafström and Schelin (2014), which suits spatially balanced samples and
-needs no joint inclusion probabilities. The simple-random-sampling variance
-of the same sample is reported as a reference.
+\code{\link[=select_units]{select_units()}} sample, with the variance estimator that matches the
+design: the local-mean estimator of Grafström and Schelin (2014) for
+spatially balanced samples (it needs no joint inclusion probabilities),
+the variance among replicate estimates for replicated systematic samples,
+and the simple-random-sampling formula for equal-probability simple random
+samples. The simple-random-sampling variance of the same sample is always
+reported as a reference.
 }
 \examples{
 set.seed(2)
@@ -29,6 +32,8 @@ frame <- data.frame(x = runif(80), y = runif(80))
 frame$crop <- 10 + 20 * frame$x + rnorm(80)
 s <- select_units(frame, n = 20)
 design_variance(s, y = "crop")
+r <- select_units(frame, n = 20, method = "systematic", replicates = 4)
+design_variance(r, y = "crop")
 }
 \references{
 Grafström, A. and Schelin, L. (2014). How to select

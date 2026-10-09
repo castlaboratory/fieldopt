@@ -5,9 +5,10 @@
 
 use extendr_api::prelude::*;
 use fieldopt_core::{
-    allocate_for_budget, allocate_for_variance, euclidean_matrix, grasp_routes, haversine_matrix, ht_total,
-    inclusion_probabilities, local_mean_variance, local_pivotal, srs_variance, GraspOptions, Matrix, RouteLimits,
-    Stratum,
+    allocate_for_budget, allocate_for_variance, dual_frame_allocation, euclidean_matrix, grasp_routes,
+    haversine_matrix, hilbert_order, ht_total, inclusion_probabilities, local_mean_variance, local_pivotal,
+    srs_variance, systematic_replicates, two_stage_for_budget, two_stage_for_variance, Domain, DualFrame,
+    GraspOptions, Matrix, RouteLimits, Stratum, Target, TwoStage,
 };
 
 fn err<T>(r: std::result::Result<T, String>) -> extendr_api::Result<T> {
@@ -113,6 +114,64 @@ fn allocate_rs(size: &[i32], sd: &[f64], cost: &[f64], target: f64, mode: &str) 
     ))
 }
 
+/// Order of the units (0-based) along a Hilbert curve; `coords` is n x 2 row-major.
+/// @noRd
+#[extendr]
+fn hilbert_order_rs(coords: &[f64], bits: i32) -> extendr_api::Result<Vec<i32>> {
+    let o = err(hilbert_order(coords, bits as u32))?;
+    Ok(o.into_iter().map(|v| v as i32).collect())
+}
+
+/// Systematic PPS sampling along `order` (0-based) as independent replicates;
+/// returns the n x r indicator matrix, row-major.
+/// @noRd
+#[extendr]
+fn systematic_replicates_rs(order: &[i32], pi: &[f64], replicates: i32, seed: f64) -> extendr_api::Result<Vec<bool>> {
+    let o: Vec<usize> = order.iter().map(|&v| v as usize).collect();
+    err(systematic_replicates(&o, pi, replicates as usize, seed as u64))
+}
+
+/// Hartley dual-frame allocation. `theta` < 0 means optimise.
+/// @noRd
+#[extendr]
+#[allow(clippy::too_many_arguments)]
+fn dual_frame_rs(size: &[i32], mean: &[f64], sd: &[f64], cost_a: f64, cost_b: f64, deff_a: f64, deff_b: f64,
+                 theta: f64, target: f64, mode: &str) -> extendr_api::Result<List> {
+    if size.len() != 3 || mean.len() != 3 || sd.len() != 3 {
+        return Err(Error::Other("size, mean and sd must describe the three domains a, ab, b".into()));
+    }
+    let dom = |h: usize| Domain { size: size[h].max(0) as usize, mean: mean[h], sd: sd[h] };
+    let f = DualFrame { a: dom(0), ab: dom(1), b: dom(2), cost_a, cost_b, deff_a, deff_b };
+    let t = match mode {
+        "variance" => Target::Variance(target),
+        "budget" => Target::Budget(target),
+        other => return Err(Error::Other(format!("unknown mode {other}"))),
+    };
+    let th = if theta < 0.0 { None } else { Some(theta) };
+    let a = err(dual_frame_allocation(&f, th, t))?;
+    Ok(list!(
+        n_a = a.n_a as i32, n_b = a.n_b as i32, theta = a.theta, cost = a.cost, variance = a.variance,
+        variance_a = a.variance_a, variance_b = a.variance_b, overlap_a = a.overlap_a, overlap_b = a.overlap_b,
+        bounded = a.bounded
+    ))
+}
+
+/// Two-stage allocation; `target` is a variance of the mean ("variance") or a budget.
+/// @noRd
+#[extendr]
+fn two_stage_rs(n_primary: i32, m_secondary: i32, s2_between: f64, s2_within: f64, c1: f64, c2: f64,
+                target: f64, mode: &str) -> extendr_api::Result<List> {
+    let t = TwoStage { n_primary: n_primary.max(0) as usize, m_secondary: m_secondary.max(0) as usize,
+                       s2_between, s2_within, c1, c2 };
+    let a = match mode {
+        "variance" => err(two_stage_for_variance(&t, target))?,
+        "budget" => err(two_stage_for_budget(&t, target))?,
+        other => return Err(Error::Other(format!("unknown mode {other}"))),
+    };
+    Ok(list!(n = a.n as i32, m = a.m as i32, m_optimal = a.m_optimal, cost = a.cost,
+             variance_mean = a.variance_mean, variance_total = a.variance_total, bounded = a.bounded))
+}
+
 /// Version of the engine crate.
 /// @noRd
 #[extendr]
@@ -130,5 +189,9 @@ extendr_module! {
     fn local_mean_variance_rs;
     fn srs_variance_rs;
     fn allocate_rs;
+    fn hilbert_order_rs;
+    fn systematic_replicates_rs;
+    fn dual_frame_rs;
+    fn two_stage_rs;
     fn core_version_rs;
 }

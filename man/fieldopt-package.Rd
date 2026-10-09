@@ -4,11 +4,11 @@
 \name{fieldopt-package}
 \alias{fieldopt}
 \alias{fieldopt-package}
-\title{fieldopt: Field-Survey Design under Real Field Cost}
+\title{fieldopt: Area-Frame and Dual-Frame Survey Design under Real Field Cost}
 \description{
 \if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
 
-Design of area and list sample surveys that go to the field, minimising the real cost of field work (travel between sampling units plus interviews) subject to a target variance of the design-based estimator. Travel matrices from coordinates or a road network, GRASP routing of the field work for one or several teams, spatially balanced selection of units with the local pivotal method, Horvitz-Thompson estimation with the local-mean variance estimator, cost-aware allocation across strata or frames, and the cost-variance frontier of a design by simulation. The computational engine is the Rust crate fieldopt-core.
+Design of agricultural and other area-frame and dual-frame (area plus list) sample surveys that go to the field, with the real cost of field work (travel between sampling units plus interviews) next to the variance of the design-based estimator. Travel matrices from coordinates or a road network; GRASP routing of the field work for one or several teams; stratified spatially balanced (local pivotal) or spatially ordered systematic selection of segments with interpenetrating replicates; points inside segments with multiplicity (expected-hits) estimation; closed, open and weighted segment estimators; Horvitz-Thompson estimation with local-mean or replicate variances; cost-aware allocation across strata, Hartley's dual-frame allocation with an overlap, and two-stage allocation with a cost function; and the cost-variance frontier of a design by simulation. The computational engine is the Rust crate fieldopt-core.
 }
 \seealso{
 Useful links:

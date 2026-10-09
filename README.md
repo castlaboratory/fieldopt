@@ -6,11 +6,13 @@
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-Field-survey design under real field cost. Survey samples are usually designed
-for precision alone; the cost that actually decides whether a survey happens is
-the field work: travelling between sampling units and interviewing. `fieldopt`
-puts that cost next to the variance of the estimator so that both are visible
-when the design is chosen.
+Area-frame and dual-frame survey design under real field cost. Survey samples
+are usually designed for precision alone; the cost that actually decides
+whether a survey happens is the field work: travelling between sampling units
+and interviewing. `fieldopt` puts that cost next to the variance of the
+estimator so that both are visible when the design is chosen, and provides
+the pieces an agricultural survey with an area frame (grid cells, points
+inside them) and a list frame needs.
 
 - `travel_matrix()` builds the travel matrix between units from coordinates
   (great-circle or planar distances) or wraps a road-network matrix.
@@ -19,12 +21,22 @@ when the design is chosen.
   units, for one team or several, under route-length and stop limits (GRASP
   with 2-opt, Or-opt and an optimal split of the tour), and reports the gap to
   a lower bound.
-- `select_units()` draws a spatially balanced probability sample with the local
-  pivotal method, with equal or size-proportional inclusion probabilities.
-- `design_variance()` gives the Horvitz-Thompson total and its local-mean
-  variance estimate, with the simple-random-sampling variance as a reference.
-- `frame_allocation()` allocates the sample across strata or frames for a
-  target variance at minimum cost, or for a budget at minimum variance.
+- `select_units()` draws a probability sample of segments or cells, within
+  strata, by the local pivotal method (spatially balanced), by spatially
+  ordered systematic sampling along a Hilbert curve with interpenetrating
+  replicates, or by simple random sampling.
+- `select_points()`, `expected_hits()` and `point_estimator()` implement
+  point sampling inside the selected cells and the multiplicity estimator
+  (each hit of an establishment counts, divided by its expected hits).
+- `segment_estimator()` gives the closed, open and weighted segment
+  estimators; `design_variance()` the Horvitz-Thompson total with the
+  variance estimator that matches the design (local-mean, replicates, SRS).
+- `frame_allocation()` allocates across strata for a target variance or a
+  budget; `dual_frame_allocation()` is Hartley's allocation for an area frame
+  plus a list frame with overlap, with the optimal mixing weight or the
+  screening design; `two_stage_allocation()` is Cochran's two-stage
+  allocation with the cost function `c1 n + c2 n m`, where `c1` comes from
+  the routing.
 - `cost_variance_frontier()` simulates designs over a grid of sample sizes and
   returns the trade-off between field cost and variance.
 
@@ -81,10 +93,12 @@ autoplot(f)
 
 Spatially balanced sampling and its variance estimator follow Grafström,
 Lundström and Schelin (2012) and Grafström and Schelin (2014), as implemented
-in `BalancedSampling`; the allocation is Cochran's (1977) cost-optimal
-allocation. What `fieldopt` adds is the routing and the cost model, so that
-the field cost of a design is computed instead of approximated by the sample
-size.
+in `BalancedSampling`; the allocations are Cochran's (1977) cost-optimal
+allocations and Hartley's (1962, 1974) dual-frame design; the dual-frame
+*estimators* (Hartley, Fuller-Burmeister, Kalton-Anderson, pseudo-maximum
+likelihood, calibration) are in `Frames2`. What `fieldopt` adds is the
+design side with the routing and the cost model, so that the field cost of a
+design is computed instead of approximated by the sample size.
 
 ## Authors
 

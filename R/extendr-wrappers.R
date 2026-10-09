@@ -39,6 +39,23 @@ srs_variance_rs <- function(y, sampled, big_n) .Call(wrap__srs_variance_rs, y, s
 #' @noRd
 allocate_rs <- function(size, sd, cost, target, mode) .Call(wrap__allocate_rs, size, sd, cost, target, mode)
 
+#' Order of the units (0-based) along a Hilbert curve; `coords` is n x 2 row-major.
+#' @noRd
+hilbert_order_rs <- function(coords, bits) .Call(wrap__hilbert_order_rs, coords, bits)
+
+#' Systematic PPS sampling along `order` (0-based) as independent replicates;
+#' returns the n x r indicator matrix, row-major.
+#' @noRd
+systematic_replicates_rs <- function(order, pi, replicates, seed) .Call(wrap__systematic_replicates_rs, order, pi, replicates, seed)
+
+#' Hartley dual-frame allocation. `theta` < 0 means optimise.
+#' @noRd
+dual_frame_rs <- function(size, mean, sd, cost_a, cost_b, deff_a, deff_b, theta, target, mode) .Call(wrap__dual_frame_rs, size, mean, sd, cost_a, cost_b, deff_a, deff_b, theta, target, mode)
+
+#' Two-stage allocation; `target` is a variance of the mean ("variance") or a budget.
+#' @noRd
+two_stage_rs <- function(n_primary, m_secondary, s2_between, s2_within, c1, c2, target, mode) .Call(wrap__two_stage_rs, n_primary, m_secondary, s2_between, s2_within, c1, c2, target, mode)
+
 #' Version of the engine crate.
 #' @noRd
 core_version_rs <- function() .Call(wrap__core_version_rs)

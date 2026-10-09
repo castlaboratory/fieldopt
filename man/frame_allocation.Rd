@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling.R
 \name{frame_allocation}
 \alias{frame_allocation}
-\title{Cost-aware allocation across strata or frames}
+\title{Cost-aware allocation across strata}
 \usage{
 frame_allocation(strata, target_variance = NULL, budget = NULL)
 }
@@ -24,9 +24,8 @@ and \code{bounded} (whether \verb{2 <= n_h <= N_h} was active), of class
 \description{
 Classical optimum allocation with a cost per unit in each stratum (Cochran
 1977, Section 5.5): minimum cost for a target variance of the estimated
-total, or minimum variance for a budget. Frames (a list frame and an area
-frame) are treated as strata with their own variance and cost; the overlap
-of dual frames is not modelled here.
+total, or minimum variance for a budget. For two frames with an overlap
+use \code{\link[=dual_frame_allocation]{dual_frame_allocation()}} instead.
 }
 \examples{
 strata <- data.frame(stratum = c("list", "area"), size = c(2000, 800),

@@ -1,66 +1,365 @@
 # Selection of units, estimation and allocation --------------------------------
 
-#' Select units with a spatially balanced probability sample
+#' Select units with a spatially balanced or systematic probability sample
 #'
-#' Draws `n` units with inclusion probabilities proportional to `size` (equal
-#' when `size` is `NULL`) by the local pivotal method (Grafström, Lundström
-#' and Schelin, 2012), which spreads the sample over the coordinate space so
-#' that nearby units are rarely selected together. The design is
-#' probabilistic with known inclusion probabilities, which is what the
-#' estimator needs; spatial balance reduces the variance and, at the same
-#' time, tends to spread the field work, which is the tension the cost model
-#' and routing make explicit.
+#' Draws a probability sample of the units of a frame (segments, grid cells,
+#' establishments) with equal or size-proportional inclusion probabilities,
+#' within strata when given, by one of three methods:
+#'
+#' * `"lpm"`: the local pivotal method (Grafström, Lundström and Schelin,
+#'   2012), which spreads the sample over the coordinate space so that nearby
+#'   units are rarely selected together;
+#' * `"systematic"`: systematic sampling with probabilities proportional to
+#'   size along a Hilbert curve through the coordinates (a spatially ordered
+#'   systematic sample), drawn as `replicates` independent interpenetrating
+#'   systematic samples so that a design-based variance can be estimated;
+#' * `"srs"`: simple random sampling without replacement.
+#'
+#' Spatial balance reduces the variance of totals of spatially structured
+#' variables and, at the same time, spreads the field work; the cost model and
+#' the routing make that tension explicit.
 #'
 #' @param frame Data frame with one row per unit: coordinate columns (`lat`,
-#'   `lon` or `x`, `y`, or those named in `coords`), an optional `size` column
-#'   and an optional `unit` column with names.
-#' @param n Sample size.
+#'   `lon` or `x`, `y`, or those named in `coords`), an optional `size`
+#'   column, an optional `unit` column with names and an optional stratum
+#'   column.
+#' @param n Sample size: a single number (allocated to strata in proportion
+#'   to the sum of `size`, or to the number of units when `size` is `NULL`),
+#'   or a vector named by stratum.
 #' @param size Column of the size measure for probability-proportional-to-size
-#'   selection, or `NULL` for equal probabilities.
+#'   selection, or `NULL` for equal probabilities within stratum.
 #' @param coords Names of the coordinate columns used for spatial balance (any
-#'   number of columns; a travel-cost embedding is admissible).
+#'   number of columns for `"lpm"`; exactly two for `"systematic"`).
+#' @param strata Column with the stratum of each unit, or `NULL`.
+#' @param method `"lpm"`, `"systematic"` or `"srs"`.
+#' @param replicates Number of independent interpenetrating replicates for
+#'   `"systematic"` (each a systematic sample of about `n / replicates`
+#'   units; replicates may share units). Ignored by the other methods.
 #' @param seed Seed.
-#' @return The frame as a tibble with columns `pi` (inclusion probability) and
-#'   `sampled`, of class `fieldopt_sample`, with attributes `n`, `coords` and
-#'   `seed`.
+#' @return The frame as a tibble with columns `pi` (inclusion probability in
+#'   the union of the replicates) and `sampled`, of class `fieldopt_sample`,
+#'   with attributes `n`, `coords`, `strata`, `method`, `seed` and, for
+#'   replicated systematic samples, `replicates` (a logical matrix, one column
+#'   per replicate) and `pi_replicate` (inclusion probability within one
+#'   replicate).
 #' @references Grafström, A., Lundström, N. L. P. and Schelin, L. (2012).
 #'   Spatially balanced sampling through the pivotal method. *Biometrics*,
 #'   68(2), 514--520.
 #' @export
 #' @examples
 #' set.seed(1)
-#' frame <- data.frame(unit = paste0("s", 1:50), x = runif(50), y = runif(50), size = rexp(50))
-#' s <- select_units(frame, n = 10, size = "size")
-#' sum(s$sampled); sum(s$pi)
-select_units <- function(frame, n, size = NULL, coords = NULL, seed = 1) {
+#' cells <- expand.grid(x = 1:20, y = 1:20)
+#' cells$unit <- paste0("c", seq_len(nrow(cells)))
+#' cells$intensity <- cut(cells$x + rnorm(400, sd = 3), c(-Inf, 7, 14, Inf), c("low", "mid", "high"))
+#' cells$size <- c(low = 1, mid = 2, high = 4)[cells$intensity]
+#' s <- select_units(cells, n = c(low = 10, mid = 15, high = 25), size = "size", strata = "intensity")
+#' table(s$intensity, s$sampled)
+#' r <- select_units(cells, n = 40, method = "systematic", replicates = 4)
+#' dim(attr(r, "replicates"))
+select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
+                         method = c("lpm", "systematic", "srs"), replicates = 1, seed = 1) {
+  method <- rlang::arg_match(method)
   frame <- tibble::as_tibble(frame)
   if (is.null(coords)) coords <- if (all(c("lat", "lon") %in% names(frame))) c("lat", "lon") else if (all(c("x", "y") %in% names(frame))) c("x", "y") else cli::cli_abort("{.arg frame} needs coordinate columns ({.field lat}/{.field lon} or {.field x}/{.field y}) or {.arg coords}.")
   if (!all(coords %in% names(frame))) cli::cli_abort("Coordinate column{?s} {.field {setdiff(coords, names(frame))}} not found.")
+  if (method == "systematic" && length(coords) != 2L) cli::cli_abort("{.val systematic} needs exactly two coordinate columns.")
   X <- as.matrix(frame[, coords]); storage.mode(X) <- "double"
   if (anyNA(X)) cli::cli_abort("Coordinates must not be missing.")
   N <- nrow(frame)
-  if (!is.numeric(n) || length(n) != 1L || n < 1 || n > N || n != round(n)) cli::cli_abort("{.arg n} must be a whole number between 1 and {N}.")
-  sz <- if (is.null(size)) rep(1, N) else { if (!size %in% names(frame)) cli::cli_abort("Size column {.field {size}} not found."); as.numeric(frame[[size]]) }
-  pi <- inclusion_probabilities_rs(sz, as.integer(n))
-  sampled <- local_pivotal_rs(as.numeric(t(X)), ncol(X), pi, seed)
-  frame$pi <- pi; frame$sampled <- sampled
   if (!"unit" %in% names(frame)) frame$unit <- paste0("u", seq_len(N))
-  structure(frame, class = c("fieldopt_sample", class(frame)), n = n, coords = coords, seed = seed, size = size)
+  sz <- if (is.null(size)) rep(1, N) else { if (!size %in% names(frame)) cli::cli_abort("Size column {.field {size}} not found."); as.numeric(frame[[size]]) }
+  if (anyNA(sz) || any(sz < 0)) cli::cli_abort("Sizes must be non-negative without missing values.")
+  if (!is.numeric(replicates) || length(replicates) != 1L || replicates < 1 || replicates != round(replicates)) cli::cli_abort("{.arg replicates} must be a whole number of at least 1.")
+  if (method != "systematic" && replicates > 1) cli::cli_abort("{.arg replicates} applies to {.val systematic} sampling only.")
+  if (!is.numeric(n) || anyNA(n) || any(n < 1) || any(n != round(n))) cli::cli_abort("{.arg n} must be whole numbers of at least 1.")
+  # strata and allocation
+  if (is.null(strata)) {
+    h <- factor(rep("all", N))
+    if (length(n) != 1L) cli::cli_abort("Without {.arg strata}, {.arg n} must be a single number.")
+    n_h <- c(all = unname(n))
+  } else {
+    if (!strata %in% names(frame)) cli::cli_abort("Stratum column {.field {strata}} not found.")
+    h <- factor(frame[[strata]])
+    if (anyNA(h)) cli::cli_abort("Strata must not be missing.")
+    if (length(n) == 1L && is.null(names(n))) {
+      share <- tapply(sz, h, sum)
+      if (sum(share) <= 0) share <- table(h)
+      n_h <- largest_remainder(n * share / sum(share), floor_min = 1)
+    } else {
+      if (is.null(names(n)) || !all(levels(h) %in% names(n))) cli::cli_abort("{.arg n} must be named by stratum: {.val {levels(h)}}.")
+      n_h <- n[levels(h)]
+    }
+  }
+  N_h <- table(h)[names(n_h)]
+  too_big <- n_h > N_h
+  if (any(too_big)) cli::cli_abort("Sample size exceeds the number of units in strat{?um/a} {.val {names(n_h)[too_big]}}.")
+  pi <- numeric(N); sampled <- logical(N)
+  rep_mat <- if (replicates > 1) matrix(FALSE, N, replicates) else NULL
+  pi_rep <- if (replicates > 1) numeric(N) else NULL
+  for (k in seq_along(n_h)) {
+    idx <- which(h == names(n_h)[k])
+    nk <- as.integer(n_h[k])
+    sk <- sz[idx]
+    if (sum(sk) <= 0) sk <- rep(1, length(idx))
+    p <- inclusion_probabilities_rs(sk, nk)
+    seed_k <- seed * 100 + k
+    if (method == "lpm") {
+      pi[idx] <- p
+      sampled[idx] <- local_pivotal_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), p, seed_k)
+    } else if (method == "srs") {
+      pi[idx] <- p
+      set.seed(seed_k)
+      sampled[idx[sample.int(length(idx), nk)]] <- TRUE
+    } else {
+      ord <- hilbert_order_rs(as.numeric(t(X[idx, , drop = FALSE])), 16L)
+      m <- matrix(systematic_replicates_rs(ord, p, as.integer(replicates), seed_k), length(idx), replicates, byrow = TRUE)
+      if (replicates > 1) {
+        rep_mat[idx, ] <- m
+        pi_rep[idx] <- p / replicates
+        pi[idx] <- 1 - (1 - p / replicates)^replicates
+      } else {
+        pi[idx] <- p
+      }
+      sampled[idx] <- rowSums(m) > 0
+    }
+  }
+  frame$pi <- pi; frame$sampled <- sampled
+  if (!is.null(rep_mat)) frame$n_replicates <- rowSums(rep_mat)
+  structure(frame, class = c("fieldopt_sample", class(frame)), n = n_h, coords = coords, strata = strata,
+            method = method, seed = seed, size = size, replicates = rep_mat, pi_replicate = pi_rep)
+}
+
+# Largest-remainder rounding of a positive allocation to integers with a floor.
+largest_remainder <- function(x, floor_min = 1) {
+  total <- round(sum(x))
+  base <- pmax(floor(x), floor_min)
+  rem <- total - sum(base)
+  if (rem > 0) {
+    o <- order(x - floor(x), decreasing = TRUE)
+    base[o[seq_len(rem)]] <- base[o[seq_len(rem)]] + 1
+  } else if (rem < 0) {
+    o <- order(x - floor(x))
+    k <- 0
+    for (i in o) { if (k == -rem) break; if (base[i] > floor_min) { base[i] <- base[i] - 1; k <- k + 1 } }
+  }
+  stats::setNames(as.integer(base), names(x))
+}
+
+#' @export
+print.fieldopt_sample <- function(x, ...) {
+  n_h <- attr(x, "n")
+  cli::cli_text("Sample of {sum(x$sampled)} unit{?s} from {nrow(x)} by {.val {attr(x, 'method')}}{if (!is.null(attr(x, 'replicates'))) paste0(' (', ncol(attr(x, 'replicates')), ' replicates)') else ''}{if (length(n_h) > 1) paste0(', ', length(n_h), ' strata') else ''}.")
+  NextMethod()
+}
+
+#' Select points inside sampled grid cells
+#'
+#' For an area frame of square cells (segments) selected with [select_units()],
+#' draws `points_per_cell` uniform random points inside each sampled cell. In
+#' the field, each point identifies the field (and so the establishment) it
+#' falls on; an establishment can be hit several times. The point density of
+#' a cell, `pi * points / area`, is what [expected_hits()] and
+#' [point_estimator()] need.
+#'
+#' @param sample A `fieldopt_sample` of cells with coordinate columns giving
+#'   the cell centres.
+#' @param points_per_cell Points per sampled cell: a single number, a vector
+#'   named by stratum (for example more points where agricultural use is more
+#'   intense), or the name of a column of the sample.
+#' @param cell_size Side of the square cells, in the units of the coordinates
+#'   (one number, or `c(dx, dy)`).
+#' @param seed Seed.
+#' @return A tibble of class `fieldopt_points` with one row per point: `unit`
+#'   (the cell), `point`, the two coordinates, `pi_cell`, `points_in_cell` and
+#'   `density` (expected points per unit area of the cell).
+#' @export
+#' @examples
+#' cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
+#' s <- select_units(cells, n = 12, seed = 2)
+#' p <- select_points(s, points_per_cell = 9, cell_size = 1)
+#' nrow(p); head(p)
+select_points <- function(sample, points_per_cell, cell_size, seed = 1) {
+  if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
+  co <- attr(sample, "coords")
+  if (length(co) != 2L) cli::cli_abort("Point selection needs two coordinate columns.")
+  if (length(cell_size) == 1L) cell_size <- c(cell_size, cell_size)
+  if (!is.numeric(cell_size) || length(cell_size) != 2L || any(cell_size <= 0)) cli::cli_abort("{.arg cell_size} must be one or two positive numbers.")
+  sel <- sample[sample$sampled, ]
+  m <- if (is.character(points_per_cell)) {
+    if (!points_per_cell %in% names(sel)) cli::cli_abort("Column {.field {points_per_cell}} not found.")
+    as.numeric(sel[[points_per_cell]])
+  } else if (!is.null(names(points_per_cell))) {
+    st <- attr(sample, "strata")
+    if (is.null(st)) cli::cli_abort("A named {.arg points_per_cell} needs a stratified sample.")
+    lev <- as.character(sel[[st]])
+    if (!all(lev %in% names(points_per_cell))) cli::cli_abort("{.arg points_per_cell} must name every stratum.")
+    as.numeric(points_per_cell[lev])
+  } else rep(as.numeric(points_per_cell), nrow(sel))
+  if (anyNA(m) || any(m < 1) || any(m != round(m))) cli::cli_abort("Points per cell must be whole numbers of at least 1.")
+  set.seed(seed)
+  rows <- lapply(seq_len(nrow(sel)), function(i) {
+    k <- m[i]
+    tibble::tibble(unit = sel$unit[i], point = seq_len(k),
+                   a = sel[[co[1]]][i] + (stats::runif(k) - 0.5) * cell_size[1],
+                   b = sel[[co[2]]][i] + (stats::runif(k) - 0.5) * cell_size[2],
+                   pi_cell = sel$pi[i], points_in_cell = k,
+                   density = sel$pi[i] * k / prod(cell_size))
+  })
+  out <- do.call(rbind, rows)
+  names(out)[names(out) == "a"] <- co[1]; names(out)[names(out) == "b"] <- co[2]
+  structure(out, class = c("fieldopt_points", class(out)), cell_size = cell_size, coords = co)
+}
+
+#' Expected number of point hits of each establishment
+#'
+#' An establishment with agricultural area `area` inside cell `unit` is hit by
+#' a point of that cell with expected count `density * area`; summed over the
+#' cells it spans, this is the multiplicity factor that [point_estimator()]
+#' divides by. Cells outside the sample contribute `pi * points / area` as
+#' well, so the expectation is over the whole design; supply `points_per_cell`
+#' for them.
+#'
+#' @param areas Data frame with columns `establishment`, `unit` (cell) and
+#'   `area` (agricultural area of the establishment inside that cell, in the
+#'   square units of `cell_size`).
+#' @param sample The `fieldopt_sample` of cells.
+#' @param points_per_cell As in [select_points()], applied to every cell of
+#'   the frame.
+#' @param cell_size As in [select_points()].
+#' @return A tibble with `establishment` and `expected_hits`.
+#' @export
+expected_hits <- function(areas, sample, points_per_cell, cell_size) {
+  if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
+  for (col in c("establishment", "unit", "area")) if (!col %in% names(areas)) cli::cli_abort("{.arg areas} needs a column {.field {col}}.")
+  if (length(cell_size) == 1L) cell_size <- c(cell_size, cell_size)
+  m <- if (is.character(points_per_cell)) as.numeric(sample[[points_per_cell]]) else if (!is.null(names(points_per_cell))) as.numeric(points_per_cell[as.character(sample[[attr(sample, "strata")]])]) else rep(as.numeric(points_per_cell), nrow(sample))
+  dens <- stats::setNames(sample$pi * m / prod(cell_size), sample$unit)
+  miss <- setdiff(unique(areas$unit), names(dens))
+  if (length(miss)) cli::cli_abort("Cell{?s} {.val {miss}} not in the frame.")
+  e <- dens[as.character(areas$unit)] * as.numeric(areas$area)
+  out <- tapply(e, areas$establishment, sum)
+  tibble::tibble(establishment = names(out), expected_hits = as.numeric(out))
+}
+
+#' Multiplicity (point) estimator of a total from an area sample of points
+#'
+#' Each point that hits an establishment contributes `y / expected_hits` of
+#' that establishment; the sum over hits is unbiased for the population total
+#' whatever the number of times an establishment is hit (the more points fall
+#' on an establishment, the larger its contribution, matching its larger
+#' chance of selection). The variance is estimated at the cell level
+#' (ultimate-cluster approximation): the cell contributions are treated as
+#' cell totals and the variance estimator of the cell design is applied
+#' (local-mean for `"lpm"`, replicates for replicated systematic samples,
+#' simple random sampling otherwise).
+#'
+#' @param hits Data frame with one row per point that hit an establishment:
+#'   columns `unit` (cell), `establishment`, `y` (value of the whole
+#'   establishment) and `expected_hits` (from [expected_hits()]).
+#' @param sample The `fieldopt_sample` of cells.
+#' @return A one-row tibble as in [design_variance()], with `n_hits` and
+#'   `n_establishments`.
+#' @export
+point_estimator <- function(hits, sample) {
+  for (col in c("unit", "establishment", "y", "expected_hits")) if (!col %in% names(hits)) cli::cli_abort("{.arg hits} needs a column {.field {col}}.")
+  if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
+  if (any(hits$expected_hits <= 0) || anyNA(hits$expected_hits)) cli::cli_abort("{.field expected_hits} must be positive.")
+  contrib <- as.numeric(hits$y) / as.numeric(hits$expected_hits)
+  u <- tapply(contrib, factor(hits$unit, levels = sample$unit), sum)
+  u[is.na(u)] <- 0
+  bad <- unique(hits$unit[!hits$unit %in% sample$unit[sample$sampled]])
+  if (length(bad)) cli::cli_abort("Hits refer to unsampled cell{?s} {.val {bad}}.")
+  # cell totals z such that sum(z / pi) over sampled cells equals the estimate
+  z <- as.numeric(u) * sample$pi
+  out <- ht_variance(sample, z)
+  out$n_hits <- nrow(hits); out$n_establishments <- length(unique(hits$establishment))
+  out
+}
+
+#' Segment estimators of a total from an area sample of segments
+#'
+#' The three classical ways to attribute establishments to the segments of
+#' an area frame (Houseman 1975; Nealon 1984):
+#'
+#' * `"closed"`: each segment reports what lies inside it (the tracts);
+#' * `"open"`: each establishment is attributed entirely to the segment that
+#'   holds its headquarters;
+#' * `"weighted"`: each establishment is attributed to every segment it
+#'   touches in proportion to the share of its land inside the segment.
+#'
+#' The segment totals are then expanded with the segment design.
+#'
+#' @param tracts Data frame with one row per (segment, establishment) pair:
+#'   `unit` (segment), `establishment`, and, as needed, `y_tract` (value
+#'   inside the segment, for `"closed"`), `y_total` (value of the whole
+#'   establishment, for `"open"` and `"weighted"`), `headquarters` (logical,
+#'   headquarters inside the segment, for `"open"`) and `share` (fraction of
+#'   the establishment's land inside the segment, for `"weighted"`).
+#' @param sample The `fieldopt_sample` of segments.
+#' @param type `"closed"`, `"open"` or `"weighted"`.
+#' @return A one-row tibble as in [design_variance()] with a column `type`.
+#' @references Nealon, J. P. (1984). Review of the multiple and area frame
+#'   estimators. USDA Statistical Reporting Service, Staff Report 80.
+#' @export
+segment_estimator <- function(tracts, sample, type = c("closed", "open", "weighted")) {
+  type <- rlang::arg_match(type)
+  if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
+  need <- switch(type, closed = c("unit", "y_tract"), open = c("unit", "y_total", "headquarters"), weighted = c("unit", "y_total", "share"))
+  for (col in need) if (!col %in% names(tracts)) cli::cli_abort("{.arg tracts} needs a column {.field {col}} for type {.val {type}}.")
+  bad <- unique(tracts$unit[!tracts$unit %in% sample$unit[sample$sampled]])
+  if (length(bad)) cli::cli_abort("Tracts refer to unsampled segment{?s} {.val {bad}}.")
+  v <- switch(type,
+    closed = as.numeric(tracts$y_tract),
+    open = as.numeric(tracts$y_total) * as.numeric(as.logical(tracts$headquarters)),
+    weighted = { sh <- as.numeric(tracts$share); if (any(sh < 0 | sh > 1, na.rm = TRUE)) cli::cli_abort("{.field share} must lie in [0, 1]."); as.numeric(tracts$y_total) * sh })
+  if (anyNA(v)) cli::cli_abort("Missing values in the tract data.")
+  z <- tapply(v, factor(tracts$unit, levels = sample$unit), sum)
+  z[is.na(z)] <- 0
+  out <- ht_variance(sample, as.numeric(z))
+  out$type <- type
+  out
+}
+
+# Horvitz-Thompson total of unit values z (zero on unsampled units) with the
+# variance estimator that matches the sample's design.
+ht_variance <- function(sample, z) {
+  s <- sample$sampled
+  z[!s] <- 0
+  X <- as.matrix(sample[, attr(sample, "coords")]); storage.mode(X) <- "double"
+  rep_mat <- attr(sample, "replicates")
+  if (!is.null(rep_mat)) {
+    r <- ncol(rep_mat); pr <- attr(sample, "pi_replicate")
+    est_k <- vapply(seq_len(r), function(k) sum(z[rep_mat[, k]] / pr[rep_mat[, k]]), numeric(1))
+    total <- mean(est_k)
+    v <- stats::var(est_k) / r
+    method <- "replicates"
+  } else {
+    total <- ht_total_rs(z, sample$pi, s)
+    method <- attr(sample, "method")
+    v <- if (identical(method, "srs") && length(unique(sample$pi[s])) == 1L) srs_variance_rs(z, s, nrow(sample)) else local_mean_variance_rs(as.numeric(t(X)), ncol(X), z, sample$pi, s)
+    method <- if (identical(method, "srs") && length(unique(sample$pi[s])) == 1L) "srs" else "local-mean"
+  }
+  v_srs <- srs_variance_rs(z, s, nrow(sample))
+  tibble::tibble(total = total, variance = v, se = sqrt(v), cv = sqrt(v) / abs(total),
+                 variance_srs = v_srs, n = sum(s), N = nrow(sample), variance_method = method)
 }
 
 #' Design-based estimate of a total with its variance
 #'
 #' Horvitz-Thompson estimate of the population total of `y` from a
-#' [select_units()] sample, with the local-mean variance estimator of
-#' Grafström and Schelin (2014), which suits spatially balanced samples and
-#' needs no joint inclusion probabilities. The simple-random-sampling variance
-#' of the same sample is reported as a reference.
+#' [select_units()] sample, with the variance estimator that matches the
+#' design: the local-mean estimator of Grafström and Schelin (2014) for
+#' spatially balanced samples (it needs no joint inclusion probabilities),
+#' the variance among replicate estimates for replicated systematic samples,
+#' and the simple-random-sampling formula for equal-probability simple random
+#' samples. The simple-random-sampling variance of the same sample is always
+#' reported as a reference.
 #'
 #' @param sample A `fieldopt_sample`.
 #' @param y Column of the study variable (observed on the sampled units; other
 #'   rows may be `NA`).
 #' @return A one-row tibble: `total`, `variance`, `se`, `cv`, `variance_srs`,
-#'   `n`, `N`.
+#'   `n`, `N`, `variance_method`.
 #' @references Grafström, A. and Schelin, L. (2014). How to select
 #'   representative samples. *Scandinavian Journal of Statistics*, 41(2),
 #'   277--290.
@@ -71,27 +370,22 @@ select_units <- function(frame, n, size = NULL, coords = NULL, seed = 1) {
 #' frame$crop <- 10 + 20 * frame$x + rnorm(80)
 #' s <- select_units(frame, n = 20)
 #' design_variance(s, y = "crop")
+#' r <- select_units(frame, n = 20, method = "systematic", replicates = 4)
+#' design_variance(r, y = "crop")
 design_variance <- function(sample, y) {
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
   if (!y %in% names(sample)) cli::cli_abort("Column {.field {y}} not found.")
   yy <- as.numeric(sample[[y]]); s <- sample$sampled
   if (anyNA(yy[s])) cli::cli_abort("{.field {y}} is missing for some sampled units.")
-  yy[!s] <- 0
-  X <- as.matrix(sample[, attr(sample, "coords")]); storage.mode(X) <- "double"
-  total <- ht_total_rs(yy, sample$pi, s)
-  v <- local_mean_variance_rs(as.numeric(t(X)), ncol(X), yy, sample$pi, s)
-  v_srs <- srs_variance_rs(yy, s, nrow(sample))
-  tibble::tibble(total = total, variance = v, se = sqrt(v), cv = sqrt(v) / abs(total),
-                 variance_srs = v_srs, n = sum(s), N = nrow(sample))
+  ht_variance(sample, yy)
 }
 
-#' Cost-aware allocation across strata or frames
+#' Cost-aware allocation across strata
 #'
 #' Classical optimum allocation with a cost per unit in each stratum (Cochran
 #' 1977, Section 5.5): minimum cost for a target variance of the estimated
-#' total, or minimum variance for a budget. Frames (a list frame and an area
-#' frame) are treated as strata with their own variance and cost; the overlap
-#' of dual frames is not modelled here.
+#' total, or minimum variance for a budget. For two frames with an overlap
+#' use [dual_frame_allocation()] instead.
 #'
 #' @param strata Data frame with columns `size` (population units), `sd`
 #'   (standard deviation of the study variable) and `cost` (cost per unit,

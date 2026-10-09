@@ -30,8 +30,12 @@ reference:
   contents: [travel_matrix, field_cost_model]
 - title: Routing the field work
   contents: [route_fieldwork, autoplot.fieldopt_routes]
-- title: Selecting units and estimating
-  contents: [select_units, design_variance, frame_allocation]
+- title: Selecting units and points
+  contents: [select_units, select_points]
+- title: Estimating
+  contents: [design_variance, segment_estimator, point_estimator, expected_hits]
+- title: Allocation
+  contents: [frame_allocation, dual_frame_allocation, two_stage_allocation]
 - title: The cost-variance frontier
   contents: [cost_variance_frontier, autoplot.fieldopt_frontier]
 - title: Engine
@@ -45,4 +49,4 @@ articles:
   contents: [fieldopt]
 - title: Practice
   navbar: Practice
-  contents: [routing-teams, frames-and-allocation]
+  contents: [area-and-dual-frame, routing-teams, frames-and-allocation]

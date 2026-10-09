@@ -2,45 +2,84 @@
 % Please edit documentation in R/sampling.R
 \name{select_units}
 \alias{select_units}
-\title{Select units with a spatially balanced probability sample}
+\title{Select units with a spatially balanced or systematic probability sample}
 \usage{
-select_units(frame, n, size = NULL, coords = NULL, seed = 1)
+select_units(
+  frame,
+  n,
+  size = NULL,
+  coords = NULL,
+  strata = NULL,
+  method = c("lpm", "systematic", "srs"),
+  replicates = 1,
+  seed = 1
+)
 }
 \arguments{
 \item{frame}{Data frame with one row per unit: coordinate columns (\code{lat},
-\code{lon} or \code{x}, \code{y}, or those named in \code{coords}), an optional \code{size} column
-and an optional \code{unit} column with names.}
+\code{lon} or \code{x}, \code{y}, or those named in \code{coords}), an optional \code{size}
+column, an optional \code{unit} column with names and an optional stratum
+column.}
 
-\item{n}{Sample size.}
+\item{n}{Sample size: a single number (allocated to strata in proportion
+to the sum of \code{size}, or to the number of units when \code{size} is \code{NULL}),
+or a vector named by stratum.}
 
 \item{size}{Column of the size measure for probability-proportional-to-size
-selection, or \code{NULL} for equal probabilities.}
+selection, or \code{NULL} for equal probabilities within stratum.}
 
 \item{coords}{Names of the coordinate columns used for spatial balance (any
-number of columns; a travel-cost embedding is admissible).}
+number of columns for \code{"lpm"}; exactly two for \code{"systematic"}).}
+
+\item{strata}{Column with the stratum of each unit, or \code{NULL}.}
+
+\item{method}{\code{"lpm"}, \code{"systematic"} or \code{"srs"}.}
+
+\item{replicates}{Number of independent interpenetrating replicates for
+\code{"systematic"} (each a systematic sample of about \code{n / replicates}
+units; replicates may share units). Ignored by the other methods.}
 
 \item{seed}{Seed.}
 }
 \value{
-The frame as a tibble with columns \code{pi} (inclusion probability) and
-\code{sampled}, of class \code{fieldopt_sample}, with attributes \code{n}, \code{coords} and
-\code{seed}.
+The frame as a tibble with columns \code{pi} (inclusion probability in
+the union of the replicates) and \code{sampled}, of class \code{fieldopt_sample},
+with attributes \code{n}, \code{coords}, \code{strata}, \code{method}, \code{seed} and, for
+replicated systematic samples, \code{replicates} (a logical matrix, one column
+per replicate) and \code{pi_replicate} (inclusion probability within one
+replicate).
 }
 \description{
-Draws \code{n} units with inclusion probabilities proportional to \code{size} (equal
-when \code{size} is \code{NULL}) by the local pivotal method (Grafström, Lundström
-and Schelin, 2012), which spreads the sample over the coordinate space so
-that nearby units are rarely selected together. The design is
-probabilistic with known inclusion probabilities, which is what the
-estimator needs; spatial balance reduces the variance and, at the same
-time, tends to spread the field work, which is the tension the cost model
-and routing make explicit.
+Draws a probability sample of the units of a frame (segments, grid cells,
+establishments) with equal or size-proportional inclusion probabilities,
+within strata when given, by one of three methods:
+}
+\details{
+\itemize{
+\item \code{"lpm"}: the local pivotal method (Grafström, Lundström and Schelin,
+2012), which spreads the sample over the coordinate space so that nearby
+units are rarely selected together;
+\item \code{"systematic"}: systematic sampling with probabilities proportional to
+size along a Hilbert curve through the coordinates (a spatially ordered
+systematic sample), drawn as \code{replicates} independent interpenetrating
+systematic samples so that a design-based variance can be estimated;
+\item \code{"srs"}: simple random sampling without replacement.
+}
+
+Spatial balance reduces the variance of totals of spatially structured
+variables and, at the same time, spreads the field work; the cost model and
+the routing make that tension explicit.
 }
 \examples{
 set.seed(1)
-frame <- data.frame(unit = paste0("s", 1:50), x = runif(50), y = runif(50), size = rexp(50))
-s <- select_units(frame, n = 10, size = "size")
-sum(s$sampled); sum(s$pi)
+cells <- expand.grid(x = 1:20, y = 1:20)
+cells$unit <- paste0("c", seq_len(nrow(cells)))
+cells$intensity <- cut(cells$x + rnorm(400, sd = 3), c(-Inf, 7, 14, Inf), c("low", "mid", "high"))
+cells$size <- c(low = 1, mid = 2, high = 4)[cells$intensity]
+s <- select_units(cells, n = c(low = 10, mid = 15, high = 25), size = "size", strata = "intensity")
+table(s$intensity, s$sampled)
+r <- select_units(cells, n = 40, method = "systematic", replicates = 4)
+dim(attr(r, "replicates"))
 }
 \references{
 Grafström, A., Lundström, N. L. P. and Schelin, L. (2012).
