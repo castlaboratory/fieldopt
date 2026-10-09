@@ -40,3 +40,8 @@ Authors:
 
 - Cristiano Ferraz <cferraz@castlab.org>
   ([ORCID](https://orcid.org/0000-0002-6838-6734))
+
+Other contributors:
+
+- The authors of the dependency Rust crates (see inst/AUTHORS file for
+  details) \[contributor\]
