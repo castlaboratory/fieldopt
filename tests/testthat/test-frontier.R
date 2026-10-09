@@ -20,3 +20,20 @@ test_that("the frontier reports cost and variance per sample size", {
 test_that("core version is reported", {
   expect_match(core_version(), "^[0-9]+\\.[0-9]+\\.[0-9]+$")
 })
+
+test_that("the frontier accepts strata, selection methods and allocations", {
+  set.seed(6)
+  cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", seq_len(nrow(cells)))
+  cells$h <- ifelse(cells$x <= 6, "west", "east"); cells$crop <- 3 + cells$x + rnorm(nrow(cells))
+  fr <- rbind(data.frame(unit = "depot", x = 6.5, y = 6.5, h = NA, crop = NA), cells)
+  cm <- field_cost_model(per_travel = 1, per_unit = 10, per_interview = 5)
+  f <- cost_variance_frontier(fr, "depot", cm, n_grid = list(c(west = 4, east = 8), c(west = 8, east = 12)), y = "crop",
+                              strata = "h", selection = "systematic", replicates = 2, method = "euclidean", n_rep = 2, iterations = 10)
+  expect_equal(f$n, c(12, 20))
+  expect_equal(f$allocation[[2]], c(east = 12, west = 8)[c("east", "west")])
+  expect_equal(f$cost_per_unit, f$cost_mean / f$n)
+  expect_equal(attr(f, "selection"), "systematic")
+  g <- cost_variance_frontier(fr, "depot", cm, n_grid = 10, strata = "h", selection = "srs", method = "euclidean", n_rep = 2, iterations = 10)
+  expect_equal(sum(g$allocation[[1]]), 10)
+  expect_error(cost_variance_frontier(fr, "depot", cm, n_grid = numeric(0), method = "euclidean"), "at least one")
+})

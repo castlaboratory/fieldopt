@@ -91,6 +91,7 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
     }
   }
   N_h <- table(h)[names(n_h)]
+  if (replicates > 1 && any(n_h < replicates)) cli::cli_abort("Every stratum needs at least {.arg replicates} = {replicates} sampled units.")
   too_big <- n_h > N_h
   if (any(too_big)) cli::cli_abort("Sample size exceeds the number of units in strat{?um/a} {.val {names(n_h)[too_big]}}.")
   pi <- numeric(N); sampled <- logical(N)
@@ -261,7 +262,9 @@ expected_hits <- function(areas, sample, points_per_cell, cell_size) {
 #' (ultimate-cluster approximation): the cell contributions are treated as
 #' cell totals and the variance estimator of the cell design is applied
 #' (local-mean for `"lpm"`, replicates for replicated systematic samples,
-#' simple random sampling otherwise).
+#' simple random sampling otherwise). With replicated systematic samples the
+#' expected hits refer to the union of the replicates, so the replicate
+#' variance is an approximation.
 #'
 #' @param hits Data frame with one row per point that hit an establishment:
 #'   columns `unit` (cell), `establishment`, `y` (value of the whole
@@ -281,7 +284,7 @@ point_estimator <- function(hits, sample) {
   if (length(bad)) cli::cli_abort("Hits refer to unsampled cell{?s} {.val {bad}}.")
   # cell totals z such that sum(z / pi) over sampled cells equals the estimate
   z <- as.numeric(u) * sample$pi
-  out <- ht_variance(sample, z)
+  out <- ht_variance(sample, z, total = sum(as.numeric(u)))
   out$n_hits <- nrow(hits); out$n_establishments <- length(unique(hits$establishment))
   out
 }
@@ -331,26 +334,44 @@ segment_estimator <- function(tracts, sample, type = c("closed", "open", "weight
 }
 
 # Horvitz-Thompson total of unit values z (zero on unsampled units) with the
-# variance estimator that matches the sample's design.
-ht_variance <- function(sample, z) {
+# variance estimator that matches the sample's design. Strata are handled
+# stratum by stratum (neighbourhoods of the local-mean estimator and the SRS
+# formula stay within the stratum) and the variances are summed. With
+# replicates, the total is the mean of the replicate estimates and the
+# variance their spread, unless `total` is supplied (then only the variance
+# comes from the replicates).
+ht_variance <- function(sample, z, total = NULL) {
   s <- sample$sampled
   z[!s] <- 0
   X <- as.matrix(sample[, attr(sample, "coords")]); storage.mode(X) <- "double"
   rep_mat <- attr(sample, "replicates")
+  strata <- attr(sample, "strata")
+  h <- if (is.null(strata)) factor(rep("all", nrow(sample))) else factor(sample[[strata]])
   if (!is.null(rep_mat)) {
     r <- ncol(rep_mat); pr <- attr(sample, "pi_replicate")
     est_k <- vapply(seq_len(r), function(k) sum(z[rep_mat[, k]] / pr[rep_mat[, k]]), numeric(1))
-    total <- mean(est_k)
+    if (is.null(total)) total <- mean(est_k)
     v <- stats::var(est_k) / r
     method <- "replicates"
   } else {
-    total <- ht_total_rs(z, sample$pi, s)
-    method <- attr(sample, "method")
-    v <- if (identical(method, "srs") && length(unique(sample$pi[s])) == 1L) srs_variance_rs(z, s, nrow(sample)) else local_mean_variance_rs(as.numeric(t(X)), ncol(X), z, sample$pi, s)
-    method <- if (identical(method, "srs") && length(unique(sample$pi[s])) == 1L) "srs" else "local-mean"
+    if (is.null(total)) total <- ht_total_rs(z, sample$pi, s)
+    design <- attr(sample, "method")
+    v <- 0; method <- NULL
+    for (lev in levels(h)) {
+      idx <- which(h == lev)
+      if (sum(s[idx]) < 2L) cli::cli_abort("At least two sampled units are needed in every stratum to estimate the variance (stratum {.val {lev}}).")
+      equal <- length(unique(sample$pi[idx][s[idx]])) == 1L
+      if (identical(design, "srs") && equal) {
+        v <- v + srs_variance_rs(z[idx], s[idx], length(idx)); method <- c(method, "srs")
+      } else {
+        v <- v + local_mean_variance_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), z[idx], sample$pi[idx], s[idx]); method <- c(method, "local-mean")
+      }
+    }
+    method <- paste(unique(method), collapse = "+")
+    if (nlevels(h) > 1) method <- paste0("stratified ", method)
   }
   v_srs <- srs_variance_rs(z, s, nrow(sample))
-  tibble::tibble(total = total, variance = v, se = sqrt(v), cv = sqrt(v) / abs(total),
+  tibble::tibble(total = total, variance = v, se = sqrt(v), cv = if (total != 0) sqrt(v) / abs(total) else NA_real_,
                  variance_srs = v_srs, n = sum(s), N = nrow(sample), variance_method = method)
 }
 

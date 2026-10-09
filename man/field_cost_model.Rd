@@ -19,8 +19,10 @@ field_cost_model(
 
 \item{per_interview}{Cost of one interview.}
 
-\item{interviews_per_unit}{Expected interviews per visited unit (a single
-number or a function of the unit index).}
+\item{interviews_per_unit}{Expected interviews per visited unit: a single
+number, a vector with one value per row of the travel matrix (depot
+included, in the same order), or a function of the row indices of the
+visited units.}
 
 \item{currency}{Label for reports.}
 }

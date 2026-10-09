@@ -53,3 +53,14 @@ test_that("routes are deterministic in the seed and plot", {
   expect_identical(a$routes, b$routes)
   expect_s3_class(autoplot(a), "ggplot")
 })
+
+test_that("geographic routes plot longitude on x and a degenerate bound gives no gap", {
+  pts <- data.frame(unit = c("depot", "a", "b", "c"), lat = c(-8.05, -8.10, -8.00, -8.12), lon = c(-34.90, -34.95, -34.85, -34.80))
+  r <- route_fieldwork(travel_matrix(pts), c("a", "b", "c"), "depot", iterations = 10)
+  p <- autoplot(r)
+  expect_equal(p$labels$x %||% ggplot2::get_labs(p)$x, "longitude")
+  same <- data.frame(unit = c("depot", "a"), x = c(0, 0), y = c(0, 0))
+  r0 <- route_fieldwork(travel_matrix(same, method = "euclidean"), "a", "depot", iterations = 5)
+  expect_true(is.na(r0$gap))
+  expect_message(print(r0), "lower bound 0")
+})

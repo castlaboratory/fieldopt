@@ -63,3 +63,22 @@ test_that("srs and replicate variances match the design", {
   # systematic along the curve beats srs on a trending variable
   expect_lt(var(est[1, ]), mean(sapply(1:200, function(s) design_variance(select_units(cells, n = 40, method = "srs", seed = s), "crop")$variance_srs)))
 })
+
+test_that("stratified variances are computed within strata", {
+  cells <- grid_cells()
+  sr <- select_units(cells, n = c(low = 10, mid = 15, high = 25), strata = "intensity", method = "srs", seed = 5)
+  d <- design_variance(sr, "crop")
+  expect_equal(d$variance_method, "stratified srs")
+  # hand computation of the stratified SRS variance of the total
+  v <- 0
+  for (lev in c("low", "mid", "high")) {
+    idx <- sr$intensity == lev; N_h <- sum(idx); n_h <- sum(sr$sampled[idx])
+    v <- v + N_h^2 * (1 - n_h / N_h) * var(sr$crop[idx & sr$sampled]) / n_h
+  }
+  expect_equal(d$variance, v)
+  lp <- select_units(cells, n = c(low = 10, mid = 15, high = 25), strata = "intensity", seed = 5)
+  expect_equal(design_variance(lp, "crop")$variance_method, "stratified local-mean")
+  tiny <- select_units(cells, n = c(low = 1, mid = 5, high = 5), strata = "intensity", seed = 5)
+  expect_error(design_variance(tiny, "crop"), "two sampled units")
+  expect_error(select_units(cells, n = c(low = 2, mid = 5, high = 5), strata = "intensity", method = "systematic", replicates = 3), "at least")
+})

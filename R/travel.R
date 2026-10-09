@@ -65,8 +65,10 @@ print.fieldopt_matrix <- function(x, ...) {
 #' @param per_travel Cost per unit of the travel matrix (per km, per minute).
 #' @param per_unit Fixed cost of visiting one unit.
 #' @param per_interview Cost of one interview.
-#' @param interviews_per_unit Expected interviews per visited unit (a single
-#'   number or a function of the unit index).
+#' @param interviews_per_unit Expected interviews per visited unit: a single
+#'   number, a vector with one value per row of the travel matrix (depot
+#'   included, in the same order), or a function of the row indices of the
+#'   visited units.
 #' @param currency Label for reports.
 #' @return An object of class `field_cost_model`.
 #' @export

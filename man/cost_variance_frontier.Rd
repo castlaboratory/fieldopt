@@ -11,6 +11,9 @@ cost_variance_frontier(
   n_grid,
   y = NULL,
   size = NULL,
+  strata = NULL,
+  selection = c("lpm", "systematic", "srs"),
+  replicates = 1,
   matrix = NULL,
   method = c("haversine", "euclidean"),
   max_length = Inf,
@@ -28,14 +31,23 @@ row named in \code{depot}.}
 
 \item{cost_model}{A \code{\link[=field_cost_model]{field_cost_model()}}.}
 
-\item{n_grid}{Sample sizes to evaluate.}
+\item{n_grid}{Sample sizes to evaluate: a numeric vector of total sizes
+(allocated across strata as in \code{\link[=select_units]{select_units()}}), or a list of vectors
+named by stratum, one allocation per grid point.}
 
 \item{y}{Optional column of the study variable for the whole frame (a
 planning value); when given, the variance of the estimated total is
-computed from the local-mean estimator on each simulated sample.}
+computed with \code{\link[=design_variance]{design_variance()}} on each simulated sample.}
 
 \item{size}{Optional size column for probability-proportional-to-size
 selection.}
+
+\item{strata}{Optional stratum column, passed to \code{\link[=select_units]{select_units()}}.}
+
+\item{selection}{Selection method of \code{\link[=select_units]{select_units()}}: \code{"lpm"},
+\code{"systematic"} or \code{"srs"}.}
+
+\item{replicates}{Replicates of a \code{"systematic"} selection.}
 
 \item{matrix}{Optional \code{\link[=travel_matrix]{travel_matrix()}} of the frame (computed from the
 coordinates otherwise).}
@@ -52,8 +64,12 @@ coordinates otherwise).}
 }
 \value{
 A tibble of class \code{fieldopt_frontier} with one row per sample
-size: \code{n}, \code{cost_mean}, \code{cost_sd}, \code{travel_mean}, \code{routes_mean},
-\code{variance_mean} and \code{cv_mean} (when \code{y} is given), \code{n_rep}.
+size: \code{n}, \code{cost_mean}, \code{cost_sd}, \code{cost_per_unit} (the planning value
+for \code{c1} in \code{\link[=two_stage_allocation]{two_stage_allocation()}} or \code{cost_a} in
+\code{\link[=dual_frame_allocation]{dual_frame_allocation()}}), \code{travel_mean}, \code{routes_mean},
+\code{variance_mean} and \code{cv_mean} (when \code{y} is given), \code{n_rep}, and
+\code{allocation} (a list column with the stratum sizes) when strata are
+used.
 }
 \description{
 For each sample size in \code{n_grid}, draws \code{n_rep} spatially balanced samples

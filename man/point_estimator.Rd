@@ -26,5 +26,7 @@ chance of selection). The variance is estimated at the cell level
 (ultimate-cluster approximation): the cell contributions are treated as
 cell totals and the variance estimator of the cell design is applied
 (local-mean for \code{"lpm"}, replicates for replicated systematic samples,
-simple random sampling otherwise).
+simple random sampling otherwise). With replicated systematic samples the
+expected hits refer to the union of the replicates, so the replicate
+variance is an approximation.
 }

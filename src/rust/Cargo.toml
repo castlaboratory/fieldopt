@@ -15,7 +15,7 @@ path = 'document.rs'
 
 [dependencies]
 extendr-api = '0.9'
-fieldopt-core = '0.2.1'
+fieldopt-core = '0.2.2'
 
 [profile.release]
 lto = true

@@ -54,11 +54,12 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
     tibble::tibble(route = k, stop = seq_along(r), unit = nm[r])
   }))
   out <- list(routes = routes, lengths = res$lengths, total = res$total, lower_bound = res$lower_bound,
-              gap = (res$total - res$lower_bound) / res$lower_bound, best_iteration = res$best_iteration,
+              gap = if (res$lower_bound > 0) (res$total - res$lower_bound) / res$lower_bound else NA_real_,
+              best_iteration = res$best_iteration,
               n_routes = length(res$routes), depot = nm[d], units = nm[u],
               limits = c(max_length = max_length, max_stops = max_stops),
               options = list(iterations = iterations, alpha = alpha, seed = seed),
-              travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"))
+              travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"))
   if (!is.null(cost_model)) {
     if (!inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
     out$cost <- cost_of(cost_model, res$total, length(u), u)
@@ -70,7 +71,7 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
 #' @export
 print.fieldopt_routes <- function(x, ...) {
   cli::cli_h1("Field routes")
-  cli::cli_text("{x$n_routes} route{?s} from {.val {x$depot}} through {length(x$units)} unit{?s}: total travel {signif(x$total, 4)} {x$travel_unit} (lower bound {signif(x$lower_bound, 4)}, gap {signif(100 * x$gap, 3)}%).")
+  cli::cli_text("{x$n_routes} route{?s} from {.val {x$depot}} through {length(x$units)} unit{?s}: total travel {signif(x$total, 4)} {x$travel_unit} (lower bound {signif(x$lower_bound, 4)}{if (is.na(x$gap)) '' else paste0(', gap ', signif(100 * x$gap, 3), '%')}).")
   for (k in seq_len(x$n_routes)) {
     r <- x$routes$unit[x$routes$route == k]
     cli::cli_text("Route {k} ({signif(x$lengths[k], 4)}): {paste(r, collapse = ' > ')}")
@@ -103,11 +104,16 @@ autoplot.fieldopt_routes <- function(object, ...) {
   }))
   pts <- co[co$unit %in% object$units, ]
   dep <- co[co$unit == object$depot, ]
-  xl <- if (identical(attr(object, "method"), "haversine")) "latitude" else "x"
+  geo <- identical(object$method, "haversine")
+  if (geo) {  # coordinates are (lat, lon): plot longitude on x
+    segs <- data.frame(route = segs$route, x = segs$y, y = segs$x, xend = segs$yend, yend = segs$xend)
+    pts <- data.frame(a = pts$b, b = pts$a); dep <- data.frame(a = dep$b, b = dep$a)
+  }
   ggplot2::ggplot() +
     ggplot2::geom_segment(data = segs, ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend, colour = .data$route), linewidth = 0.6) +
     ggplot2::geom_point(data = pts, ggplot2::aes(x = .data$a, y = .data$b), size = 2) +
     ggplot2::geom_point(data = dep, ggplot2::aes(x = .data$a, y = .data$b), shape = 17, size = 3.5, colour = "#B4432B") +
-    ggplot2::labs(x = xl, y = NULL, colour = "route") + ggplot2::coord_equal() +
+    ggplot2::labs(x = if (geo) "longitude" else "x", y = if (geo) "latitude" else "y", colour = "route") +
+    (if (geo) ggplot2::coord_quickmap() else ggplot2::coord_equal()) +
     ggplot2::theme_minimal() + ggplot2::theme(legend.position = "bottom")
 }
