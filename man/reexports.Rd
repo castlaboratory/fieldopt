@@ -4,6 +4,8 @@
 \name{reexports}
 \alias{reexports}
 \alias{autoplot}
+\alias{tidy}
+\alias{glance}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -11,6 +13,8 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
+  \item{generics}{\code{\link[generics:glance]{glance()}}, \code{\link[generics:tidy]{tidy()}}}
+
   \item{ggplot2}{\code{\link[ggplot2:autoplot]{autoplot()}}}
 }}
 

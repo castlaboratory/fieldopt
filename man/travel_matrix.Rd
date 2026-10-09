@@ -37,6 +37,7 @@ approximation; a network matrix is the honest input when it is available.
 }
 \examples{
 segments <- data.frame(unit = c("depot", "s1", "s2", "s3"),
-                       lat = c(-8.05, -8.10, -8.00, -8.12), lon = c(-34.90, -34.95, -34.85, -34.80))
+                       lat = c(-8.05, -8.10, -8.00, -8.12),
+                       lon = c(-34.90, -34.95, -34.85, -34.80))
 travel_matrix(segments)
 }

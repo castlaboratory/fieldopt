@@ -72,7 +72,7 @@ dual_frame_allocation <- function(domains, cost_a, cost_b, deff_a = 1, deff_b = 
 #' @export
 print.fieldopt_dual_frame <- function(x, ...) {
   cli::cli_h1("Dual-frame allocation")
-  cli::cli_text("{if (x$mode == 'variance') 'Minimum cost for target variance' else 'Minimum variance for budget'} {signif(x$target, 4)}: n_A = {x$n_a} (frame A, cost {x$cost_a}/unit), n_B = {x$n_b} (frame B, cost {x$cost_b}/unit), theta = {round(x$theta, 3)}{if (x$theta_fixed) ' (fixed)' else ' (optimised)'}.")
+  cli::cli_text("{if (x$mode == 'variance') 'Minimum cost for target variance' else 'Minimum variance for budget'} {signif(x$target, 4)}: n_A = {x$n_a} (frame A, cost {signif(x$cost_a, 4)}/unit), n_B = {x$n_b} (frame B, cost {signif(x$cost_b, 4)}/unit), theta = {round(x$theta, 3)}{if (x$theta_fixed) ' (fixed)' else ' (optimised)'}.")
   cli::cli_text("Cost {signif(x$cost, 4)}; variance {signif(x$variance, 4)} (frame A {signif(x$variance_a, 3)}, frame B {signif(x$variance_b, 3)}); CV {signif(100 * x$cv, 3)}% of the total {signif(x$total, 4)}.")
   cli::cli_text("Expected overlap units: {round(x$overlap_a, 1)} in the A sample, {round(x$overlap_b, 1)} in the B sample{if (x$bounded) '; a bound on a sample size was active' else ''}.")
   invisible(x)

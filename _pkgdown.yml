@@ -33,9 +33,11 @@ reference:
 - title: Selecting units and points
   contents: [select_units, select_points]
 - title: Estimating
-  contents: [design_variance, segment_estimator, point_estimator, expected_hits]
+  contents: [design_variance, segment_estimator, point_estimator, expected_hits, point_design_effect]
 - title: Allocation
-  contents: [frame_allocation, dual_frame_allocation, two_stage_allocation]
+  contents: [frame_allocation, dual_frame_allocation, two_stage_allocation, allocation-methods]
+- title: Allocation with the routed field cost
+  contents: [routed_unit_cost, two_stage_design, dual_frame_design]
 - title: The cost-variance frontier
   contents: [cost_variance_frontier, autoplot.fieldopt_frontier]
 - title: Engine

@@ -35,8 +35,14 @@ inside them) and a list frame needs.
   budget; `dual_frame_allocation()` is Hartley's allocation for an area frame
   plus a list frame with overlap, with the optimal mixing weight or the
   screening design; `two_stage_allocation()` is Cochran's two-stage
-  allocation with the cost function `c1 n + c2 n m`, where `c1` comes from
-  the routing.
+  allocation with the cost function `c1 n + c2 n m`. `tidy()` and `glance()`
+  read all three.
+- `routed_unit_cost()`, `two_stage_design()` and `dual_frame_design()` close
+  the loop: the cost of an area unit is measured by routing a sample of the
+  allocated size, and the allocation is repeated until it stabilises.
+- `point_design_effect()` simulates the whole area design (cells, points,
+  hits, estimator) and returns the bias, the variance and the design effect
+  of point sampling, the `deff_a` the dual-frame allocation asks for.
 - `cost_variance_frontier()` simulates designs over a grid of sample sizes and
   returns the trade-off between field cost and variance.
 
@@ -88,6 +94,8 @@ autoplot(f)
 <img src="man/figures/architecture.svg" alt="Architecture of fieldopt: R package, extendr bindings and the fieldopt-core Rust crate" width="100%" />
 
 <img src="man/figures/workflow.svg" alt="Workflow of fieldopt: frame, travel matrix, selection, routing, cost and variance, and the frontier" width="100%" />
+
+<img src="man/figures/area-frame.svg" alt="Area-frame workflow of fieldopt: cells, points, hits, multiplicity estimator, design effect, routed cost and the dual-frame allocation" width="100%" />
 
 ## Related work
 

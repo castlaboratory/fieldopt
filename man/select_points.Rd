@@ -4,7 +4,13 @@
 \alias{select_points}
 \title{Select points inside sampled grid cells}
 \usage{
-select_points(sample, points_per_cell, cell_size, seed = 1)
+select_points(
+  sample,
+  points_per_cell,
+  cell_size,
+  layout = c("random", "systematic"),
+  seed = 1
+)
 }
 \arguments{
 \item{sample}{A \code{fieldopt_sample} of cells with coordinate columns giving
@@ -16,6 +22,11 @@ intense), or the name of a column of the sample.}
 
 \item{cell_size}{Side of the square cells, in the units of the coordinates
 (one number, or \code{c(dx, dy)}).}
+
+\item{layout}{\code{"random"} (independent uniform points) or \code{"systematic"}
+(a regular grid of \verb{k1 x k2 = m} points with one random offset per cell,
+which spreads the points inside the cell; each point is still uniform
+over the cell, so the density is the same).}
 
 \item{seed}{Seed.}
 }
@@ -35,6 +46,6 @@ a cell, \code{pi * points / area}, is what \code{\link[=expected_hits]{expected_
 \examples{
 cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
 s <- select_units(cells, n = 12, seed = 2)
-p <- select_points(s, points_per_cell = 9, cell_size = 1)
+p <- select_points(s, points_per_cell = 9, cell_size = 1, layout = "systematic")
 nrow(p); head(p)
 }

@@ -50,9 +50,11 @@
 #' set.seed(1)
 #' cells <- expand.grid(x = 1:20, y = 1:20)
 #' cells$unit <- paste0("c", seq_len(nrow(cells)))
-#' cells$intensity <- cut(cells$x + rnorm(400, sd = 3), c(-Inf, 7, 14, Inf), c("low", "mid", "high"))
+#' cells$intensity <- cut(cells$x + rnorm(400, sd = 3), c(-Inf, 7, 14, Inf),
+#'                        c("low", "mid", "high"))
 #' cells$size <- c(low = 1, mid = 2, high = 4)[cells$intensity]
-#' s <- select_units(cells, n = c(low = 10, mid = 15, high = 25), size = "size", strata = "intensity")
+#' s <- select_units(cells, n = c(low = 10, mid = 15, high = 25), size = "size",
+#'                   strata = "intensity")
 #' table(s$intensity, s$sampled)
 #' r <- select_units(cells, n = 40, method = "systematic", replicates = 4)
 #' dim(attr(r, "replicates"))
@@ -169,6 +171,10 @@ print.fieldopt_sample <- function(x, ...) {
 #'   intense), or the name of a column of the sample.
 #' @param cell_size Side of the square cells, in the units of the coordinates
 #'   (one number, or `c(dx, dy)`).
+#' @param layout `"random"` (independent uniform points) or `"systematic"`
+#'   (a regular grid of `k1 x k2 = m` points with one random offset per cell,
+#'   which spreads the points inside the cell; each point is still uniform
+#'   over the cell, so the density is the same).
 #' @param seed Seed.
 #' @return A tibble of class `fieldopt_points` with one row per point: `unit`
 #'   (the cell), `point`, the two coordinates, `pi_cell`, `points_in_cell` and
@@ -177,9 +183,10 @@ print.fieldopt_sample <- function(x, ...) {
 #' @examples
 #' cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
 #' s <- select_units(cells, n = 12, seed = 2)
-#' p <- select_points(s, points_per_cell = 9, cell_size = 1)
+#' p <- select_points(s, points_per_cell = 9, cell_size = 1, layout = "systematic")
 #' nrow(p); head(p)
-select_points <- function(sample, points_per_cell, cell_size, seed = 1) {
+select_points <- function(sample, points_per_cell, cell_size, layout = c("random", "systematic"), seed = 1) {
+  layout <- rlang::arg_match(layout)
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
   co <- attr(sample, "coords")
   if (length(co) != 2L) cli::cli_abort("Point selection needs two coordinate columns.")
@@ -200,15 +207,22 @@ select_points <- function(sample, points_per_cell, cell_size, seed = 1) {
   set.seed(seed)
   rows <- lapply(seq_len(nrow(sel)), function(i) {
     k <- m[i]
+    if (layout == "random") {
+      ua <- stats::runif(k); ub <- stats::runif(k)
+    } else {
+      k1 <- max(which(k %% seq_len(floor(sqrt(k))) == 0)); k2 <- k %/% k1
+      g <- expand.grid(i = seq_len(k2) - 1, j = seq_len(k1) - 1)
+      ua <- (g$i + stats::runif(1)) / k2; ub <- (g$j + stats::runif(1)) / k1
+    }
     tibble::tibble(unit = sel$unit[i], point = seq_len(k),
-                   a = sel[[co[1]]][i] + (stats::runif(k) - 0.5) * cell_size[1],
-                   b = sel[[co[2]]][i] + (stats::runif(k) - 0.5) * cell_size[2],
+                   a = sel[[co[1]]][i] + (ua - 0.5) * cell_size[1],
+                   b = sel[[co[2]]][i] + (ub - 0.5) * cell_size[2],
                    pi_cell = sel$pi[i], points_in_cell = k,
                    density = sel$pi[i] * k / prod(cell_size))
   })
   out <- do.call(rbind, rows)
   names(out)[names(out) == "a"] <- co[1]; names(out)[names(out) == "b"] <- co[2]
-  structure(out, class = c("fieldopt_points", class(out)), cell_size = cell_size, coords = co)
+  structure(out, class = c("fieldopt_points", class(out)), cell_size = cell_size, coords = co, layout = layout)
 }
 
 #' Expected number of point hits of each establishment

@@ -10,6 +10,12 @@ NULL
 #' @export
 ggplot2::autoplot
 
+#' @export
+generics::tidy
+
+#' @export
+generics::glance
+
 #' Version of the Rust engine
 #'
 #' @return The version string of the `fieldopt-core` crate compiled into the

@@ -13,6 +13,11 @@
   Engine: `fieldopt-core` 0.2.2.
 * `cost_variance_frontier()` accepts `strata`, `selection` and `replicates`,
   a list of per-stratum allocations in `n_grid`, and reports `cost_per_unit`.
+* `routed_unit_cost()`, `two_stage_design()` and `dual_frame_design()`
+  iterate the allocation with the cost per area unit measured by routing;
+  `point_design_effect()` simulates the area design and returns the bias,
+  variance and design effect of point sampling; `select_points()` gains a
+  systematic layout; `tidy()` and `glance()` for the three allocations.
 * Variances are computed within strata and summed (`"stratified srs"`,
   `"stratified local-mean"`); route plots of geographic matrices put longitude
   on the x axis.
