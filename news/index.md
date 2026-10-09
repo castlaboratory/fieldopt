@@ -22,7 +22,15 @@
   `c1 n + c2 n m`.
   [`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
   chooses the variance estimator that matches the design (local-mean,
-  replicates or SRS). Engine: `fieldopt-core` 0.2.0.
+  replicates or SRS). Engine: `fieldopt-core` 0.2.2.
+
+- [`cost_variance_frontier()`](https://castlaboratory.github.io/fieldopt/reference/cost_variance_frontier.md)
+  accepts `strata`, `selection` and `replicates`, a list of per-stratum
+  allocations in `n_grid`, and reports `cost_per_unit`.
+
+- Variances are computed within strata and summed (`"stratified srs"`,
+  `"stratified local-mean"`); route plots of geographic matrices put
+  longitude on the x axis.
 
 - First version: travel matrices from coordinates or a road network
   ([`travel_matrix()`](https://castlaboratory.github.io/fieldopt/reference/travel_matrix.md)),

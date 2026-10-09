@@ -155,15 +155,16 @@ f <- cost_variance_frontier(frame, depot = "depot", cost_model = model,
                             method = "euclidean", max_stops = 5,
                             n_rep = 8, iterations = 60)
 f
-#> # A tibble: 6 × 8
-#>       n cost_mean cost_sd travel_mean routes_mean variance_mean cv_mean n_rep
-#> * <dbl>     <dbl>   <dbl>       <dbl>       <dbl>         <dbl>   <dbl> <dbl>
-#> 1     6      472.    6.62        26.0        2           19563.  0.107      8
-#> 2     9      699.    4.08        34.5        2.12         6200.  0.0630     8
-#> 3    12      925.    5.24        42.7        3            2972.  0.0434     8
-#> 4    16     1222.    7.82        51.2        4            1500.  0.0311     8
-#> 5    20     1518.    4.01        58.9        4.62         1013.  0.0257     8
-#> 6    24     1812.    2.52        66.2        5.25          542.  0.0187     8
+#> # A tibble: 6 × 9
+#>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
+#> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>
+#> 1     6      475.    5.92          79.2        27.6        2           20211.
+#> 2     9      701.    6.89          77.9        35.5        2.25         6185.
+#> 3    12      925.    7.68          77.1        42.7        3.25         3122.
+#> 4    16     1223.    6.12          76.4        51.3        4            1632.
+#> 5    20     1518.    4.33          75.9        59.2        4.38          909.
+#> 6    24     1810.    5.25          75.4        65.1        5.38          558.
+#> # ℹ 2 more variables: cv_mean <dbl>, n_rep <dbl>
 autoplot(f)
 ```
 

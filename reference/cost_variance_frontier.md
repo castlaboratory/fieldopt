@@ -17,6 +17,9 @@ cost_variance_frontier(
   n_grid,
   y = NULL,
   size = NULL,
+  strata = NULL,
+  selection = c("lpm", "systematic", "srs"),
+  replicates = 1,
   matrix = NULL,
   method = c("haversine", "euclidean"),
   max_length = Inf,
@@ -46,17 +49,37 @@ cost_variance_frontier(
 
 - n_grid:
 
-  Sample sizes to evaluate.
+  Sample sizes to evaluate: a numeric vector of total sizes (allocated
+  across strata as in
+  [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)),
+  or a list of vectors named by stratum, one allocation per grid point.
 
 - y:
 
   Optional column of the study variable for the whole frame (a planning
   value); when given, the variance of the estimated total is computed
-  from the local-mean estimator on each simulated sample.
+  with
+  [`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
+  on each simulated sample.
 
 - size:
 
   Optional size column for probability-proportional-to-size selection.
+
+- strata:
+
+  Optional stratum column, passed to
+  [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md).
+
+- selection:
+
+  Selection method of
+  [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md):
+  `"lpm"`, `"systematic"` or `"srs"`.
+
+- replicates:
+
+  Replicates of a `"systematic"` selection.
 
 - matrix:
 
@@ -88,8 +111,13 @@ cost_variance_frontier(
 ## Value
 
 A tibble of class `fieldopt_frontier` with one row per sample size: `n`,
-`cost_mean`, `cost_sd`, `travel_mean`, `routes_mean`, `variance_mean`
-and `cv_mean` (when `y` is given), `n_rep`.
+`cost_mean`, `cost_sd`, `cost_per_unit` (the planning value for `c1` in
+[`two_stage_allocation()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_allocation.md)
+or `cost_a` in
+[`dual_frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_allocation.md)),
+`travel_mean`, `routes_mean`, `variance_mean` and `cv_mean` (when `y` is
+given), `n_rep`, and `allocation` (a list column with the stratum sizes)
+when strata are used.
 
 ## Examples
 
@@ -102,9 +130,10 @@ model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
                           interviews_per_unit = 4)
 cost_variance_frontier(frame, depot = "depot", cost_model = model, n_grid = c(8, 16),
                        y = "crop", method = "euclidean", n_rep = 3, iterations = 20)
-#> # A tibble: 2 × 8
-#>       n cost_mean cost_sd travel_mean routes_mean variance_mean cv_mean n_rep
-#> * <dbl>     <dbl>   <dbl>       <dbl>       <dbl>         <dbl>   <dbl> <dbl>
-#> 1     8      619.    2.63        29.5           1         8199.  0.0664     3
-#> 2    16     1193.    3.47        36.5           1          800.  0.0211     3
+#> # A tibble: 2 × 9
+#>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
+#> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>
+#> 1     8      626.   1.94           78.3        33.2           1        11128.
+#> 2    16     1194.   0.948          74.6        37.0           1          739.
+#> # ℹ 2 more variables: cv_mean <dbl>, n_rep <dbl>
 ```

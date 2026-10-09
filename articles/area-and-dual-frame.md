@@ -108,9 +108,9 @@ eh <- expected_hits(areas, cells_s, points_per_cell = ppc, cell_size = 1)
 hits$expected_hits <- eh$expected_hits[match(hits$establishment, eh$establishment)]
 point_estimator(hits, cells_s)
 #> # A tibble: 1 × 10
-#>    total variance    se     cv variance_srs     n     N variance_method n_hits
-#>    <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>            <int>
-#> 1 21557. 1499491. 1225. 0.0568     4322582.   100   900 local-mean         401
+#>    total variance    se     cv variance_srs     n     N variance_method   n_hits
+#>    <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>              <int>
+#> 1 21557. 1390104. 1179. 0.0547     4322582.   100   900 stratified local…    401
 #> # ℹ 1 more variable: n_establishments <int>
 truth
 #> [1] 22075.4

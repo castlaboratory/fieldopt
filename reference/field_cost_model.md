@@ -32,8 +32,9 @@ field_cost_model(
 
 - interviews_per_unit:
 
-  Expected interviews per visited unit (a single number or a function of
-  the unit index).
+  Expected interviews per visited unit: a single number, a vector with
+  one value per row of the travel matrix (depot included, in the same
+  order), or a function of the row indices of the visited units.
 
 - currency:
 

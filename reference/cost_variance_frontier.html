@@ -72,6 +72,9 @@ field work costs and how precise the estimate is at each sample size.</p>
 <span>  <span class="va">n_grid</span>,</span>
 <span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  strata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lpm"</span>, <span class="st">"systematic"</span>, <span class="st">"srs"</span><span class="op">)</span>,</span>
+<span>  replicates <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"haversine"</span>, <span class="st">"euclidean"</span><span class="op">)</span>,</span>
 <span>  max_length <span class="op">=</span> <span class="cn">Inf</span>,</span>
@@ -100,18 +103,33 @@ row named in <code>depot</code>.</p></dd>
 
 
 <dt id="arg-n-grid">n_grid<a class="anchor" aria-label="anchor" href="#arg-n-grid"></a></dt>
-<dd><p>Sample sizes to evaluate.</p></dd>
+<dd><p>Sample sizes to evaluate: a numeric vector of total sizes
+(allocated across strata as in <code><a href="select_units.html">select_units()</a></code>), or a list of vectors
+named by stratum, one allocation per grid point.</p></dd>
 
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
 <dd><p>Optional column of the study variable for the whole frame (a
 planning value); when given, the variance of the estimated total is
-computed from the local-mean estimator on each simulated sample.</p></dd>
+computed with <code><a href="design_variance.html">design_variance()</a></code> on each simulated sample.</p></dd>
 
 
 <dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
 <dd><p>Optional size column for probability-proportional-to-size
 selection.</p></dd>
+
+
+<dt id="arg-strata">strata<a class="anchor" aria-label="anchor" href="#arg-strata"></a></dt>
+<dd><p>Optional stratum column, passed to <code><a href="select_units.html">select_units()</a></code>.</p></dd>
+
+
+<dt id="arg-selection">selection<a class="anchor" aria-label="anchor" href="#arg-selection"></a></dt>
+<dd><p>Selection method of <code><a href="select_units.html">select_units()</a></code>: <code>"lpm"</code>,
+<code>"systematic"</code> or <code>"srs"</code>.</p></dd>
+
+
+<dt id="arg-replicates">replicates<a class="anchor" aria-label="anchor" href="#arg-replicates"></a></dt>
+<dd><p>Replicates of a <code>"systematic"</code> selection.</p></dd>
 
 
 <dt id="arg-matrix">matrix<a class="anchor" aria-label="anchor" href="#arg-matrix"></a></dt>
@@ -142,8 +160,12 @@ coordinates otherwise).</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble of class <code>fieldopt_frontier</code> with one row per sample
-size: <code>n</code>, <code>cost_mean</code>, <code>cost_sd</code>, <code>travel_mean</code>, <code>routes_mean</code>,
-<code>variance_mean</code> and <code>cv_mean</code> (when <code>y</code> is given), <code>n_rep</code>.</p>
+size: <code>n</code>, <code>cost_mean</code>, <code>cost_sd</code>, <code>cost_per_unit</code> (the planning value
+for <code>c1</code> in <code><a href="two_stage_allocation.html">two_stage_allocation()</a></code> or <code>cost_a</code> in
+<code><a href="dual_frame_allocation.html">dual_frame_allocation()</a></code>), <code>travel_mean</code>, <code>routes_mean</code>,
+<code>variance_mean</code> and <code>cv_mean</code> (when <code>y</code> is given), <code>n_rep</code>, and
+<code>allocation</code> (a list column with the stratum sizes) when strata are
+used.</p>
     </div>
 
     <div class="section level2">
@@ -156,11 +178,12 @@ size: <code>n</code>, <code>cost_mean</code>, <code>cost_sd</code>, <code>travel
 <span class="r-in"><span>                          interviews_per_unit <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">cost_variance_frontier</span><span class="op">(</span><span class="va">frame</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, cost_model <span class="op">=</span> <span class="va">model</span>, n_grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">16</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                       y <span class="op">=</span> <span class="st">"crop"</span>, method <span class="op">=</span> <span class="st">"euclidean"</span>, n_rep <span class="op">=</span> <span class="fl">3</span>, iterations <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       n cost_mean cost_sd travel_mean routes_mean variance_mean cv_mean n_rep</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     8      619.    2.63        29.5           1         <span style="text-decoration: underline;">8</span>199.  0.066<span style="text-decoration: underline;">4</span>     3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>    16     <span style="text-decoration: underline;">1</span>193.    3.47        36.5           1          800.  0.021<span style="text-decoration: underline;">1</span>     3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     8      626.   1.94           78.3        33.2           1        <span style="text-decoration: underline;">11</span>128.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>    16     <span style="text-decoration: underline;">1</span>194.   0.948          74.6        37.0           1          739.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: cv_mean &lt;dbl&gt;, n_rep &lt;dbl&gt;</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
