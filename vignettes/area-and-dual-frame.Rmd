@@ -190,7 +190,7 @@ minimise the variance, and the Fuller-Burmeister estimator adds the
 difference between the two estimates of the overlap size. The variances come
 from the variance estimator of each design.
 
-```{r estimate}
+```{r dual-estimate}
 cells$domain <- ifelse(cells$intensity == "high" & runif(nrow(cells)) < 0.6, "ab", "a")
 cells$crop_est <- ifelse(cells$domain == "ab", 60, 12) + rnorm(nrow(cells), sd = 3)
 ab <- cells[cells$domain == "ab", ]   # the overlap: the same holdings, seen from the list
