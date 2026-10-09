@@ -17,8 +17,13 @@ test_that("the frontier reports cost and variance per sample size", {
   expect_error(cost_variance_frontier(fr[, -1], "depot", cm, 6, method = "euclidean"), "unit")
 })
 
-test_that("core version is reported", {
+test_that("core version is the version of fieldopt-core in Cargo.toml", {
   expect_match(core_version(), "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+  toml <- system.file("rust/Cargo.toml", package = "fieldopt")
+  if (toml == "") toml <- testthat::test_path("..", "..", "src", "rust", "Cargo.toml")
+  skip_if_not(file.exists(toml))
+  dep <- grep("^fieldopt-core", readLines(toml), value = TRUE)
+  expect_equal(core_version(), gsub("[^0-9.]", "", sub("^fieldopt-core\\s*=\\s*", "", dep)))
 })
 
 test_that("the frontier accepts strata, selection methods and allocations", {

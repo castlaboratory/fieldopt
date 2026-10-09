@@ -18,6 +18,10 @@
 #' * from a matrix computed elsewhere (`matrix`), with the coordinates used
 #'   only for names and plots.
 #'
+#' Road matrices need not be symmetric (one-way streets, different durations
+#' by direction); the routing solver prices every leg in the direction
+#' travelled.
+#'
 #' @param coords Data frame or matrix with two coordinate columns: `lat`, `lon`
 #'   (degrees) for `"haversine"` and `"osrm"`, or `x`, `y` (planar, any unit)
 #'   for `"euclidean"`. Row names, or a column `unit`, name the units.

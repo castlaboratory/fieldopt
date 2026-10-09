@@ -18,8 +18,8 @@ dual_frame_allocation(
 }
 \arguments{
 \item{domains}{Data frame with one row per domain \code{a}, \code{ab}, \code{b} (column
-\code{domain}) and columns \code{size} (units), \code{mean} and \code{sd} of the study
-variable.}
+\code{domain}) and columns \code{size} (units), \code{mean} and \code{sd} (standard
+deviation with divisor \code{size - 1}) of the study variable.}
 
 \item{cost_a, cost_b}{Cost per sampled unit in frame A and frame B.}
 

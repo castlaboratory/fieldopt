@@ -69,6 +69,10 @@ small tests only: run your own server for a frame);
 \item from a matrix computed elsewhere (\code{matrix}), with the coordinates used
 only for names and plots.
 }
+
+Road matrices need not be symmetric (one-way streets, different durations
+by direction); the routing solver prices every leg in the direction
+travelled.
 }
 \examples{
 segments <- data.frame(unit = c("depot", "s1", "s2", "s3"),

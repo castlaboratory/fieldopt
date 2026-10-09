@@ -19,7 +19,10 @@ two_stage_allocation(
 }
 \arguments{
 \item{n_primary, m_secondary}{Primary units in the population and secondary
-units per primary unit (an average when they differ).}
+units per primary unit (an average when they differ; need not be a whole
+number). The allocation tries every whole \code{m} up to \code{m_secondary} and
+keeps the cheapest pair meeting the target (or the least variance within
+the budget), so small populations are handled exactly.}
 
 \item{s2_between, s2_within}{Variance among primary-unit means and within
 primary units.}

@@ -43,6 +43,7 @@
 point_design_effect <- function(cells, areas, n, points_per_cell, cell_size, size = NULL, strata = NULL,
                                 method = c("lpm", "systematic", "srs"), replicates = 1, n_sim = 200, seed = 1) {
   method <- rlang::arg_match(method)
+  check_seed(seed)
   for (col in c("establishment", "unit", "area", "y")) if (!col %in% names(areas)) cli::cli_abort("{.arg areas} needs a column {.field {col}}.")
   cells <- tibble::as_tibble(cells)
   if (!"unit" %in% names(cells)) cells$unit <- paste0("u", seq_len(nrow(cells)))
@@ -59,14 +60,13 @@ point_design_effect <- function(cells, areas, n, points_per_cell, cell_size, siz
     s <- select_units(cells, n = n, size = size, coords = NULL, strata = strata, method = method, replicates = replicates, seed = seed * 10000 + b)
     p <- select_points(s, points_per_cell = points_per_cell, cell_size = cell_size, seed = seed * 10000 + b)
     eh <- expected_hits(areas, s, points_per_cell = points_per_cell, cell_size = cell_size)
-    set.seed(seed * 10000 + b)
-    hit_e <- vapply(seq_len(nrow(p)), function(i) {
+    hit_e <- with_seed(seed * 10000 + b, vapply(seq_len(nrow(p)), function(i) {
       a <- by_cell[[p$unit[i]]]
       if (is.null(a)) return(NA_character_)
       pr <- a$area / cell_area
       k <- sample.int(nrow(a) + 1L, 1L, prob = c(pr, 1 - sum(pr)))
       if (k > nrow(a)) NA_character_ else a$establishment[k]
-    }, character(1))
+    }, character(1)))
     ok <- !is.na(hit_e)
     if (sum(ok) == 0) { est[b] <- 0; var_est[b] <- NA; interviews[b] <- 0; next }
     hits <- data.frame(unit = p$unit[ok], establishment = hit_e[ok])

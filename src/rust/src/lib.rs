@@ -159,10 +159,9 @@ fn dual_frame_rs(size: &[i32], mean: &[f64], sd: &[f64], cost_a: f64, cost_b: f6
 /// Two-stage allocation; `target` is a variance of the mean ("variance") or a budget.
 /// @noRd
 #[extendr]
-fn two_stage_rs(n_primary: i32, m_secondary: i32, s2_between: f64, s2_within: f64, c1: f64, c2: f64,
+fn two_stage_rs(n_primary: i32, m_secondary: f64, s2_between: f64, s2_within: f64, c1: f64, c2: f64,
                 target: f64, mode: &str) -> extendr_api::Result<List> {
-    let t = TwoStage { n_primary: n_primary.max(0) as usize, m_secondary: m_secondary.max(0) as usize,
-                       s2_between, s2_within, c1, c2 };
+    let t = TwoStage { n_primary: n_primary.max(0) as usize, m_secondary, s2_between, s2_within, c1, c2 };
     let a = match mode {
         "variance" => err(two_stage_for_variance(&t, target))?,
         "budget" => err(two_stage_for_budget(&t, target))?,
@@ -176,7 +175,7 @@ fn two_stage_rs(n_primary: i32, m_secondary: i32, s2_between: f64, s2_within: f6
 /// @noRd
 #[extendr]
 fn core_version_rs() -> &'static str {
-    env!("CARGO_PKG_VERSION")
+    fieldopt_core::VERSION
 }
 
 extendr_module! {

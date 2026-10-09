@@ -40,8 +40,8 @@ row named in \code{depot}.}
 \item{cost_model}{A \code{\link[=field_cost_model]{field_cost_model()}}.}
 
 \item{domains}{Data frame with one row per domain \code{a}, \code{ab}, \code{b} (column
-\code{domain}) and columns \code{size} (units), \code{mean} and \code{sd} of the study
-variable.}
+\code{domain}) and columns \code{size} (units), \code{mean} and \code{sd} (standard
+deviation with divisor \code{size - 1}) of the study variable.}
 
 \item{cost_b}{Cost per sampled unit of the list frame.}
 

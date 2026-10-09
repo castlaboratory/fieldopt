@@ -9,13 +9,9 @@ rust-version = '1.70'
 crate-type = [ 'rlib', 'staticlib' ]
 name = 'fieldopt'
 
-[[bin]]
-name = 'document'
-path = 'document.rs'
-
 [dependencies]
 extendr-api = '0.9'
-fieldopt-core = '0.2.3'
+fieldopt-core = '0.3.0'
 
 [profile.release]
 lto = true

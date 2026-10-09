@@ -61,9 +61,12 @@ cost_variance_frontier <- function(frame, depot, cost_model, n_grid, y = NULL, s
   if (!"unit" %in% names(frame)) cli::cli_abort("{.arg frame} needs a column {.field unit} with names, including the depot.")
   if (!depot %in% frame$unit) cli::cli_abort("Depot {.val {depot}} not found in {.field unit}.")
   if (!inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
+  check_seed(seed)
   if (is.null(matrix)) matrix <- travel_matrix(frame, method = method)
+  if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
+  if (!setequal(rownames(matrix), frame$unit)) cli::cli_abort("{.arg matrix} must have one row per unit of {.arg frame}, with the same names.")
   units_frame <- frame[frame$unit != depot, ]
-  coords <- if (method == "euclidean") c("x", "y") else c("lat", "lon")
+  coords <- switch(attr(matrix, "method"), euclidean = c("x", "y"), haversine = , osrm = c("lat", "lon"), NULL)
   rows <- lapply(seq_along(n_grid), function(k) {
     n <- n_grid[[k]]
     cost <- travel <- nr <- var <- cv <- numeric(n_rep)

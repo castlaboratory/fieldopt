@@ -69,6 +69,9 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
   if (anyNA(X)) cli::cli_abort("Coordinates must not be missing.")
   N <- nrow(frame)
   if (!"unit" %in% names(frame)) frame$unit <- paste0("u", seq_len(N))
+  if (anyDuplicated(frame$unit)) cli::cli_abort("Unit names in {.field unit} must be distinct.")
+  check_seed(seed)
+  if (method == "srs" && !is.null(size)) cli::cli_abort(c("{.val srs} selects with equal probabilities.", i = "Drop {.arg size}, or use {.val lpm} or {.val systematic} for selection proportional to size."))
   sz <- if (is.null(size)) rep(1, N) else { if (!size %in% names(frame)) cli::cli_abort("Size column {.field {size}} not found."); as.numeric(frame[[size]]) }
   if (anyNA(sz) || any(sz < 0)) cli::cli_abort("Sizes must be non-negative without missing values.")
   if (!is.numeric(replicates) || length(replicates) != 1L || replicates < 1 || replicates != round(replicates)) cli::cli_abort("{.arg replicates} must be a whole number of at least 1.")
@@ -86,6 +89,7 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
     if (length(n) == 1L && is.null(names(n))) {
       share <- tapply(sz, h, sum)
       if (sum(share) <= 0) share <- table(h)
+      if (n < nlevels(h)) cli::cli_abort("{.arg n} = {n} is smaller than the number of strata ({nlevels(h)}); give one size per stratum or a larger {.arg n}.")
       n_h <- largest_remainder(n * share / sum(share), floor_min = 1)
     } else {
       if (is.null(names(n)) || !all(levels(h) %in% names(n))) cli::cli_abort("{.arg n} must be named by stratum: {.val {levels(h)}}.")
@@ -104,6 +108,7 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
     nk <- as.integer(n_h[k])
     sk <- sz[idx]
     if (sum(sk) <= 0) sk <- rep(1, length(idx))
+    if (sum(sk > 0) < nk) cli::cli_abort("Stratum {.val {names(n_h)[k]}} has {sum(sk > 0)} unit{?s} with positive size but {nk} {?is/are} to be sampled.")
     p <- inclusion_probabilities_rs(sk, nk)
     seed_k <- seed * 100 + k
     if (method == "lpm") {
@@ -111,8 +116,7 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
       sampled[idx] <- local_pivotal_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), p, seed_k)
     } else if (method == "srs") {
       pi[idx] <- p
-      set.seed(seed_k)
-      sampled[idx[sample.int(length(idx), nk)]] <- TRUE
+      sampled[idx[with_seed(seed_k, sample.int(length(idx), nk))]] <- TRUE
     } else {
       ord <- hilbert_order_rs(as.numeric(t(X[idx, , drop = FALSE])), 16L)
       m <- matrix(systematic_replicates_rs(ord, p, as.integer(replicates), seed_k), length(idx), replicates, byrow = TRUE)
@@ -204,8 +208,8 @@ select_points <- function(sample, points_per_cell, cell_size, layout = c("random
     as.numeric(points_per_cell[lev])
   } else rep(as.numeric(points_per_cell), nrow(sel))
   if (anyNA(m) || any(m < 1) || any(m != round(m))) cli::cli_abort("Points per cell must be whole numbers of at least 1.")
-  set.seed(seed)
-  rows <- lapply(seq_len(nrow(sel)), function(i) {
+  check_seed(seed)
+  rows <- with_seed(seed, lapply(seq_len(nrow(sel)), function(i) {
     k <- m[i]
     if (layout == "random") {
       ua <- stats::runif(k); ub <- stats::runif(k)
@@ -219,10 +223,44 @@ select_points <- function(sample, points_per_cell, cell_size, layout = c("random
                    b = sel[[co[2]]][i] + (ub - 0.5) * cell_size[2],
                    pi_cell = sel$pi[i], points_in_cell = k,
                    density = sel$pi[i] * k / prod(cell_size))
-  })
+  }))
   out <- do.call(rbind, rows)
   names(out)[names(out) == "a"] <- co[1]; names(out)[names(out) == "b"] <- co[2]
   structure(out, class = c("fieldopt_points", class(out)), cell_size = cell_size, coords = co, layout = layout)
+}
+
+#' @export
+print.fieldopt_points <- function(x, ...) {
+  cli::cli_text("{nrow(x)} {attr(x, 'layout')} {cli::qty(nrow(x))}point{?s} in {length(unique(x$unit))} sampled cell{?s} of size {paste(attr(x, 'cell_size'), collapse = ' x ')}.")
+  NextMethod()
+}
+
+#' Plot a sample of units
+#'
+#' @param object A `fieldopt_sample`.
+#' @param ... Unused.
+#' @return A ggplot of the frame with the sampled units highlighted, coloured
+#'   by stratum when the sample is stratified, with longitude on the x axis
+#'   for geographic coordinates.
+#' @exportS3Method ggplot2::autoplot fieldopt_sample
+#' @examples
+#' cells <- expand.grid(x = 1:12, y = 1:12)
+#' cells$h <- ifelse(cells$x <= 6, "west", "east")
+#' autoplot(select_units(cells, n = 20, strata = "h", seed = 3))
+autoplot.fieldopt_sample <- function(object, ...) {
+  co <- attr(object, "coords"); st <- attr(object, "strata")
+  geo <- identical(co, c("lat", "lon"))
+  d <- tibble::tibble(a = if (geo) object[[co[2]]] else object[[co[1]]], b = if (geo) object[[co[1]]] else object[[co[2]]],
+                      sampled = factor(ifelse(object$sampled, "sampled", "not sampled"), c("sampled", "not sampled")),
+                      stratum = if (is.null(st)) factor("all") else factor(object[[st]]))
+  p <- ggplot2::ggplot(d, ggplot2::aes(x = .data$a, y = .data$b)) +
+    ggplot2::geom_point(data = d[!object$sampled, ], ggplot2::aes(colour = .data$stratum), size = 1, alpha = 0.35) +
+    ggplot2::geom_point(data = d[object$sampled, ], ggplot2::aes(colour = .data$stratum), size = 2.4) +
+    ggplot2::labs(x = if (geo) "longitude" else co[1], y = if (geo) "latitude" else co[2], colour = "stratum",
+                  subtitle = paste0(sum(object$sampled), " of ", nrow(object), " units by ", attr(object, "method"))) +
+    (if (geo) ggplot2::coord_quickmap() else ggplot2::coord_equal()) +
+    ggplot2::theme_minimal() + ggplot2::theme(legend.position = if (is.null(st)) "none" else "bottom")
+  p
 }
 
 #' Expected number of point hits of each establishment
@@ -291,11 +329,12 @@ point_estimator <- function(hits, sample) {
   for (col in c("unit", "establishment", "y", "expected_hits")) if (!col %in% names(hits)) cli::cli_abort("{.arg hits} needs a column {.field {col}}.")
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
   if (any(hits$expected_hits <= 0) || anyNA(hits$expected_hits)) cli::cli_abort("{.field expected_hits} must be positive.")
-  contrib <- as.numeric(hits$y) / as.numeric(hits$expected_hits)
-  u <- tapply(contrib, factor(hits$unit, levels = sample$unit), sum)
-  u[is.na(u)] <- 0
+  if (anyNA(hits$y)) cli::cli_abort("{.field y} of the hits must not be missing.")
   bad <- unique(hits$unit[!hits$unit %in% sample$unit[sample$sampled]])
   if (length(bad)) cli::cli_abort("Hits refer to unsampled cell{?s} {.val {bad}}.")
+  contrib <- as.numeric(hits$y) / as.numeric(hits$expected_hits)
+  u <- tapply(contrib, factor(hits$unit, levels = sample$unit), sum)
+  u[is.na(u)] <- 0  # sampled cells without hits
   # cell totals z such that sum(z / pi) over sampled cells equals the estimate
   z <- as.numeric(u) * sample$pi
   out <- ht_variance(sample, z, total = sum(as.numeric(u)))

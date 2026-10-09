@@ -1,5 +1,26 @@
 # fieldopt 0.1.0
 
+* Review round (engine `fieldopt-core` 0.3.0): the routing local search
+  prices every move in the direction travelled, so asymmetric road matrices
+  (one-way streets, durations by direction) no longer loop, and the lower
+  bound is valid for asymmetric matrices and for several routes;
+  `two_stage_allocation()` tries every whole `m`, accepts a fractional
+  `m_secondary` and meets its target in small populations;
+  `dual_frame_allocation()` reads `sd` as the standard deviation with
+  divisor `N - 1` and refuses `theta` outside `[0, 1]` and budgets below two
+  units per frame; `select_units()` refuses `size` with `"srs"` (the
+  probabilities were mislabelled), duplicate unit names, `n` below the
+  number of strata, strata with too few positive sizes and invalid seeds, and
+  leaves the user's random-number generator untouched; `point_estimator()`
+  refuses missing `y`; `two_stage_design()` and `dual_frame_design()` report
+  `converged = FALSE` when the rounds run out; `cost_variance_frontier()`
+  takes the coordinate columns from a supplied `matrix`; `core_version()`
+  reports the engine crate. New: `autoplot()` for samples, `print()` for
+  points, `tidy()`/`glance()` for routes, `glance()` for frontiers.
+* The R wrappers are shipped in `R/extendr-wrappers.R` and no longer
+  regenerated at install time (`cargo run --bin document`), which failed on
+  the CRAN Windows toolchain.
+
 * Area-frame and dual-frame design: `select_units()` gains strata, a
   spatially ordered systematic method with interpenetrating replicates and
   simple random sampling; `select_points()`, `expected_hits()` and

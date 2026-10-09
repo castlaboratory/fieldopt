@@ -19,7 +19,8 @@
 #' @param cost_model Optional [field_cost_model()] to price the solution.
 #' @return An object of class `fieldopt_routes`: `routes` (a tibble with
 #'   columns `route`, `stop`, `unit`), `lengths`, `total`, `lower_bound`,
-#'   `gap`, `best_iteration`, `cost` (when a model is given) and the inputs.
+#'   `gap`, `best_iteration`, `cost` (when a model is given), the inputs and
+#'   the travel matrix.
 #' @export
 #' @examples
 #' set.seed(1)
@@ -41,7 +42,8 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
   if (length(d) != 1L) cli::cli_abort("{.arg depot} must be a single unit.")
   if (anyDuplicated(u)) cli::cli_abort("{.arg units} must be distinct.")
   if (d %in% u) cli::cli_abort("The depot cannot be among the units to visit.")
-  for (v in c("iterations", "alpha", "seed")) if (!is.numeric(get(v)) || length(get(v)) != 1L) cli::cli_abort("{.arg {v}} must be a single number.")
+  for (v in c("iterations", "alpha")) if (!is.numeric(get(v)) || length(get(v)) != 1L) cli::cli_abort("{.arg {v}} must be a single number.")
+  check_seed(seed)
   if (is.finite(max_length)) {
     far <- nm[u][2 * unclass(matrix)[d, u] > max_length]
     if (length(far)) cli::cli_abort(c("A route from {.val {nm[d]}} to {.val {far}} and back exceeds {.arg max_length} = {max_length}.",
@@ -60,7 +62,8 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
               n_routes = length(res$routes), depot = nm[d], units = nm[u],
               limits = c(max_length = max_length, max_stops = max_stops),
               options = list(iterations = iterations, alpha = alpha, seed = seed),
-              travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"))
+              travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"),
+              matrix = matrix)
   if (!is.null(cost_model)) {
     if (!inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
     out$cost <- cost_of(cost_model, res$total, length(u), u)

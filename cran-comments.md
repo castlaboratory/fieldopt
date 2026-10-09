@@ -14,6 +14,8 @@ First submission.
 0 errors | 0 warnings | 1 note
 
 * "New submission" (CRAN incoming feasibility). This is the first release.
+  The words flagged as possibly misspelled are proper nouns and the package
+  name (Hartley's, Horvitz, fieldopt).
 
 ## Notes for the reviewers
 
@@ -24,8 +26,9 @@ First submission.
   offline with `cargo build --offline -j 2`; nothing is downloaded during the
   installation. The crates and their authors and licences are listed in
   `inst/AUTHORS` and acknowledged in `Authors@R`. The computational crate
-  `fieldopt-core` is written by the package authors and published on
-  crates.io.
+  `fieldopt-core` (0.3.0) is written by the package authors and published on
+  crates.io. The R wrappers of the Rust functions are shipped in the package
+  (`R/extendr-wrappers.R`); the installation runs a single `cargo build`.
 * Examples run in under two seconds each; the only `\dontrun{}` example
   queries a public routing server (the `osrm` package, in Suggests). The test
   that queries that server is skipped on CRAN; the connector is otherwise

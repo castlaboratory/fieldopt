@@ -70,3 +70,56 @@ glance.fieldopt_two_stage <- function(x, ...) {
   tibble::tibble(mode = x$mode, n = x$n, m = x$m, m_optimal = x$m_optimal, cost = x$cost,
                  variance_total = x$variance_total, se_total = x$se_total, cv = x$cv, bounded = x$bounded)
 }
+
+#' Tidy and glance methods for routes and frontiers
+#'
+#' `tidy()` of a `fieldopt_routes` returns one row per stop (`route`, `stop`,
+#' `unit`, and `leg`, the travel from the previous stop or the depot);
+#' `glance()` one row with the total travel, the lower bound, the gap, the
+#' number of routes and the cost when a model was given. `glance()` of a
+#' `fieldopt_frontier` returns one row with the range of sample sizes, costs
+#' and variances covered, the selection method and the replicates.
+#'
+#' @param x A `fieldopt_routes` or `fieldopt_frontier`.
+#' @param ... Unused.
+#' @return A tibble.
+#' @name routes-methods
+#' @examples
+#' set.seed(1)
+#' pts <- data.frame(unit = c("depot", paste0("s", 1:8)), x = c(0, runif(8)), y = c(0, runif(8)))
+#' r <- route_fieldwork(travel_matrix(pts, method = "euclidean"), paste0("s", 1:8), "depot",
+#'                      max_stops = 4, iterations = 20)
+#' tidy(r); glance(r)
+NULL
+
+#' @rdname routes-methods
+#' @method tidy fieldopt_routes
+#' @export
+tidy.fieldopt_routes <- function(x, ...) {
+  d <- x$routes
+  m <- unclass(x$matrix)
+  prev <- ifelse(d$stop == 1, x$depot, c(NA_character_, d$unit[-nrow(d)]))
+  d$leg <- m[cbind(match(prev, rownames(m)), match(d$unit, rownames(m)))]
+  d
+}
+
+#' @rdname routes-methods
+#' @method glance fieldopt_routes
+#' @export
+glance.fieldopt_routes <- function(x, ...) {
+  out <- tibble::tibble(n_units = length(x$units), n_routes = x$n_routes, total = x$total, lower_bound = x$lower_bound,
+                        gap = x$gap, longest_route = max(x$lengths), travel_unit = x$travel_unit)
+  if (!is.null(x$cost)) out$cost <- x$cost[["total"]]
+  out
+}
+
+#' @rdname routes-methods
+#' @method glance fieldopt_frontier
+#' @export
+glance.fieldopt_frontier <- function(x, ...) {
+  d <- tibble::as_tibble(unclass(x))
+  out <- tibble::tibble(n_grid = nrow(d), n_min = min(d$n), n_max = max(d$n), cost_min = min(d$cost_mean), cost_max = max(d$cost_mean))
+  if ("variance_mean" %in% names(d)) { out$variance_min <- min(d$variance_mean); out$variance_max <- max(d$variance_mean) }
+  out$selection <- attr(x, "selection"); out$replicates <- attr(x, "replicates"); out$n_rep <- d$n_rep[1]
+  out
+}

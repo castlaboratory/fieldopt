@@ -20,8 +20,8 @@
 #' sample size under consideration, and iterate once or twice.
 #'
 #' @param domains Data frame with one row per domain `a`, `ab`, `b` (column
-#'   `domain`) and columns `size` (units), `mean` and `sd` of the study
-#'   variable.
+#'   `domain`) and columns `size` (units), `mean` and `sd` (standard
+#'   deviation with divisor `size - 1`) of the study variable.
 #' @param cost_a,cost_b Cost per sampled unit in frame A and frame B.
 #' @param deff_a,deff_b Design effects of the two samples relative to simple
 #'   random sampling (an area sample of segments or points usually has
@@ -61,7 +61,7 @@ dual_frame_allocation <- function(domains, cost_a, cost_b, deff_a = 1, deff_b = 
   }
   mode <- if (is.null(budget)) "variance" else "budget"
   target <- if (mode == "variance") target_variance else budget
-  th <- if (is.null(theta)) -1 else if (identical(theta, "screening")) 0 else { if (!is.numeric(theta) || length(theta) != 1L) cli::cli_abort("{.arg theta} must be a number, {.val screening} or NULL."); theta }
+  th <- if (is.null(theta)) -1 else if (identical(theta, "screening")) 0 else { if (!is.numeric(theta) || length(theta) != 1L || is.na(theta) || theta < 0 || theta > 1) cli::cli_abort("{.arg theta} must be a number in [0, 1], {.val screening} or NULL."); theta }
   res <- dual_frame_rs(as.integer(d$size), as.numeric(d$mean), as.numeric(d$sd), cost_a, cost_b, deff_a, deff_b, th, as.numeric(target), mode)
   res$se <- sqrt(res$variance); res$cv <- if (total != 0) res$se / abs(total) else NA_real_; res$total <- total
   res$domains <- tibble::as_tibble(d); res$cost_a <- cost_a; res$cost_b <- cost_b; res$deff_a <- deff_a; res$deff_b <- deff_b
@@ -93,7 +93,10 @@ print.fieldopt_dual_frame <- function(x, ...) {
 #' `n` and iterate.
 #'
 #' @param n_primary,m_secondary Primary units in the population and secondary
-#'   units per primary unit (an average when they differ).
+#'   units per primary unit (an average when they differ; need not be a whole
+#'   number). The allocation tries every whole `m` up to `m_secondary` and
+#'   keeps the cheapest pair meeting the target (or the least variance within
+#'   the budget), so small populations are handled exactly.
 #' @param s2_between,s2_within Variance among primary-unit means and within
 #'   primary units.
 #' @param c1,c2 Cost per primary unit visited and per secondary unit observed.
@@ -120,7 +123,7 @@ two_stage_allocation <- function(n_primary, m_secondary, s2_between, s2_within, 
   }
   mode <- if (is.null(budget)) "variance" else "budget"
   target <- if (mode == "variance") target_variance / scale else budget
-  res <- two_stage_rs(as.integer(n_primary), as.integer(m_secondary), s2_between, s2_within, c1, c2, as.numeric(target), mode)
+  res <- two_stage_rs(as.integer(n_primary), as.numeric(m_secondary), s2_between, s2_within, c1, c2, as.numeric(target), mode)
   res$se_total <- sqrt(res$variance_total)
   res$cv <- if (!is.null(mean) && mean != 0) res$se_total / abs(mean * n_primary * m_secondary) else NA_real_
   res$mode <- mode; res$inputs <- list(n_primary = n_primary, m_secondary = m_secondary, s2_between = s2_between, s2_within = s2_within, c1 = c1, c2 = c2)

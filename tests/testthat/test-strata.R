@@ -50,6 +50,8 @@ test_that("srs and replicate variances match the design", {
   d <- design_variance(sr, "crop")
   expect_equal(d$variance, d$variance_srs)
   expect_equal(d$variance_method, "srs")
+  yk <- cells$crop[sr$sampled]
+  expect_equal(d$variance, 400^2 * (1 - 40 / 400) * stats::var(yk) / 40)
   r4 <- select_units(cells, n = 40, method = "systematic", replicates = 4, seed = 3)
   d4 <- design_variance(r4, "crop")
   expect_equal(d4$variance_method, "replicates")

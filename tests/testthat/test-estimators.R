@@ -55,14 +55,14 @@ test_that("segment estimators reduce to the HT total of the segment values", {
   sel <- s$unit[s$sampled]
   # two establishments per segment: one with headquarters inside holding 70% of its land there
   tracts <- rbind(
-    data.frame(unit = sel, establishment = paste0(sel, "-a"), y_tract = 0.7 * 10, y_total = 10, headquarters = TRUE, share = 0.7),
-    data.frame(unit = sel, establishment = paste0(sel, "-b"), y_tract = 0.3 * 20, y_total = 20, headquarters = FALSE, share = 0.3))
+    data.frame(unit = sel, establishment = paste0(sel, "-a"), y_tract = 0.7 * 10, y_total = 10, headquarters = TRUE, share = 0.5),
+    data.frame(unit = sel, establishment = paste0(sel, "-b"), y_tract = 0.3 * 20, y_total = 20, headquarters = FALSE, share = 0.25))
   closed <- segment_estimator(tracts, s, "closed")
   open <- segment_estimator(tracts, s, "open")
   weighted <- segment_estimator(tracts, s, "weighted")
   expect_equal(closed$total, 400 * 13)
   expect_equal(open$total, 400 * 10)
-  expect_equal(weighted$total, 400 * 13)
+  expect_equal(weighted$total, 400 * (0.5 * 10 + 0.25 * 20))
   expect_equal(closed$type, "closed")
   expect_error(segment_estimator(tracts[, c("unit", "y_tract")], s, "open"), "y_total")
   tracts$share[1] <- 2

@@ -38,7 +38,8 @@ route_fieldwork(
 \value{
 An object of class \code{fieldopt_routes}: \code{routes} (a tibble with
 columns \code{route}, \code{stop}, \code{unit}), \code{lengths}, \code{total}, \code{lower_bound},
-\code{gap}, \code{best_iteration}, \code{cost} (when a model is given) and the inputs.
+\code{gap}, \code{best_iteration}, \code{cost} (when a model is given), the inputs and
+the travel matrix.
 }
 \description{
 Finds low-cost routes from a depot through the selected units with GRASP
