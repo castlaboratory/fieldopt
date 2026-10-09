@@ -33,6 +33,8 @@
   points
 - [`expected_hits()`](https://castlaboratory.github.io/fieldopt/reference/expected_hits.md)
   : Expected number of point hits of each establishment
+- [`point_design_effect()`](https://castlaboratory.github.io/fieldopt/reference/point_design_effect.md)
+  : Design effect and bias of point sampling by simulation
 
 ## Allocation
 
@@ -42,6 +44,24 @@
   : Dual-frame allocation (area frame plus list frame with overlap)
 - [`two_stage_allocation()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_allocation.md)
   : Two-stage allocation with a field cost function
+- [`tidy(`*`<fieldopt_allocation>`*`)`](https://castlaboratory.github.io/fieldopt/reference/allocation-methods.md)
+  [`glance(`*`<fieldopt_allocation>`*`)`](https://castlaboratory.github.io/fieldopt/reference/allocation-methods.md)
+  [`tidy(`*`<fieldopt_dual_frame>`*`)`](https://castlaboratory.github.io/fieldopt/reference/allocation-methods.md)
+  [`glance(`*`<fieldopt_dual_frame>`*`)`](https://castlaboratory.github.io/fieldopt/reference/allocation-methods.md)
+  [`tidy(`*`<fieldopt_two_stage>`*`)`](https://castlaboratory.github.io/fieldopt/reference/allocation-methods.md)
+  [`glance(`*`<fieldopt_two_stage>`*`)`](https://castlaboratory.github.io/fieldopt/reference/allocation-methods.md)
+  : Tidy and glance methods for allocations
+
+## Allocation with the routed field cost
+
+- [`routed_unit_cost()`](https://castlaboratory.github.io/fieldopt/reference/routed_unit_cost.md)
+  : Field cost per sampled unit at a given sample size, from the routing
+- [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
+  : Two-stage allocation with the primary-unit cost taken from the
+  routing
+- [`dual_frame_design()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_design.md)
+  : Dual-frame allocation with the area-frame cost taken from the
+  routing
 
 ## The cost-variance frontier
 
@@ -59,4 +79,6 @@
 
 - [`reexports`](https://castlaboratory.github.io/fieldopt/reference/reexports.md)
   [`autoplot`](https://castlaboratory.github.io/fieldopt/reference/reexports.md)
+  [`tidy`](https://castlaboratory.github.io/fieldopt/reference/reexports.md)
+  [`glance`](https://castlaboratory.github.io/fieldopt/reference/reexports.md)
   : Objects exported from other packages

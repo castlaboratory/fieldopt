@@ -50,7 +50,10 @@ truth
 
 Cells are selected within intensity strata, more where use is intense,
 with the local pivotal method so that the sample spreads over the
-territory; then 3, 6 or 9 points per cell depending on the stratum.
+territory; then 3, 6 or 9 points per cell depending on the stratum, laid
+out as a regular grid with one random offset per cell
+(`layout = "systematic"`), which keeps each point uniform over the cell
+while spreading them.
 
 ``` r
 
@@ -73,7 +76,7 @@ cells_s
 #> 10    10     1 c10   low           1 0.0501 FALSE  
 #> # ℹ 890 more rows
 ppc <- c(low = 3, mid = 6, high = 9)
-points <- select_points(cells_s, points_per_cell = ppc, cell_size = 1, seed = 7)
+points <- select_points(cells_s, points_per_cell = ppc, cell_size = 1, layout = "systematic", seed = 7)
 nrow(points)
 #> [1] 675
 ```
@@ -142,18 +145,41 @@ how spread they are, which is why it is computed rather than assumed.
 ``` r
 
 frame <- rbind(data.frame(unit = "depot", x = side / 2, y = side / 2), cells[, c("unit", "x", "y")])
-m <- travel_matrix(frame, method = "euclidean", unit = "km")
 model <- field_cost_model(per_travel = 2.5, per_unit = 60, per_interview = 25,
                           interviews_per_unit = 4, currency = "BRL")
-routes <- route_fieldwork(m, units = cells_s$unit[cells_s$sampled], depot = "depot",
-                          max_stops = 8, cost_model = model)
-routes$cost
-#>     travel      units interviews      total 
-#>   1208.023   6000.000  10000.000  17208.023
-c1 <- routes$cost[["total"]] / sum(cells_s$sampled)
-c1
-#> [1] 172.0802
+routed_unit_cost(frame, "depot", model, n = sum(n_h), method = "euclidean",
+                 n_rep = 3, iterations = 60)
+#> # A tibble: 1 × 6
+#>       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep
+#>   <dbl>         <dbl>           <dbl>     <dbl>       <dbl> <dbl>
+#> 1   100          167.            2.70    16675.           1     3
 ```
+
+## The design effect of point sampling
+
+The dual-frame allocation below needs the design effect of the area
+sample relative to simple random sampling of establishments.
+[`point_design_effect()`](https://castlaboratory.github.io/fieldopt/reference/point_design_effect.md)
+simulates the whole area design (cells, points, hits, multiplicity
+estimator) and returns the bias, the empirical variance, the mean of the
+variance estimates, the number of interviews and the design effect.
+
+``` r
+
+deff <- point_design_effect(cells, areas, n = n_h, strata = "intensity",
+                            points_per_cell = ppc, cell_size = 1, n_sim = 60, seed = 9)
+deff
+#> # A tibble: 1 × 10
+#>   n_sim  total mean_estimate  bias variance     cv mean_variance_estimate
+#> * <dbl>  <dbl>         <dbl> <dbl>    <dbl>  <dbl>                  <dbl>
+#> 1    60 22075.        22132.  56.8 1783359. 0.0605               1413371.
+#> # ℹ 3 more variables: interviews <dbl>, variance_srs <dbl>, deff <dbl>
+```
+
+The bias is negligible and the variance estimator of
+[`point_estimator()`](https://castlaboratory.github.io/fieldopt/reference/point_estimator.md)
+tracks the empirical variance; the design effect is what enters
+`deff_a`.
 
 ## Two-stage allocation: how many cells, how many points
 
@@ -161,18 +187,28 @@ With the between-cell and within-cell variance components (from a pilot
 or from the frame) and the costs per cell and per point, Cochran’s rule
 gives the number of points per cell and then the number of cells for a
 target precision.
+[`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
+measures the cost per cell by routing a sample of the allocated size and
+iterates until the number of cells settles.
 
 ``` r
 
 cell_tot <- tapply(areas$y, areas$unit, sum)
-two_stage_allocation(n_primary = nrow(cells), m_secondary = 9,
-                     s2_between = var(cell_tot / 9), s2_within = var(areas$y) * 2,
-                     c1 = routes$cost[["travel"]] / sum(cells_s$sampled) + model$per_unit,
-                     c2 = model$per_interview, target_cv = 0.05, mean = mean(cell_tot) / 9)
+ts <- two_stage_design(frame, "depot", model, m_secondary = 9,
+                       s2_between = var(cell_tot / 9), s2_within = var(areas$y) * 2,
+                       target_cv = 0.05, mean = mean(cell_tot) / 9,
+                       method = "euclidean", n_rep = 3, iterations = 60)
+ts
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
 #> n = 170 primary units with m = 9 secondary units each (optimal m 9): cost
-#> 50500, variance of the total 1218000 (SE 1104, CV 5%).
+#> 49300, variance of the total 1218000 (SE 1104, CV 5%).
+ts$history
+#> # A tibble: 2 × 6
+#>   round    c1     n     m   cost variance_total
+#>   <int> <dbl> <int> <int>  <dbl>          <dbl>
+#> 1     1  90.1   170     9 53568.       1218047.
+#> 2     2  65.0   170     9 49304.       1218047.
 ```
 
 ## Dual-frame allocation: area plus list
@@ -180,41 +216,52 @@ two_stage_allocation(n_primary = nrow(cells), m_secondary = 9,
 The list frame holds the large establishments, which are also on the
 area frame (the overlap `ab`); small establishments are on the area
 frame only (`a`); a few specialised units are on the list only (`b`).
-Given the sizes, means and standard deviations of the three domains and
-the cost per unit in each frame (the area cost from the routing above),
-Hartley’s allocation gives the two sample sizes and the mixing weight,
-or the screening design in which the area sample does not use the
-overlap.
+Given the sizes, means and standard deviations of the three domains, the
+cost per list unit and the design effect from the simulation,
+[`dual_frame_design()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_design.md)
+runs Hartley’s allocation with the area cost measured by routing,
+iterating until the area sample size settles; `theta = "screening"`
+gives the design in which the area sample does not use the overlap.
 
 ``` r
 
 domains <- data.frame(domain = c("a", "ab", "b"),
                       size = c(1500, 250, 50),
                       mean = c(6, 30, 45), sd = c(5, 20, 35))
-dual_frame_allocation(domains, cost_a = c1, cost_b = 45, deff_a = 1.6, target_cv = 0.05)
+df <- dual_frame_design(frame, "depot", model, domains, cost_b = 45, deff_a = deff$deff,
+                        target_cv = 0.05, method = "euclidean", n_rep = 3, iterations = 60)
+df
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 878900: n_A = 137 (frame A, cost
-#> 172.080226773024/unit), n_B = 168 (frame B, cost 45/unit), theta = 0.153
-#> (optimised).
-#> Cost 31130; variance 875600 (frame A 759000, frame B 117000); CV 4.99% of the
+#> Minimum cost for target variance 878900: n_A = 81 (frame A, cost 167.7/unit),
+#> n_B = 136 (frame B, cost 45/unit), theta = 0.143 (optimised).
+#> Cost 19700; variance 875300 (frame A 694000, frame B 181000); CV 4.99% of the
 #> total 18750.
-#> Expected overlap units: 19.6 in the A sample, 140 in the B sample.
-dual_frame_allocation(domains, cost_a = c1, cost_b = 45, deff_a = 1.6, theta = "screening", target_cv = 0.05)
+#> Expected overlap units: 11.6 in the A sample, 113.3 in the B sample.
+df$history
+#> # A tibble: 3 × 7
+#>   round cost_a   n_a   n_b theta   cost variance
+#>   <int>  <dbl> <int> <int> <dbl>  <dbl>    <dbl>
+#> 1     1   190.    80   141 0.169 21553.  875550.
+#> 2     2   168.    81   136 0.142 19690.  875348.
+#> 3     3   168.    81   136 0.143 19704.  875314.
+tidy(df)
+#> # A tibble: 2 × 8
+#>   frame     n cost_per_unit   cost  deff variance overlap_units
+#>   <chr> <int>         <dbl>  <dbl> <dbl>    <dbl>         <dbl>
+#> 1 A        81          168. 13584. 0.839  694252.          11.6
+#> 2 B       136           45   6120  1      181061.         113. 
+#> # ℹ 1 more variable: weight_on_overlap <dbl>
+dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$deff,
+                      theta = "screening", target_cv = 0.05)
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 878900: n_A = 150 (frame A, cost
-#> 172.080226773024/unit), n_B = 186 (frame B, cost 45/unit), theta = 0 (fixed).
-#> Cost 34180; variance 876200 (frame A 772000, frame B 105000); CV 4.99% of the
+#> Minimum cost for target variance 878900: n_A = 89 (frame A, cost 167.7/unit),
+#> n_B = 151 (frame B, cost 45/unit), theta = 0 (fixed).
+#> Cost 21720; variance 876100 (frame A 708000, frame B 168000); CV 4.99% of the
 #> total 18750.
-#> Expected overlap units: 21.4 in the A sample, 155 in the B sample.
+#> Expected overlap units: 12.7 in the A sample, 125.8 in the B sample.
 ```
-
-`deff_a` carries the design effect of the point sampling relative to
-simple random sampling of establishments; estimate it from the variance
-ratio of a pilot. The allocation is a planning tool: the cost per area
-unit changes with `n_A`, so run the routing at the allocated size and
-iterate once.
 
 ## References
 

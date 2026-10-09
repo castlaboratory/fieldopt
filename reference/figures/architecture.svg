@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520" viewBox="0 0 800 520" font-family="Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" font-family="Helvetica, Arial, sans-serif">
 <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A5568"/></marker></defs>
-<rect width="800" height="520" fill="#FFFFFF"/>
-<rect x="20" y="416" width="760" height="90" rx="12" fill="none" stroke="#B4432B" stroke-width="1.4" stroke-dasharray="7 5"/>
-<rect x="20" y="36" width="760" height="270" rx="12" fill="none" stroke="#2E6B3A" stroke-width="1.4" stroke-dasharray="7 5"/>
+<rect width="800" height="600" fill="#FFFFFF"/>
+<rect x="20" y="496" width="760" height="90" rx="12" fill="none" stroke="#B4432B" stroke-width="1.4" stroke-dasharray="7 5"/>
+<rect x="20" y="36" width="760" height="350" rx="12" fill="none" stroke="#2E6B3A" stroke-width="1.4" stroke-dasharray="7 5"/>
 <rect x="30" y="27.0" width="356" height="18" fill="#FFFFFF"/>
 <text x="34" y="40.2" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#2E6B3A">R package fieldopt: data frames, S3 classes, plots</text>
 <rect x="40" y="62" width="170" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
@@ -27,8 +27,8 @@
 <text x="125.0" y="196.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">with replicates, SRS</text>
 <rect x="226" y="142" width="170" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
 <text x="311.0" y="160.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">select_points()</text>
-<text x="311.0" y="181.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">points inside cells,</text>
-<text x="311.0" y="196.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">expected_hits()</text>
+<text x="311.0" y="181.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">random or systematic</text>
+<text x="311.0" y="196.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">points; expected_hits()</text>
 <rect x="412" y="142" width="170" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
 <text x="497.0" y="160.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">point_estimator()</text>
 <text x="497.0" y="181.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">multiplicity</text>
@@ -52,29 +52,40 @@
 <rect x="598" y="222" width="162" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
 <text x="679.0" y="239.8" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">two_stage_allocation()</text>
 <text x="679.0" y="260.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">Cochran: n cells,</text>
-<text x="679.0" y="275.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">m points; c1 routed</text>
-<rect x="440" y="340" width="320" height="44" rx="8" fill="#FFF8E6" stroke="#B7791F" stroke-width="1.6"/>
-<text x="600.0" y="356.1" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">extendr bindings (src/rust/src/lib.rs)</text>
-<text x="600.0" y="377.1" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">plain vectors in, vectors and lists out</text>
-<rect x="30" y="407.0" width="377" height="18" fill="#FFFFFF"/>
-<text x="34" y="420.2" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#B4432B">Rust crate fieldopt-core (crates.io, no dependencies)</text>
-<rect x="40" y="436" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
-<text x="108.0" y="455.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">distance</text>
-<text x="108.0" y="475.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">haversine, euclidean</text>
-<rect x="188" y="436" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
-<text x="256.0" y="455.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">routing</text>
-<text x="256.0" y="475.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">GRASP, split, 2-opt</text>
-<rect x="336" y="436" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
-<text x="404.0" y="455.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">sampling / spatial</text>
-<text x="404.0" y="475.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">LPM2, systematic</text>
-<rect x="484" y="436" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
-<text x="552.0" y="455.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">estimation</text>
-<text x="552.0" y="475.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">HT, local-mean, SRS</text>
-<rect x="632" y="436" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
-<text x="700.0" y="455.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">allocation</text>
-<text x="700.0" y="475.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">strata, dual, 2-stage</text>
-<polyline points="600,306 600,340" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
-<polyline points="600,384 600,416" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
-<text x="612" y="327" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#718096" font-style="italic">.Call()</text>
-<text x="612" y="404" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#718096" font-style="italic">Rust calls</text>
+<text x="679.0" y="275.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">m points</text>
+<rect x="40" y="302" width="170" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
+<text x="125.0" y="320.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1A202C">point_design_effect()</text>
+<text x="125.0" y="341.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">Monte Carlo: bias,</text>
+<text x="125.0" y="356.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">variance, deff</text>
+<rect x="226" y="302" width="170" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
+<text x="311.0" y="320.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">routed_unit_cost()</text>
+<text x="311.0" y="341.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">cost per unit</text>
+<text x="311.0" y="356.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">at a sample size</text>
+<rect x="412" y="302" width="348" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
+<text x="586.0" y="328.1" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">dual_frame_design(), two_stage_design()</text>
+<text x="586.0" y="349.1" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">allocation and routing iterated until n settles</text>
+<rect x="440" y="420" width="320" height="44" rx="8" fill="#FFF8E6" stroke="#B7791F" stroke-width="1.6"/>
+<text x="600.0" y="436.1" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">extendr bindings (src/rust/src/lib.rs)</text>
+<text x="600.0" y="457.1" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">plain vectors in, vectors and lists out</text>
+<rect x="30" y="487.0" width="377" height="18" fill="#FFFFFF"/>
+<text x="34" y="500.2" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#B4432B">Rust crate fieldopt-core (crates.io, no dependencies)</text>
+<rect x="40" y="516" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="108.0" y="535.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">distance</text>
+<text x="108.0" y="555.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">haversine, euclidean</text>
+<rect x="188" y="516" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="256.0" y="535.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">routing</text>
+<text x="256.0" y="555.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">GRASP, split, 2-opt</text>
+<rect x="336" y="516" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="404.0" y="535.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">sampling / spatial</text>
+<text x="404.0" y="555.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">LPM2, systematic</text>
+<rect x="484" y="516" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="552.0" y="535.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">estimation</text>
+<text x="552.0" y="555.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">HT, local-mean, SRS</text>
+<rect x="632" y="516" width="136" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="700.0" y="535.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">allocation</text>
+<text x="700.0" y="555.9" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">strata, dual, 2-stage</text>
+<polyline points="600,386 600,420" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="600,464 600,496" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<text x="612" y="407" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#718096" font-style="italic">.Call()</text>
+<text x="612" y="484" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#718096" font-style="italic">Rust calls</text>
 </svg>

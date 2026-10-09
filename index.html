@@ -95,7 +95,11 @@
 <li>
 <code><a href="reference/segment_estimator.html">segment_estimator()</a></code> gives the closed, open and weighted segment estimators; <code><a href="reference/design_variance.html">design_variance()</a></code> the Horvitz-Thompson total with the variance estimator that matches the design (local-mean, replicates, SRS).</li>
 <li>
-<code><a href="reference/frame_allocation.html">frame_allocation()</a></code> allocates across strata for a target variance or a budget; <code><a href="reference/dual_frame_allocation.html">dual_frame_allocation()</a></code> is Hartley’s allocation for an area frame plus a list frame with overlap, with the optimal mixing weight or the screening design; <code><a href="reference/two_stage_allocation.html">two_stage_allocation()</a></code> is Cochran’s two-stage allocation with the cost function <code>c1 n + c2 n m</code>, where <code>c1</code> comes from the routing.</li>
+<code><a href="reference/frame_allocation.html">frame_allocation()</a></code> allocates across strata for a target variance or a budget; <code><a href="reference/dual_frame_allocation.html">dual_frame_allocation()</a></code> is Hartley’s allocation for an area frame plus a list frame with overlap, with the optimal mixing weight or the screening design; <code><a href="reference/two_stage_allocation.html">two_stage_allocation()</a></code> is Cochran’s two-stage allocation with the cost function <code>c1 n + c2 n m</code>. <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> and <code><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance()</a></code> read all three.</li>
+<li>
+<code><a href="reference/routed_unit_cost.html">routed_unit_cost()</a></code>, <code><a href="reference/two_stage_design.html">two_stage_design()</a></code> and <code><a href="reference/dual_frame_design.html">dual_frame_design()</a></code> close the loop: the cost of an area unit is measured by routing a sample of the allocated size, and the allocation is repeated until it stabilises.</li>
+<li>
+<code><a href="reference/point_design_effect.html">point_design_effect()</a></code> simulates the whole area design (cells, points, hits, estimator) and returns the bias, the variance and the design effect of point sampling, the <code>deff_a</code> the dual-frame allocation asks for.</li>
 <li>
 <code><a href="reference/cost_variance_frontier.html">cost_variance_frontier()</a></code> simulates designs over a grid of sample sizes and returns the trade-off between field cost and variance.</li>
 </ul>
@@ -142,6 +146,7 @@
 </h2>
 <p><img src="reference/figures/architecture.svg" alt="Architecture of fieldopt: R package, extendr bindings and the fieldopt-core Rust crate" width="100%"></p>
 <p><img src="reference/figures/workflow.svg" alt="Workflow of fieldopt: frame, travel matrix, selection, routing, cost and variance, and the frontier" width="100%"></p>
+<p><img src="reference/figures/area-frame.svg" alt="Area-frame workflow of fieldopt: cells, points, hits, multiplicity estimator, design effect, routed cost and the dual-frame allocation" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="related-work">Related work<a class="anchor" aria-label="anchor" href="#related-work"></a>

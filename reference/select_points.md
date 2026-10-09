@@ -14,7 +14,13 @@ need.
 ## Usage
 
 ``` r
-select_points(sample, points_per_cell, cell_size, seed = 1)
+select_points(
+  sample,
+  points_per_cell,
+  cell_size,
+  layout = c("random", "systematic"),
+  seed = 1
+)
 ```
 
 ## Arguments
@@ -35,6 +41,13 @@ select_points(sample, points_per_cell, cell_size, seed = 1)
   Side of the square cells, in the units of the coordinates (one number,
   or `c(dx, dy)`).
 
+- layout:
+
+  `"random"` (independent uniform points) or `"systematic"` (a regular
+  grid of `k1 x k2 = m` points with one random offset per cell, which
+  spreads the points inside the cell; each point is still uniform over
+  the cell, so the density is the same).
+
 - seed:
 
   Seed.
@@ -50,16 +63,16 @@ cell), `point`, the two coordinates, `pi_cell`, `points_in_cell` and
 ``` r
 cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
 s <- select_units(cells, n = 12, seed = 2)
-p <- select_points(s, points_per_cell = 9, cell_size = 1)
+p <- select_points(s, points_per_cell = 9, cell_size = 1, layout = "systematic")
 nrow(p); head(p)
 #> [1] 108
 #> # A tibble: 6 × 7
 #>   unit  point     x     y pi_cell points_in_cell density
 #>   <chr> <int> <dbl> <dbl>   <dbl>          <dbl>   <dbl>
-#> 1 c10       1  9.77 0.562    0.12              9    1.08
-#> 2 c10       2  9.87 0.706    0.12              9    1.08
-#> 3 c10       3 10.1  0.677    0.12              9    1.08
-#> 4 c10       4 10.4  1.19     0.12              9    1.08
-#> 5 c10       5  9.70 0.884    0.12              9    1.08
-#> 6 c10       6 10.4  1.27     0.12              9    1.08
+#> 1 c10       1  9.59 0.624    0.12              9    1.08
+#> 2 c10       2  9.92 0.624    0.12              9    1.08
+#> 3 c10       3 10.3  0.624    0.12              9    1.08
+#> 4 c10       4  9.59 0.957    0.12              9    1.08
+#> 5 c10       5  9.92 0.957    0.12              9    1.08
+#> 6 c10       6 10.3  0.957    0.12              9    1.08
 ```

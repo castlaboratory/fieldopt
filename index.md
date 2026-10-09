@@ -42,7 +42,21 @@ frame (grid cells, points inside them) and a list frame needs.
   overlap, with the optimal mixing weight or the screening design;
   [`two_stage_allocation()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_allocation.md)
   is Cochran’s two-stage allocation with the cost function
-  `c1 n + c2 n m`, where `c1` comes from the routing.
+  `c1 n + c2 n m`.
+  [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
+  [`glance()`](https://generics.r-lib.org/reference/glance.html) read
+  all three.
+- [`routed_unit_cost()`](https://castlaboratory.github.io/fieldopt/reference/routed_unit_cost.md),
+  [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
+  and
+  [`dual_frame_design()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_design.md)
+  close the loop: the cost of an area unit is measured by routing a
+  sample of the allocated size, and the allocation is repeated until it
+  stabilises.
+- [`point_design_effect()`](https://castlaboratory.github.io/fieldopt/reference/point_design_effect.md)
+  simulates the whole area design (cells, points, hits, estimator) and
+  returns the bias, the variance and the design effect of point
+  sampling, the `deff_a` the dual-frame allocation asks for.
 - [`cost_variance_frontier()`](https://castlaboratory.github.io/fieldopt/reference/cost_variance_frontier.md)
   simulates designs over a grid of sample sizes and returns the
   trade-off between field cost and variance.
@@ -99,6 +113,10 @@ fieldopt-core Rust crate](reference/figures/architecture.svg)
 
 ![Workflow of fieldopt: frame, travel matrix, selection, routing, cost
 and variance, and the frontier](reference/figures/workflow.svg)
+
+![Area-frame workflow of fieldopt: cells, points, hits, multiplicity
+estimator, design effect, routed cost and the dual-frame
+allocation](reference/figures/area-frame.svg)
 
 ## Related work
 

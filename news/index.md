@@ -28,6 +28,21 @@
   accepts `strata`, `selection` and `replicates`, a list of per-stratum
   allocations in `n_grid`, and reports `cost_per_unit`.
 
+- [`routed_unit_cost()`](https://castlaboratory.github.io/fieldopt/reference/routed_unit_cost.md),
+  [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
+  and
+  [`dual_frame_design()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_design.md)
+  iterate the allocation with the cost per area unit measured by
+  routing;
+  [`point_design_effect()`](https://castlaboratory.github.io/fieldopt/reference/point_design_effect.md)
+  simulates the area design and returns the bias, variance and design
+  effect of point sampling;
+  [`select_points()`](https://castlaboratory.github.io/fieldopt/reference/select_points.md)
+  gains a systematic layout;
+  [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
+  [`glance()`](https://generics.r-lib.org/reference/glance.html) for the
+  three allocations.
+
 - Variances are computed within strata and summed (`"stratified srs"`,
   `"stratified local-mean"`); route plots of geographic matrices put
   longitude on the x axis.
