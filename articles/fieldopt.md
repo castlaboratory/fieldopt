@@ -177,7 +177,7 @@ change that price. The vignettes `routing-teams` and
 
 ## References
 
-Cochran, W. G. (1977). *Sampling Techniques*, 3rd ed. Wiley.
+Cochran, W. G. (1977). *Sampling Techniques*, third edition. Wiley.
 
 Grafström, A., Lundström, N. L. P. and Schelin, L. (2012). Spatially
 balanced sampling through the pivotal method. *Biometrics*, 68(2),

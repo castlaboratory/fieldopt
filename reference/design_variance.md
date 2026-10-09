@@ -7,8 +7,10 @@ local-mean estimator of Grafström and Schelin (2014) for spatially
 balanced samples (it needs no joint inclusion probabilities), the
 variance among replicate estimates for replicated systematic samples,
 and the simple-random-sampling formula for equal-probability simple
-random samples. The simple-random-sampling variance of the same sample
-is always reported as a reference.
+random samples. A systematic sample drawn as a single replicate has no
+unbiased design-based variance estimator; the local-mean estimator is
+used as the customary approximation. The simple-random-sampling variance
+of the same sample is always reported as a reference.
 
 ## Usage
 
