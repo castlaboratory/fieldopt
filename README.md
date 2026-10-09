@@ -108,9 +108,9 @@ autoplot(f)
 
 <img src="man/figures/architecture.svg" alt="Architecture of fieldopt: R package, extendr bindings and the fieldopt-core Rust crate" width="100%" />
 
-<img src="man/figures/workflow.svg" alt="Workflow of fieldopt: frame, travel matrix, selection, routing, cost and variance, and the frontier" width="100%" />
+<img src="man/figures/workflow.svg" alt="Workflow of fieldopt: frame, travel matrix, selection, routing and the schedule, cost and variance, and the frontier" width="100%" />
 
-<img src="man/figures/area-frame.svg" alt="Area-frame workflow of fieldopt: cells, points, hits, multiplicity estimator, design effect, routed cost and the dual-frame allocation" width="100%" />
+<img src="man/figures/area-frame.svg" alt="Area-frame workflow of fieldopt: cells, points, hits, multiplicity estimator, design effect, routed cost, the dual-frame allocation and the dual-frame estimate" width="100%" />
 
 ## Related work
 
