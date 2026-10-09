@@ -15,7 +15,7 @@ path = 'document.rs'
 
 [dependencies]
 extendr-api = '0.9'
-fieldopt-core = { git = 'https://github.com/castlaboratory/fieldopt-core', rev = '40137daabf069c9c4795d77e61e7b1a9f2aa3f98' }
+fieldopt-core = '0.1.0'
 
 [profile.release]
 lto = true
