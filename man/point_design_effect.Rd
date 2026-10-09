@@ -43,7 +43,9 @@ selection, or \code{NULL} for equal probabilities within stratum.}
 
 \item{strata}{Column with the stratum of each unit, or \code{NULL}.}
 
-\item{method}{\code{"lpm"}, \code{"systematic"} or \code{"srs"}.}
+\item{method}{\code{"lpm"}, \code{"systematic"}, \code{"srs"} or \code{"cube"} (balanced
+sampling by the cube method of Deville and Tillé 2004, with the fast
+flight phase and landing by suppression of variables).}
 
 \item{replicates}{Number of independent interpenetrating replicates for
 \code{"systematic"} (each a systematic sample of about \code{n / replicates}

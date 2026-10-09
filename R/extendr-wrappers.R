@@ -11,9 +11,9 @@ NULL
 travel_matrix_rs <- function(a, b, method) .Call(wrap__travel_matrix_rs, a, b, method)
 
 #' GRASP routing. `matrix` is the row-major n x n travel matrix; `depot` and
-#' `units` are 0-based indices.
+#' `units` are 0-based indices; `service` has one entry per node (or none).
 #' @noRd
-route_rs <- function(matrix, n, depot, units, max_length, max_stops, iterations, alpha, seed) .Call(wrap__route_rs, matrix, n, depot, units, max_length, max_stops, iterations, alpha, seed)
+route_rs <- function(matrix, n, depot, units, service, max_length, max_stops, iterations, alpha, seed) .Call(wrap__route_rs, matrix, n, depot, units, service, max_length, max_stops, iterations, alpha, seed)
 
 #' Size-proportional inclusion probabilities summing to `n`.
 #' @noRd
@@ -55,6 +55,18 @@ dual_frame_rs <- function(size, mean, sd, cost_a, cost_b, deff_a, deff_b, theta,
 #' Two-stage allocation; `target` is a variance of the mean ("variance") or a budget.
 #' @noRd
 two_stage_rs <- function(n_primary, m_secondary, s2_between, s2_within, c1, c2, target, mode) .Call(wrap__two_stage_rs, n_primary, m_secondary, s2_between, s2_within, c1, c2, target, mode)
+
+#' Voronoi measure of spatial balance on an n x d row-major coordinate matrix.
+#' @noRd
+spatial_balance_rs <- function(coords, d, pi, sampled) .Call(wrap__spatial_balance_rs, coords, d, pi, sampled)
+
+#' Cube sampling balanced on the n x p row-major matrix `x`.
+#' @noRd
+cube_rs <- function(x, p, pi, seed) .Call(wrap__cube_rs, x, p, pi, seed)
+
+#' Multivariate allocation: `sd` is H x J row-major, `targets` one variance per variable.
+#' @noRd
+allocate_multi_rs <- function(size, cost, sd, targets) .Call(wrap__allocate_multi_rs, size, cost, sd, targets)
 
 #' Version of the engine crate.
 #' @noRd

@@ -10,6 +10,7 @@ route_fieldwork(
   depot,
   max_length = Inf,
   max_stops = Inf,
+  service_time = 0,
   iterations = 200,
   alpha = 0.3,
   seed = 1,
@@ -23,9 +24,15 @@ route_fieldwork(
 
 \item{depot}{Name (or index) of the depot.}
 
-\item{max_length}{Maximum travel per route, depot to depot; \code{Inf} for none.}
+\item{max_length}{Maximum length of a route, depot to depot: travel plus
+the service time of its units when \code{service_time} is given; \code{Inf} for
+none.}
 
 \item{max_stops}{Maximum units per route; \code{Inf} for none.}
+
+\item{service_time}{Time spent at each unit (interviews, measurements), in
+the unit of the travel matrix: a single number, or a vector named by
+unit. It counts towards \code{max_length} and is reported in \code{durations}.}
 
 \item{iterations}{GRASP iterations.}
 
@@ -37,9 +44,10 @@ route_fieldwork(
 }
 \value{
 An object of class \code{fieldopt_routes}: \code{routes} (a tibble with
-columns \code{route}, \code{stop}, \code{unit}), \code{lengths}, \code{total}, \code{lower_bound},
-\code{gap}, \code{best_iteration}, \code{cost} (when a model is given), the inputs and
-the travel matrix.
+columns \code{route}, \code{stop}, \code{unit}), \code{lengths} (travel per route),
+\code{durations} (travel plus service), \code{total}, \code{lower_bound}, \code{gap},
+\code{best_iteration}, \code{cost} (when a model is given), the inputs and the
+travel matrix.
 }
 \description{
 Finds low-cost routes from a depot through the selected units with GRASP

@@ -136,3 +136,120 @@ print.fieldopt_two_stage <- function(x, ...) {
   cli::cli_text("n = {x$n} primary units with m = {x$m} secondary units each (optimal m {round(x$m_optimal, 2)}): cost {signif(x$cost, 4)}, variance of the total {signif(x$variance_total, 4)} (SE {signif(x$se_total, 4)}{if (!is.na(x$cv)) paste0(', CV ', signif(100 * x$cv, 3), '%') else ''}){if (x$bounded) '; a bound was active' else ''}.")
   invisible(x)
 }
+
+# Covariance of two Horvitz-Thompson totals under the design of a sample:
+# var(z1 + z2) - var(z1) - var(z2), halved, with the sample's own estimator.
+cov_ht <- function(sample, z1, z2) {
+  (ht_variance(sample, z1 + z2)$variance - ht_variance(sample, z1)$variance - ht_variance(sample, z2)$variance) / 2
+}
+
+#' Dual-frame estimate of a total
+#'
+#' Combines the sample of frame A (the area frame) and the sample of frame B
+#' (the list) into one estimate of the population total of `y`. Each sampled
+#' unit carries its domain: `"a"` or `"ab"` in the A sample, `"b"` or `"ab"`
+#' in the B sample. Two estimators:
+#'
+#' * **Hartley (1962)**: `Y_a + theta * Y_ab(A) + (1 - theta) * Y_ab(B) +
+#'   Y_b`, with `theta` fixed, `"screening"` (`theta = 0`: overlap units
+#'   found in the area sample are dropped, as when the list is enumerated
+#'   completely) or estimated as the value that minimises the variance;
+#' * **Fuller and Burmeister (1972)**: adds a second term in the difference
+#'   between the two estimates of the overlap size, with coefficients chosen
+#'   to minimise the variance.
+#'
+#' Variances and covariances of the domain totals come from the variance
+#' estimator of each sample's design ([design_variance()]), the two samples
+#' being independent. The estimated `theta` and the Fuller-Burmeister
+#' coefficients make the variances slightly optimistic in small samples.
+#'
+#' @param sample_a,sample_b [select_units()] samples of frame A and frame B
+#'   with columns `y` and `domain` (unsampled rows may hold `NA`).
+#' @param y Column of the study variable.
+#' @param domain Column with the domain of each unit.
+#' @param theta Mixing weight of the overlap for Hartley: a number in
+#'   `[0, 1]`, `"screening"`, or `NULL` to estimate it.
+#' @param estimator `"hartley"` or `"fuller-burmeister"`.
+#' @return A one-row tibble: `total`, `variance`, `se`, `cv`, `estimator`,
+#'   `theta` (Hartley) or `beta_1`, `beta_2` (Fuller-Burmeister), the domain
+#'   totals `y_a`, `y_ab_a`, `y_ab_b`, `y_b`, and `n_a`, `n_b`.
+#' @references Hartley, H. O. (1962). Multiple frame surveys. *Proceedings of
+#'   the Social Statistics Section, ASA*, 203-206. Fuller, W. A. and
+#'   Burmeister, L. F. (1972). Estimators for samples selected from two
+#'   overlapping frames. *Proceedings of the Social Statistics Section, ASA*,
+#'   245-249. Lohr, S. L. (2009). Multiple-frame surveys. In *Handbook of
+#'   Statistics 29A*, 71-88.
+#' @export
+#' @examples
+#' set.seed(7)
+#' cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144)
+#' cells$domain <- ifelse(runif(144) < 0.2, "ab", "a")
+#' cells$y <- ifelse(cells$domain == "ab", 80, 10) + rnorm(144, sd = 3)
+#' # the list holds the overlap units (same values) plus units of its own
+#' ab <- cells[cells$domain == "ab", ]
+#' list <- data.frame(unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:11)),
+#'                    x = runif(nrow(ab) + 11), y = c(ab$y, 120 + rnorm(11, sd = 5)),
+#'                    domain = rep(c("ab", "b"), c(nrow(ab), 11)))
+#' list$lon <- runif(nrow(list)); list$lat <- runif(nrow(list))
+#' sa <- select_units(cells, n = 30, seed = 1)
+#' sb <- select_units(list, n = 15, coords = c("lat", "lon"), method = "srs", seed = 2)
+#' dual_frame_estimator(sa, sb, y = "y", domain = "domain")
+#' dual_frame_estimator(sa, sb, y = "y", domain = "domain", theta = "screening")
+#' dual_frame_estimator(sa, sb, y = "y", domain = "domain", estimator = "fuller-burmeister")
+dual_frame_estimator <- function(sample_a, sample_b, y, domain = "domain", theta = NULL,
+                                 estimator = c("hartley", "fuller-burmeister")) {
+  estimator <- rlang::arg_match(estimator)
+  for (s in list(sample_a, sample_b)) {
+    if (!inherits(s, "fieldopt_sample")) cli::cli_abort("{.arg sample_a} and {.arg sample_b} must come from {.fn select_units}.")
+    for (col in c(y, domain)) if (!col %in% names(s)) cli::cli_abort("Column {.field {col}} not found.")
+  }
+  dom_a <- as.character(sample_a[[domain]]); dom_b <- as.character(sample_b[[domain]])
+  sa <- sample_a$sampled; sb <- sample_b$sampled
+  if (!all(dom_a[sa] %in% c("a", "ab"))) cli::cli_abort("Domains in frame A must be {.val a} or {.val ab}.")
+  if (!all(dom_b[sb] %in% c("b", "ab"))) cli::cli_abort("Domains in frame B must be {.val b} or {.val ab}.")
+  ya <- as.numeric(sample_a[[y]]); yb <- as.numeric(sample_b[[y]])
+  if (anyNA(ya[sa]) || anyNA(yb[sb])) cli::cli_abort("{.field {y}} is missing for some sampled units.")
+  ya[!sa] <- 0; yb[!sb] <- 0
+  dom_a[!sa] <- ""; dom_b[!sb] <- ""
+  z_a <- ya * (dom_a == "a"); z_aba <- ya * (dom_a == "ab")
+  z_b <- yb * (dom_b == "b"); z_abb <- yb * (dom_b == "ab")
+  tot <- function(s, z) ht_total_rs(z, s$pi, s$sampled)
+  y_a <- tot(sample_a, z_a); y_aba <- tot(sample_a, z_aba); y_b <- tot(sample_b, z_b); y_abb <- tot(sample_b, z_abb)
+  v_a <- ht_variance(sample_a, z_a)$variance; v_aba <- ht_variance(sample_a, z_aba)$variance; c_a <- cov_ht(sample_a, z_a, z_aba)
+  v_b <- ht_variance(sample_b, z_b)$variance; v_abb <- ht_variance(sample_b, z_abb)$variance; c_b <- cov_ht(sample_b, z_b, z_abb)
+  out <- tibble::tibble(total = NA_real_, variance = NA_real_, se = NA_real_, cv = NA_real_, estimator = estimator)
+  if (estimator == "hartley") {
+    th <- if (is.null(theta)) {
+      den <- v_aba + v_abb
+      if (den <= 0) 0.5 else min(1, max(0, (v_abb + c_b - c_a) / den))
+    } else if (identical(theta, "screening")) 0 else {
+      if (!is.numeric(theta) || length(theta) != 1L || is.na(theta) || theta < 0 || theta > 1) cli::cli_abort("{.arg theta} must be a number in [0, 1], {.val screening} or NULL.")
+      theta
+    }
+    out$total <- y_a + th * y_aba + (1 - th) * y_abb + y_b
+    out$variance <- v_a + 2 * th * c_a + th^2 * v_aba + v_b + 2 * (1 - th) * c_b + (1 - th)^2 * v_abb
+    out$theta <- th; out$theta_fixed <- !is.null(theta)
+  } else {
+    ia <- as.numeric(dom_a == "ab"); ib <- as.numeric(dom_b == "ab")
+    n_aba <- tot(sample_a, ia); n_abb <- tot(sample_b, ib)
+    # base = Y_a + Y_b + Y_ab(B); D1 = Y_ab(A) - Y_ab(B); D2 = N_ab(A) - N_ab(B)
+    base <- y_a + y_b + y_abb
+    d1 <- y_aba - y_abb; d2 <- n_aba - n_abb
+    v_base <- v_a + ht_variance(sample_b, z_b + z_abb)$variance
+    v_na <- ht_variance(sample_a, ia)$variance; v_nb <- ht_variance(sample_b, ib)$variance
+    s11 <- v_aba + v_abb
+    s22 <- v_na + v_nb
+    s12 <- cov_ht(sample_a, z_aba, ia) + cov_ht(sample_b, z_abb, ib)
+    s1b <- c_a - cov_ht(sample_b, z_abb, z_b + z_abb)
+    s2b <- cov_ht(sample_a, ia, z_a) - cov_ht(sample_b, ib, z_b + z_abb)
+    S <- matrix(c(s11, s12, s12, s22), 2); r <- c(s1b, s2b)
+    beta <- tryCatch(-solve(S, r), error = function(e) c(-s1b / max(s11, 1e-12), 0))
+    out$total <- base + beta[1] * d1 + beta[2] * d2
+    out$variance <- max(v_base + 2 * sum(beta * r) + as.numeric(t(beta) %*% S %*% beta), 0)
+    out$beta_1 <- beta[1]; out$beta_2 <- beta[2]
+  }
+  out$se <- sqrt(out$variance); out$cv <- if (out$total != 0) out$se / abs(out$total) else NA_real_
+  out$y_a <- y_a; out$y_ab_a <- y_aba; out$y_ab_b <- y_abb; out$y_b <- y_b
+  out$n_a <- sum(sa); out$n_b <- sum(sb)
+  out
+}

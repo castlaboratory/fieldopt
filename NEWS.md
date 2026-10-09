@@ -1,5 +1,18 @@
 # fieldopt 0.1.0
 
+* New tools (engine `fieldopt-core` 0.4.0): `route_fieldwork()` takes a
+  `service_time` per unit that counts towards `max_length` and reports route
+  `durations`; `field_cost_model()` gains `per_route` (the cost of a
+  team-day); `schedule_fieldwork()` assigns units to bases, routes each base
+  and builds the calendar of teams and days; `dual_frame_estimator()`
+  combines the area and list samples (Hartley with fixed, screening or
+  estimated `theta`; Fuller-Burmeister) with design-based variances;
+  `select_units(method = "cube", balance = )` draws balanced samples by the
+  cube method and `spatial_balance()` is the Voronoi measure of Stevens and
+  Olsen; `ratio_estimator()` uses a known auxiliary total;
+  `multivariate_allocation()` is the Bethel allocation for several study
+  variables; `as_frame()` and `as_sf()` move between `sf` layers and frames.
+
 * Review round (engine `fieldopt-core` 0.3.0): the routing local search
   prices every move in the direction travelled, so asymmetric road matrices
   (one-way streets, durations by direction) no longer loop, and the lower

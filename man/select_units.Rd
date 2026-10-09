@@ -10,9 +10,10 @@ select_units(
   size = NULL,
   coords = NULL,
   strata = NULL,
-  method = c("lpm", "systematic", "srs"),
+  method = c("lpm", "systematic", "srs", "cube"),
   replicates = 1,
-  seed = 1
+  seed = 1,
+  balance = NULL
 )
 }
 \arguments{
@@ -33,13 +34,20 @@ number of columns for \code{"lpm"}; exactly two for \code{"systematic"}).}
 
 \item{strata}{Column with the stratum of each unit, or \code{NULL}.}
 
-\item{method}{\code{"lpm"}, \code{"systematic"} or \code{"srs"}.}
+\item{method}{\code{"lpm"}, \code{"systematic"}, \code{"srs"} or \code{"cube"} (balanced
+sampling by the cube method of Deville and Tillé 2004, with the fast
+flight phase and landing by suppression of variables).}
 
 \item{replicates}{Number of independent interpenetrating replicates for
 \code{"systematic"} (each a systematic sample of about \code{n / replicates}
 units; replicates may share units). Ignored by the other methods.}
 
 \item{seed}{Seed.}
+
+\item{balance}{For \code{"cube"}: names of the columns to balance on (the
+inclusion probabilities are always included, so the sample size is
+fixed). The Horvitz-Thompson estimates of these columns match their
+population totals as closely as the landing allows.}
 }
 \value{
 The frame as a tibble with columns \code{pi} (inclusion probability in

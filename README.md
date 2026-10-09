@@ -18,27 +18,38 @@ inside them) and a list frame needs.
   (great-circle or planar distances, optionally times a detour factor), from
   a road network through OSRM (durations or distances, in blocks), or wraps a
   matrix computed elsewhere.
-- `field_cost_model()` turns travel, visits and interviews into money or time.
+- `field_cost_model()` turns travel, team-days, visits and interviews into
+  money or time.
 - `route_fieldwork()` routes the field work from a depot through the selected
-  units, for one team or several, under route-length and stop limits (GRASP
-  with 2-opt, Or-opt and an optimal split of the tour), and reports the gap to
-  a lower bound.
+  units, for one team or several, under daily limits of length (travel plus
+  the service time at each unit) and stops (GRASP with 2-opt, Or-opt and an
+  optimal split of the tour, on symmetric or road-network matrices), and
+  reports the gap to a lower bound.
+- `schedule_fieldwork()` assigns the units to several bases, routes each
+  base and distributes the routes over the teams and the days available: a
+  calendar that says whether the field work fits.
 - `select_units()` draws a probability sample of segments or cells, within
   strata, by the local pivotal method (spatially balanced), by spatially
   ordered systematic sampling along a Hilbert curve with interpenetrating
-  replicates, or by simple random sampling.
+  replicates, by the cube method balanced on auxiliaries, or by simple random
+  sampling; `spatial_balance()` measures how evenly a sample covers the
+  territory.
 - `select_points()`, `expected_hits()` and `point_estimator()` implement
   point sampling inside the selected cells and the multiplicity estimator
   (each hit of an establishment counts, divided by its expected hits).
 - `segment_estimator()` gives the closed, open and weighted segment
   estimators; `design_variance()` the Horvitz-Thompson total with the
-  variance estimator that matches the design (local-mean, replicates, SRS).
+  variance estimator that matches the design (local-mean, replicates, SRS);
+  `ratio_estimator()` uses a known auxiliary total; `dual_frame_estimator()`
+  combines the area and the list samples (Hartley with a fixed, screening or
+  estimated weight; Fuller-Burmeister).
 - `frame_allocation()` allocates across strata for a target variance or a
-  budget; `dual_frame_allocation()` is Hartley's allocation for an area frame
-  plus a list frame with overlap, with the optimal mixing weight or the
-  screening design; `two_stage_allocation()` is Cochran's two-stage
+  budget; `multivariate_allocation()` does it for several study variables at
+  once (Bethel); `dual_frame_allocation()` is Hartley's allocation for an
+  area frame plus a list frame with overlap, with the optimal mixing weight
+  or the screening design; `two_stage_allocation()` is Cochran's two-stage
   allocation with the cost function `c1 n + c2 n m`. `tidy()` and `glance()`
-  read all three.
+  read them all.
 - `routed_unit_cost()`, `two_stage_design()` and `dual_frame_design()` close
   the loop: the cost of an area unit is measured by routing a sample of the
   allocated size, and the allocation is repeated until it stabilises.
@@ -47,6 +58,8 @@ inside them) and a list frame needs.
   of point sampling, the `deff_a` the dual-frame allocation asks for.
 - `cost_variance_frontier()` simulates designs over a grid of sample sizes and
   returns the trade-off between field cost and variance.
+- `as_frame()` and `as_sf()` move between `sf` layers and the plain frames
+  the package works on.
 
 The numerical engine is the Rust crate
 [`fieldopt-core`](https://github.com/castlaboratory/fieldopt-core), usable on

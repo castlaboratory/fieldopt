@@ -88,7 +88,7 @@ two_stage_design <- function(frame, depot, cost_model, m_secondary, s2_between, 
     if (identical(alloc$n, n_prev)) { converged <- TRUE; break }
     n_prev <- alloc$n
     # unit cost of the frame at n (the cost model is applied with the allocated interviews per cell)
-    cm <- field_cost_model(per_travel = cost_model$per_travel, per_unit = cost_model$per_unit,
+    cm <- field_cost_model(per_travel = cost_model$per_travel, per_unit = cost_model$per_unit, per_route = cost_model$per_route,
                            per_interview = 0, interviews_per_unit = 1, currency = cost_model$currency)
     ru <- routed_unit_cost(frame, depot, cm, n = alloc$n, size = size, strata = strata, selection = selection,
                            matrix = matrix, method = method, max_length = max_length, max_stops = max_stops,

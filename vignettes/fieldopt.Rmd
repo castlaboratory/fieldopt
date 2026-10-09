@@ -33,6 +33,11 @@ frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40, sd = 2))
 head(frame)
 ```
 
+A real frame usually starts as a spatial object: `as_frame()` turns an `sf`
+layer of segments or points into this data frame (centroids in latitude and
+longitude, the area of each polygon), and `as_sf()` puts samples and results
+back on the geometries for maps.
+
 ## Travel and cost
 
 `travel_matrix()` computes the matrix of travel distances between all units.

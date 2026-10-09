@@ -136,10 +136,12 @@ print.fieldopt_matrix <- function(x, ...) {
 #' Field cost model
 #'
 #' Converts a routing solution and a sample into money (or time): a cost per
-#' unit of travel, a fixed cost per visited unit (access, setup) and a cost per
+#' unit of travel, a fixed cost per route (a team-day: allowances, vehicle,
+#' lodging), a fixed cost per visited unit (access, setup) and a cost per
 #' interview.
 #'
 #' @param per_travel Cost per unit of the travel matrix (per km, per minute).
+#' @param per_route Fixed cost of one route (one team for one day).
 #' @param per_unit Fixed cost of visiting one unit.
 #' @param per_interview Cost of one interview.
 #' @param interviews_per_unit Expected interviews per visited unit: a single
@@ -151,27 +153,30 @@ print.fieldopt_matrix <- function(x, ...) {
 #' @export
 #' @examples
 #' field_cost_model(per_travel = 1.2, per_unit = 50, per_interview = 15, interviews_per_unit = 8)
-field_cost_model <- function(per_travel = 1, per_unit = 0, per_interview = 0, interviews_per_unit = 1, currency = "cost") {
-  for (v in c("per_travel", "per_unit", "per_interview")) {
+field_cost_model <- function(per_travel = 1, per_unit = 0, per_interview = 0, interviews_per_unit = 1, per_route = 0,
+                             currency = "cost") {
+  for (v in c("per_travel", "per_unit", "per_interview", "per_route")) {
     val <- get(v)
     if (!is.numeric(val) || length(val) != 1L || is.na(val) || val < 0) cli::cli_abort("{.arg {v}} must be a single non-negative number.")
   }
   if (!is.function(interviews_per_unit) && (!is.numeric(interviews_per_unit) || any(interviews_per_unit < 0))) {
     cli::cli_abort("{.arg interviews_per_unit} must be non-negative numbers or a function.")
   }
-  structure(list(per_travel = per_travel, per_unit = per_unit, per_interview = per_interview,
+  structure(list(per_travel = per_travel, per_route = per_route, per_unit = per_unit, per_interview = per_interview,
                  interviews_per_unit = interviews_per_unit, currency = currency), class = "field_cost_model")
 }
 
 #' @export
 print.field_cost_model <- function(x, ...) {
-  cli::cli_text("Field cost model ({x$currency}): {x$per_travel} per travel unit, {x$per_unit} per visited unit, {x$per_interview} per interview.")
+  cli::cli_text("Field cost model ({x$currency}): {x$per_travel} per travel unit, {x$per_route} per route, {x$per_unit} per visited unit, {x$per_interview} per interview.")
   invisible(x)
 }
 
 # Cost of a set of routes and visited units under a model.
-cost_of <- function(model, travel_total, units_visited, unit_index = NULL) {
+cost_of <- function(model, travel_total, units_visited, unit_index = NULL, n_routes = 1) {
   interviews <- if (is.function(model$interviews_per_unit)) sum(model$interviews_per_unit(unit_index)) else if (length(model$interviews_per_unit) == 1L) model$interviews_per_unit * units_visited else sum(model$interviews_per_unit[unit_index])
-  c(travel = model$per_travel * travel_total, units = model$per_unit * units_visited,
-    interviews = model$per_interview * interviews, total = model$per_travel * travel_total + model$per_unit * units_visited + model$per_interview * interviews)
+  per_route <- if (is.null(model$per_route)) 0 else model$per_route
+  parts <- c(travel = model$per_travel * travel_total, routes = per_route * n_routes, units = model$per_unit * units_visited,
+             interviews = model$per_interview * interviews)
+  c(parts, total = sum(parts))
 }

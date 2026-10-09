@@ -31,7 +31,13 @@
 #' @param coords Names of the coordinate columns used for spatial balance (any
 #'   number of columns for `"lpm"`; exactly two for `"systematic"`).
 #' @param strata Column with the stratum of each unit, or `NULL`.
-#' @param method `"lpm"`, `"systematic"` or `"srs"`.
+#' @param method `"lpm"`, `"systematic"`, `"srs"` or `"cube"` (balanced
+#'   sampling by the cube method of Deville and Tillé 2004, with the fast
+#'   flight phase and landing by suppression of variables).
+#' @param balance For `"cube"`: names of the columns to balance on (the
+#'   inclusion probabilities are always included, so the sample size is
+#'   fixed). The Horvitz-Thompson estimates of these columns match their
+#'   population totals as closely as the landing allows.
 #' @param replicates Number of independent interpenetrating replicates for
 #'   `"systematic"` (each a systematic sample of about `n / replicates`
 #'   units; replicates may share units). Ignored by the other methods.
@@ -59,8 +65,11 @@
 #' r <- select_units(cells, n = 40, method = "systematic", replicates = 4)
 #' dim(attr(r, "replicates"))
 select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
-                         method = c("lpm", "systematic", "srs"), replicates = 1, seed = 1) {
+                         method = c("lpm", "systematic", "srs", "cube"), replicates = 1, seed = 1, balance = NULL) {
   method <- rlang::arg_match(method)
+  if (method == "cube") {
+    if (is.null(balance)) cli::cli_abort("{.val cube} needs {.arg balance}: the columns to balance on.")
+  } else if (!is.null(balance)) cli::cli_abort("{.arg balance} applies to {.val cube} sampling only.")
   frame <- tibble::as_tibble(frame)
   if (is.null(coords)) coords <- if (all(c("lat", "lon") %in% names(frame))) c("lat", "lon") else if (all(c("x", "y") %in% names(frame))) c("x", "y") else cli::cli_abort("{.arg frame} needs coordinate columns ({.field lat}/{.field lon} or {.field x}/{.field y}) or {.arg coords}.")
   if (!all(coords %in% names(frame))) cli::cli_abort("Coordinate column{?s} {.field {setdiff(coords, names(frame))}} not found.")
@@ -70,6 +79,11 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
   N <- nrow(frame)
   if (!"unit" %in% names(frame)) frame$unit <- paste0("u", seq_len(N))
   if (anyDuplicated(frame$unit)) cli::cli_abort("Unit names in {.field unit} must be distinct.")
+  if (!is.null(balance)) {
+    miss <- setdiff(balance, names(frame)); if (length(miss)) cli::cli_abort("Balancing column{?s} {.field {miss}} not found.")
+    B <- as.matrix(frame[, balance]); storage.mode(B) <- "double"
+    if (anyNA(B)) cli::cli_abort("Balancing variables must not be missing.")
+  }
   check_seed(seed)
   if (method == "srs" && !is.null(size)) cli::cli_abort(c("{.val srs} selects with equal probabilities.", i = "Drop {.arg size}, or use {.val lpm} or {.val systematic} for selection proportional to size."))
   sz <- if (is.null(size)) rep(1, N) else { if (!size %in% names(frame)) cli::cli_abort("Size column {.field {size}} not found."); as.numeric(frame[[size]]) }
@@ -117,6 +131,10 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
     } else if (method == "srs") {
       pi[idx] <- p
       sampled[idx[with_seed(seed_k, sample.int(length(idx), nk))]] <- TRUE
+    } else if (method == "cube") {
+      pi[idx] <- p
+      X_b <- cbind(p, B[idx, , drop = FALSE])  # the probabilities first: they fix the sample size
+      sampled[idx] <- cube_rs(as.numeric(t(X_b)), ncol(X_b), p, seed_k)
     } else {
       ord <- hilbert_order_rs(as.numeric(t(X[idx, , drop = FALSE])), 16L)
       m <- matrix(systematic_replicates_rs(ord, p, as.integer(replicates), seed_k), length(idx), replicates, byrow = TRUE)
@@ -507,4 +525,80 @@ print.fieldopt_allocation <- function(x, ...) {
   cli::cli_text("{if (attr(x, 'mode') == 'variance') 'Minimum cost for target variance' else 'Minimum variance for budget'} {signif(attr(x, 'target'), 4)}: cost {signif(attr(x, 'cost'), 4)}, variance {signif(attr(x, 'variance'), 4)}{if (attr(x, 'bounded')) ' (a bound on n_h was active)' else ''}.")
   print(tibble::as_tibble(unclass(x))[, c("stratum", "size", "sd", "cost", "n")])
   invisible(x)
+}
+
+#' Spatial balance of a sample
+#'
+#' The Voronoi measure of Stevens and Olsen (2004): every unit of the frame
+#' is assigned to its nearest sampled unit, the inclusion probabilities
+#' assigned to each sampled unit are summed, and the balance is the mean
+#' squared deviation of those sums from one. Zero is perfect balance; simple
+#' random samples give values near one. With strata the measure is computed
+#' within each stratum and pooled.
+#'
+#' @param sample A [select_units()] sample.
+#' @param by_stratum Return one value per stratum instead of the pooled one.
+#' @return A number, or a named vector with `by_stratum = TRUE`.
+#' @references Stevens, D. L. and Olsen, A. R. (2004). Spatially balanced
+#'   sampling of natural resources. *Journal of the American Statistical
+#'   Association*, 99, 262-278.
+#' @export
+#' @examples
+#' cells <- expand.grid(x = 1:10, y = 1:10)
+#' spatial_balance(select_units(cells, n = 10, method = "lpm", seed = 1))
+#' spatial_balance(select_units(cells, n = 10, method = "srs", seed = 1))
+spatial_balance <- function(sample, by_stratum = FALSE) {
+  if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
+  X <- as.matrix(sample[, attr(sample, "coords")]); storage.mode(X) <- "double"
+  st <- attr(sample, "strata")
+  h <- if (is.null(st)) factor(rep("all", nrow(sample))) else factor(sample[[st]])
+  parts <- vapply(levels(h), function(lev) {
+    idx <- which(h == lev)
+    spatial_balance_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), sample$pi[idx], sample$sampled[idx])
+  }, numeric(1))
+  if (by_stratum) return(parts)
+  n_h <- vapply(levels(h), function(lev) sum(sample$sampled[h == lev]), numeric(1))
+  sum(parts * n_h) / sum(n_h)
+}
+
+#' Ratio estimate of a total with an auxiliary variable
+#'
+#' The ratio estimator `X * Y_hat / X_hat`, where `X` is the known population
+#' total of the auxiliary (the area of the segments, the number of farms from
+#' a census), with the variance of the residuals `y - R x` under the design,
+#' estimated as in [design_variance()]. The gain over the Horvitz-Thompson
+#' estimate is reported.
+#'
+#' @inheritParams design_variance
+#' @param x Column of the auxiliary variable.
+#' @param x_total Known population total of `x`; the frame total of the column
+#'   when `NULL`.
+#' @return A one-row tibble as in [design_variance()] plus `ratio`, `x_total`
+#'   and `variance_ht` (the variance of the plain Horvitz-Thompson estimate).
+#' @export
+#' @examples
+#' cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144)
+#' cells$farmland <- runif(144, 20, 100)
+#' cells$crop <- 0.4 * cells$farmland + rnorm(144, sd = 3)
+#' s <- select_units(cells, n = 24, seed = 2)
+#' ratio_estimator(s, y = "crop", x = "farmland")
+ratio_estimator <- function(sample, y, x, x_total = NULL) {
+  if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
+  for (col in c(y, x)) if (!col %in% names(sample)) cli::cli_abort("Column {.field {col}} not found.")
+  yy <- as.numeric(sample[[y]]); xx <- as.numeric(sample[[x]]); s <- sample$sampled
+  if (anyNA(yy[s]) || anyNA(xx[s])) cli::cli_abort("{.field {y}} and {.field {x}} must not be missing for sampled units.")
+  if (is.null(x_total)) {
+    if (anyNA(xx)) cli::cli_abort("{.field {x}} is needed for the whole frame when {.arg x_total} is not given.")
+    x_total <- sum(xx)
+  }
+  y_ht <- ht_total_rs(yy, sample$pi, s); x_ht <- ht_total_rs(xx, sample$pi, s)
+  if (x_ht <= 0) cli::cli_abort("The estimated total of {.field {x}} must be positive.")
+  R <- y_ht / x_ht
+  res <- ht_variance(sample, yy - R * xx, total = 0)
+  v <- (x_total / x_ht)^2 * res$variance
+  total <- x_total * R
+  ht <- ht_variance(sample, yy)
+  tibble::tibble(total = total, variance = v, se = sqrt(v), cv = if (total != 0) sqrt(v) / abs(total) else NA_real_,
+                 ratio = R, x_total = x_total, variance_ht = ht$variance, variance_srs = res$variance_srs * (x_total / x_ht)^2,
+                 n = res$n, N = res$N, variance_method = res$variance_method)
 }

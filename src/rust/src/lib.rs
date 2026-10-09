@@ -5,10 +5,10 @@
 
 use extendr_api::prelude::*;
 use fieldopt_core::{
-    allocate_for_budget, allocate_for_variance, dual_frame_allocation, euclidean_matrix, grasp_routes,
-    haversine_matrix, hilbert_order, ht_total, inclusion_probabilities, local_mean_variance, local_pivotal,
-    srs_variance, systematic_replicates, two_stage_for_budget, two_stage_for_variance, Domain, DualFrame,
-    GraspOptions, Matrix, RouteLimits, Stratum, Target, TwoStage,
+    allocate_for_budget, allocate_for_variance, allocate_multivariate, cube, dual_frame_allocation, euclidean_matrix,
+    grasp_routes_with_service, haversine_matrix, hilbert_order, ht_total, inclusion_probabilities, local_mean_variance,
+    local_pivotal, spatial_balance, srs_variance, systematic_replicates, two_stage_for_budget, two_stage_for_variance,
+    Domain, DualFrame, GraspOptions, Matrix, RouteLimits, Stratum, Target, TwoStage,
 };
 
 fn err<T>(r: std::result::Result<T, String>) -> extendr_api::Result<T> {
@@ -33,10 +33,10 @@ fn travel_matrix_rs(a: &[f64], b: &[f64], method: &str) -> extendr_api::Result<V
 }
 
 /// GRASP routing. `matrix` is the row-major n x n travel matrix; `depot` and
-/// `units` are 0-based indices.
+/// `units` are 0-based indices; `service` has one entry per node (or none).
 /// @noRd
 #[extendr]
-fn route_rs(matrix: &[f64], n: i32, depot: i32, units: &[i32], max_length: f64, max_stops: f64, iterations: i32, alpha: f64, seed: f64) -> extendr_api::Result<List> {
+fn route_rs(matrix: &[f64], n: i32, depot: i32, units: &[i32], service: &[f64], max_length: f64, max_stops: f64, iterations: i32, alpha: f64, seed: f64) -> extendr_api::Result<List> {
     let m = err(Matrix::from_vec(n as usize, matrix.to_vec()))?;
     let units: Vec<usize> = units.iter().map(|&u| u as usize).collect();
     let limits = RouteLimits {
@@ -44,11 +44,12 @@ fn route_rs(matrix: &[f64], n: i32, depot: i32, units: &[i32], max_length: f64, 
         max_stops: if max_stops.is_finite() { max_stops as usize } else { usize::MAX },
     };
     let options = GraspOptions { iterations: iterations as usize, alpha, seed: seed as u64 };
-    let sol = err(grasp_routes(&m, depot as usize, &units, limits, options))?;
+    let sol = err(grasp_routes_with_service(&m, depot as usize, &units, service, limits, options))?;
     let routes: Vec<Robj> = sol.routes.iter().map(|r| r.iter().map(|&u| u as i32).collect::<Vec<i32>>().into()).collect();
     Ok(list!(
         routes = List::from_values(routes),
         lengths = sol.lengths,
+        durations = sol.durations,
         total = sol.total,
         lower_bound = sol.lower_bound,
         best_iteration = sol.best_iteration as i32
@@ -171,6 +172,35 @@ fn two_stage_rs(n_primary: i32, m_secondary: f64, s2_between: f64, s2_within: f6
              variance_mean = a.variance_mean, variance_total = a.variance_total, bounded = a.bounded))
 }
 
+/// Voronoi measure of spatial balance on an n x d row-major coordinate matrix.
+/// @noRd
+#[extendr]
+fn spatial_balance_rs(coords: &[f64], d: i32, pi: &[f64], sampled: Logicals) -> extendr_api::Result<f64> {
+    err(spatial_balance(coords, d as usize, pi, &to_bools(&sampled)))
+}
+
+/// Cube sampling balanced on the n x p row-major matrix `x`.
+/// @noRd
+#[extendr]
+fn cube_rs(x: &[f64], p: i32, pi: &[f64], seed: f64) -> extendr_api::Result<Vec<bool>> {
+    err(cube(x, p as usize, pi, seed as u64))
+}
+
+/// Multivariate allocation: `sd` is H x J row-major, `targets` one variance per variable.
+/// @noRd
+#[extendr]
+fn allocate_multi_rs(size: &[i32], cost: &[f64], sd: &[f64], targets: &[f64]) -> extendr_api::Result<List> {
+    let sizes: Vec<usize> = size.iter().map(|&v| v.max(0) as usize).collect();
+    let a = err(allocate_multivariate(&sizes, cost, sd, targets))?;
+    Ok(list!(
+        n = a.n.iter().map(|&v| v as i32).collect::<Vec<i32>>(),
+        cost = a.cost,
+        attained = a.attained,
+        bounded = a.bounded,
+        multipliers = a.multipliers
+    ))
+}
+
 /// Version of the engine crate.
 /// @noRd
 #[extendr]
@@ -192,5 +222,8 @@ extendr_module! {
     fn systematic_replicates_rs;
     fn dual_frame_rs;
     fn two_stage_rs;
+    fn spatial_balance_rs;
+    fn cube_rs;
+    fn allocate_multi_rs;
     fn core_version_rs;
 }

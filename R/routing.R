@@ -11,16 +11,22 @@
 #' @param matrix A [travel_matrix()].
 #' @param units Names (or indices in the matrix) of the units to visit.
 #' @param depot Name (or index) of the depot.
-#' @param max_length Maximum travel per route, depot to depot; `Inf` for none.
+#' @param max_length Maximum length of a route, depot to depot: travel plus
+#'   the service time of its units when `service_time` is given; `Inf` for
+#'   none.
 #' @param max_stops Maximum units per route; `Inf` for none.
+#' @param service_time Time spent at each unit (interviews, measurements), in
+#'   the unit of the travel matrix: a single number, or a vector named by
+#'   unit. It counts towards `max_length` and is reported in `durations`.
 #' @param iterations GRASP iterations.
 #' @param alpha Greediness of the construction in `[0, 1]` (0 greedy, 1 random).
 #' @param seed Seed of the solver.
 #' @param cost_model Optional [field_cost_model()] to price the solution.
 #' @return An object of class `fieldopt_routes`: `routes` (a tibble with
-#'   columns `route`, `stop`, `unit`), `lengths`, `total`, `lower_bound`,
-#'   `gap`, `best_iteration`, `cost` (when a model is given), the inputs and
-#'   the travel matrix.
+#'   columns `route`, `stop`, `unit`), `lengths` (travel per route),
+#'   `durations` (travel plus service), `total`, `lower_bound`, `gap`,
+#'   `best_iteration`, `cost` (when a model is given), the inputs and the
+#'   travel matrix.
 #' @export
 #' @examples
 #' set.seed(1)
@@ -30,8 +36,8 @@
 #' r <- route_fieldwork(m, units = paste0("s", 1:12), depot = "depot", max_stops = 5,
 #'                      iterations = 50)
 #' r
-route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = Inf, iterations = 200,
-                            alpha = 0.3, seed = 1, cost_model = NULL) {
+route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = Inf, service_time = 0,
+                            iterations = 200, alpha = 0.3, seed = 1, cost_model = NULL) {
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix)
   idx <- function(v, what) {
@@ -44,43 +50,58 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
   if (d %in% u) cli::cli_abort("The depot cannot be among the units to visit.")
   for (v in c("iterations", "alpha")) if (!is.numeric(get(v)) || length(get(v)) != 1L) cli::cli_abort("{.arg {v}} must be a single number.")
   check_seed(seed)
+  service <- service_vector(service_time, nm)
   if (is.finite(max_length)) {
-    far <- nm[u][2 * unclass(matrix)[d, u] > max_length]
+    far <- nm[u][unclass(matrix)[d, u] + unclass(matrix)[u, d] + service[u] > max_length]
     if (length(far)) cli::cli_abort(c("A route from {.val {nm[d]}} to {.val {far}} and back exceeds {.arg max_length} = {max_length}.",
                                       i = "Raise {.arg max_length}, move the depot or drop {cli::qty(length(far))}{?this unit/these units}."))
   }
   if (is.finite(max_stops) && max_stops < 1) cli::cli_abort("{.arg max_stops} must be at least 1.")
-  res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, u - 1L, as.numeric(max_length), as.numeric(max_stops),
-                  as.integer(iterations), alpha, seed)
+  res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, u - 1L, service, as.numeric(max_length),
+                  as.numeric(max_stops), as.integer(iterations), alpha, seed)
   routes <- do.call(rbind, lapply(seq_along(res$routes), function(k) {
     r <- res$routes[[k]] + 1L
     tibble::tibble(route = k, stop = seq_along(r), unit = nm[r])
   }))
-  out <- list(routes = routes, lengths = res$lengths, total = res$total, lower_bound = res$lower_bound,
+  out <- list(routes = routes, lengths = res$lengths, durations = res$durations, total = res$total, lower_bound = res$lower_bound,
               gap = if (res$lower_bound > 0) (res$total - res$lower_bound) / res$lower_bound else NA_real_,
               best_iteration = res$best_iteration,
               n_routes = length(res$routes), depot = nm[d], units = nm[u],
-              limits = c(max_length = max_length, max_stops = max_stops),
+              limits = c(max_length = max_length, max_stops = max_stops), service_time = service,
               options = list(iterations = iterations, alpha = alpha, seed = seed),
               travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"),
               matrix = matrix)
   if (!is.null(cost_model)) {
     if (!inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
-    out$cost <- cost_of(cost_model, res$total, length(u), u)
+    out$cost <- cost_of(cost_model, res$total, length(u), u, n_routes = length(res$routes))
     out$cost_model <- cost_model
   }
   structure(out, class = "fieldopt_routes")
+}
+
+# Service time as a vector over the rows of the matrix (names `nm`).
+service_vector <- function(service_time, nm) {
+  if (!is.numeric(service_time) || anyNA(service_time) || any(service_time < 0)) cli::cli_abort("{.arg service_time} must be non-negative numbers.")
+  if (length(service_time) == 1L) return(rep(as.numeric(service_time), length(nm)))
+  if (!is.null(names(service_time))) {
+    out <- rep(0, length(nm)); hit <- match(names(service_time), nm)
+    if (anyNA(hit)) cli::cli_abort("Unknown unit{?s} in {.arg service_time}: {.val {names(service_time)[is.na(hit)]}}.")
+    out[hit] <- as.numeric(service_time); return(out)
+  }
+  if (length(service_time) != length(nm)) cli::cli_abort("{.arg service_time} must be a single number, a vector named by unit, or one value per row of the matrix.")
+  as.numeric(service_time)
 }
 
 #' @export
 print.fieldopt_routes <- function(x, ...) {
   cli::cli_h1("Field routes")
   cli::cli_text("{x$n_routes} route{?s} from {.val {x$depot}} through {length(x$units)} unit{?s}: total travel {signif(x$total, 4)} {x$travel_unit} (lower bound {signif(x$lower_bound, 4)}{if (is.na(x$gap)) '' else paste0(', gap ', signif(100 * x$gap, 3), '%')}).")
+  served <- any(x$service_time > 0)
   for (k in seq_len(x$n_routes)) {
     r <- x$routes$unit[x$routes$route == k]
-    cli::cli_text("Route {k} ({signif(x$lengths[k], 4)}): {paste(r, collapse = ' > ')}")
+    cli::cli_text("Route {k} ({signif(x$lengths[k], 4)}{if (served) paste0(', duration ', signif(x$durations[k], 4)) else ''}): {paste(r, collapse = ' > ')}")
   }
-  if (!is.null(x$cost)) cli::cli_text("Cost ({x$cost_model$currency}): travel {signif(x$cost[['travel']], 4)} + units {signif(x$cost[['units']], 4)} + interviews {signif(x$cost[['interviews']], 4)} = {signif(x$cost[['total']], 4)}.")
+  if (!is.null(x$cost)) cli::cli_text("Cost ({x$cost_model$currency}): travel {signif(x$cost[['travel']], 4)} + routes {signif(x$cost[['routes']], 4)} + units {signif(x$cost[['units']], 4)} + interviews {signif(x$cost[['interviews']], 4)} = {signif(x$cost[['total']], 4)}.")
   invisible(x)
 }
 

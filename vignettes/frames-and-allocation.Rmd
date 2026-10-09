@@ -69,6 +69,27 @@ frame_allocation(strata, target_variance = 2.5e7)
 Overlap between the frames (farms present in both) is not modelled here;
 the allocation treats the frames as strata of a single design.
 
+## Several study variables
+
+A survey rarely has one target: crop area and cattle, or production and the
+number of holdings, each with its own precision. `multivariate_allocation()`
+finds the cheapest allocation that meets every target at once (Bethel 1989);
+the multipliers say which targets bind, and `glance()` shows the variance
+attained for each.
+
+```{r multi}
+multi <- data.frame(stratum = c("list", "area-high", "area-low"),
+                    size = c(2000, 300, 500), cost = c(40, 200, 160),
+                    sd_crop = c(12, 35, 18), sd_cattle = c(30, 10, 25))
+ma <- multivariate_allocation(multi, sd = c("sd_crop", "sd_cattle"),
+                              target_cv = c(0.04, 0.06), totals = c(120000, 90000))
+ma
+glance(ma)
+```
+
 ## References
+
+Bethel, J. (1989). Sample allocation in multivariate surveys. *Survey
+Methodology*, 15, 47--57.
 
 Cochran, W. G. (1977). *Sampling Techniques*, third edition. Wiley.
