@@ -10,7 +10,7 @@
   `two_stage_allocation()` is Cochran's two-stage allocation with the cost
   function `c1 n + c2 n m`. `design_variance()` chooses the variance
   estimator that matches the design (local-mean, replicates or SRS).
-  Engine: `fieldopt-core` 0.2.2.
+  Engine: `fieldopt-core` 0.2.3.
 * `cost_variance_frontier()` accepts `strata`, `selection` and `replicates`,
   a list of per-stratum allocations in `n_grid`, and reports `cost_per_unit`.
 * `travel_matrix()` gains a `detour` factor for straight-line distances and
