@@ -135,6 +135,12 @@
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
+</h2>
+<p><img src="reference/figures/architecture.svg" alt="Architecture of fieldopt: R package, extendr bindings and the fieldopt-core Rust crate" width="100%"></p>
+<p><img src="reference/figures/workflow.svg" alt="Workflow of fieldopt: frame, travel matrix, selection, routing, cost and variance, and the frontier" width="100%"></p>
+</div>
+<div class="section level2">
 <h2 id="related-work">Related work<a class="anchor" aria-label="anchor" href="#related-work"></a>
 </h2>
 <p>Spatially balanced sampling and its variance estimator follow Grafström, Lundström and Schelin (2012) and Grafström and Schelin (2014), as implemented in <code>BalancedSampling</code>; the allocation is Cochran’s (1977) cost-optimal allocation. What <code>fieldopt</code> adds is the routing and the cost model, so that the field cost of a design is computed instead of approximated by the sample size.</p>

@@ -74,6 +74,14 @@ f <- cost_variance_frontier(frame, depot = "depot", cost_model = model,
 autoplot(f)
 ```
 
+## How it works
+
+![Architecture of fieldopt: R package, extendr bindings and the
+fieldopt-core Rust crate](reference/figures/architecture.svg)
+
+![Workflow of fieldopt: frame, travel matrix, selection, routing, cost
+and variance, and the frontier](reference/figures/workflow.svg)
+
 ## Related work
 
 Spatially balanced sampling and its variance estimator follow Grafström,
