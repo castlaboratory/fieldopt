@@ -14,14 +14,34 @@
 - [`autoplot(`*`<fieldopt_routes>`*`)`](https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_routes.md)
   : Plot the routes
 
-## Selecting units and estimating
+## Selecting units and points
 
 - [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
-  : Select units with a spatially balanced probability sample
+  : Select units with a spatially balanced or systematic probability
+  sample
+- [`select_points()`](https://castlaboratory.github.io/fieldopt/reference/select_points.md)
+  : Select points inside sampled grid cells
+
+## Estimating
+
 - [`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
   : Design-based estimate of a total with its variance
+- [`segment_estimator()`](https://castlaboratory.github.io/fieldopt/reference/segment_estimator.md)
+  : Segment estimators of a total from an area sample of segments
+- [`point_estimator()`](https://castlaboratory.github.io/fieldopt/reference/point_estimator.md)
+  : Multiplicity (point) estimator of a total from an area sample of
+  points
+- [`expected_hits()`](https://castlaboratory.github.io/fieldopt/reference/expected_hits.md)
+  : Expected number of point hits of each establishment
+
+## Allocation
+
 - [`frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/frame_allocation.md)
-  : Cost-aware allocation across strata or frames
+  : Cost-aware allocation across strata
+- [`dual_frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_allocation.md)
+  : Dual-frame allocation (area frame plus list frame with overlap)
+- [`two_stage_allocation()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_allocation.md)
+  : Two-stage allocation with a field cost function
 
 ## The cost-variance frontier
 

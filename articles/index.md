@@ -7,6 +7,8 @@
 
 ### Practice
 
+- [An area frame with points, a list frame, and their joint
+  design](https://castlaboratory.github.io/fieldopt/articles/area-and-dual-frame.md):
 - [Routing for one or several
   teams](https://castlaboratory.github.io/fieldopt/articles/routing-teams.md):
 - [Frames, strata and cost-aware

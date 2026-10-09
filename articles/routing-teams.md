@@ -27,11 +27,11 @@ one <- route_fieldwork(m, units = sel, depot = "depot", cost_model = model)
 one
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 1 route from "depot" through 18 units: total travel 272 km (lower bound 230,
-#> gap 18.3%).
-#> Route 1 (272): s2 > s7 > s57 > s14 > s47 > s60 > s35 > s54 > s55 > s49 > s19 >
-#> s41 > s1 > s53 > s26 > s34 > s11 > s17
-#> Cost (BRL): travel 489.7 + units 720 + interviews 1296 = 2506.
+#> 1 route from "depot" through 18 units: total travel 281.1 km (lower bound
+#> 249.6, gap 12.6%).
+#> Route 1 (281.1): s30 > s9 > s32 > s27 > s48 > s1 > s29 > s31 > s43 > s19 > s6 >
+#> s13 > s54 > s47 > s4 > s16 > s12 > s37
+#> Cost (BRL): travel 506 + units 720 + interviews 1296 = 2522.
 ```
 
 ## Routes limited by length
@@ -47,13 +47,14 @@ days <- route_fieldwork(m, units = sel, depot = "depot", max_length = 100,
 days
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 4 routes from "depot" through 18 units: total travel 345.3 km (lower bound 230,
-#> gap 50.2%).
-#> Route 1 (90.66): s17 > s53 > s1 > s41
-#> Route 2 (83.6): s34 > s26 > s11 > s7
-#> Route 3 (94.05): s2 > s57 > s14 > s47 > s60 > s35
-#> Route 4 (77.03): s54 > s49 > s19 > s55
-#> Cost (BRL): travel 621.6 + units 720 + interviews 1296 = 2638.
+#> 5 routes from "depot" through 18 units: total travel 403.1 km (lower bound
+#> 249.6, gap 61.5%).
+#> Route 1 (86.76): s37 > s54 > s13 > s6 > s19 > s43
+#> Route 2 (97.48): s47 > s4 > s16 > s12
+#> Route 3 (88.51): s30 > s9 > s32
+#> Route 4 (99.02): s27 > s48 > s1 > s29
+#> Route 5 (31.29): s31
+#> Cost (BRL): travel 725.5 + units 720 + interviews 1296 = 2741.
 autoplot(days)
 ```
 
@@ -71,14 +72,15 @@ stops <- route_fieldwork(m, units = sel, depot = "depot", max_stops = 4,
 stops
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 5 routes from "depot" through 18 units: total travel 383.4 km (lower bound 230,
-#> gap 66.7%).
-#> Route 1 (90.66): s17 > s53 > s1 > s41
-#> Route 2 (83.6): s34 > s26 > s11 > s7
-#> Route 3 (39.02): s2 > s57
-#> Route 4 (93.14): s14 > s47 > s60 > s35
-#> Route 5 (77.03): s54 > s49 > s19 > s55
-#> Cost (BRL): travel 690.2 + units 720 + interviews 1296 = 2706.
+#> 6 routes from "depot" through 18 units: total travel 406.2 km (lower bound
+#> 249.6, gap 62.7%).
+#> Route 1 (19.98): s30
+#> Route 2 (97.48): s12 > s16 > s4 > s47
+#> Route 3 (120.2): s9 > s32 > s27 > s48
+#> Route 4 (79.38): s31 > s1 > s29 > s43
+#> Route 5 (82.91): s6 > s19 > s13 > s54
+#> Route 6 (6.175): s37
+#> Cost (BRL): travel 731.1 + units 720 + interviews 1296 = 2747.
 ```
 
 ## Comparing
@@ -90,9 +92,9 @@ data.frame(organisation = c("one tour", "100 km per route", "4 stops per route")
            travel_km = round(c(one$total, days$total, stops$total), 1),
            cost = round(c(one$cost[["total"]], days$cost[["total"]], stops$cost[["total"]])))
 #>        organisation routes travel_km cost
-#> 1          one tour      1     272.0 2506
-#> 2  100 km per route      4     345.3 2638
-#> 3 4 stops per route      5     383.4 2706
+#> 1          one tour      1     281.1 2522
+#> 2  100 km per route      5     403.1 2741
+#> 3 4 stops per route      6     406.2 2747
 ```
 
 The travel grows with the number of routes because every route starts
@@ -131,5 +133,5 @@ quick <- route_fieldwork(m, units = sel, depot = "depot", iterations = 10, seed 
 long <- route_fieldwork(m, units = sel, depot = "depot", iterations = 500, seed = 2)
 c(quick = quick$total, long = long$total)
 #>    quick     long 
-#> 272.0344 272.0344
+#> 281.1368 281.1368
 ```

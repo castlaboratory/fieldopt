@@ -105,6 +105,6 @@ cost_variance_frontier(frame, depot = "depot", cost_model = model, n_grid = c(8,
 #> # A tibble: 2 × 8
 #>       n cost_mean cost_sd travel_mean routes_mean variance_mean cv_mean n_rep
 #> * <dbl>     <dbl>   <dbl>       <dbl>       <dbl>         <dbl>   <dbl> <dbl>
-#> 1     8      619.    5.35        29.5           1         6877.  0.0578     3
-#> 2    16     1194.    1.18        37.1           1         1011.  0.0232     3
+#> 1     8      619.    2.63        29.5           1         8199.  0.0664     3
+#> 2    16     1193.    3.47        36.5           1          800.  0.0211     3
 ```

@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Field-Survey Design under Real Field Cost • fieldopt</title>
+<title>Area-Frame and Dual-Frame Survey Design under Real Field Cost • fieldopt</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -17,9 +17,9 @@
 <link href="deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Field-Survey Design under Real Field Cost">
-<meta name="description" content="Design of area and list sample surveys that go to the field, minimising the real cost of field work (travel between sampling units plus interviews) subject to a target variance of the design-based estimator. Travel matrices from coordinates or a road network, GRASP routing of the field work for one or several teams, spatially balanced selection of units with the local pivotal method, Horvitz-Thompson estimation with the local-mean variance estimator, cost-aware allocation across strata or frames, and the cost-variance frontier of a design by simulation. The computational engine is the Rust crate fieldopt-core.">
-<meta property="og:description" content="Design of area and list sample surveys that go to the field, minimising the real cost of field work (travel between sampling units plus interviews) subject to a target variance of the design-based estimator. Travel matrices from coordinates or a road network, GRASP routing of the field work for one or several teams, spatially balanced selection of units with the local pivotal method, Horvitz-Thompson estimation with the local-mean variance estimator, cost-aware allocation across strata or frames, and the cost-variance frontier of a design by simulation. The computational engine is the Rust crate fieldopt-core.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Area-Frame and Dual-Frame Survey Design under Real Field Cost">
+<meta name="description" content="Design of agricultural and other area-frame and dual-frame (area plus list) sample surveys that go to the field, with the real cost of field work (travel between sampling units plus interviews) next to the variance of the design-based estimator. Travel matrices from coordinates or a road network; GRASP routing of the field work for one or several teams; stratified spatially balanced (local pivotal) or spatially ordered systematic selection of segments with interpenetrating replicates; points inside segments with multiplicity (expected-hits) estimation; closed, open and weighted segment estimators; Horvitz-Thompson estimation with local-mean or replicate variances; cost-aware allocation across strata, Hartley's dual-frame allocation with an overlap, and two-stage allocation with a cost function; and the cost-variance frontier of a design by simulation. The computational engine is the Rust crate fieldopt-core.">
+<meta property="og:description" content="Design of agricultural and other area-frame and dual-frame (area plus list) sample surveys that go to the field, with the real cost of field work (travel between sampling units plus interviews) next to the variance of the design-based estimator. Travel matrices from coordinates or a road network; GRASP routing of the field work for one or several teams; stratified spatially balanced (local pivotal) or spatially ordered systematic selection of segments with interpenetrating replicates; points inside segments with multiplicity (expected-hits) estimation; closed, open and weighted segment estimators; Horvitz-Thompson estimation with local-mean or replicate variances; cost-aware allocation across strata, Hartley's dual-frame allocation with an overlap, and two-stage allocation with a cost function; and the cost-variance frontier of a design by simulation. The computational engine is the Rust crate fieldopt-core.">
 <meta property="og:image" content="https://castlaboratory.github.io/fieldopt/logo.svg">
 </head>
 <body>
@@ -46,6 +46,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Practice</h6></li>
+    <li><a class="dropdown-item" href="articles/area-and-dual-frame.html">An area frame with points, a list frame, and their joint design</a></li>
     <li><a class="dropdown-item" href="articles/routing-teams.html">Routing for one or several teams</a></li>
     <li><a class="dropdown-item" href="articles/frames-and-allocation.html">Frames, strata and cost-aware allocation</a></li>
   </ul>
@@ -79,7 +80,7 @@
 </div>
 <!-- badges: start -->
 
-<p>Field-survey design under real field cost. Survey samples are usually designed for precision alone; the cost that actually decides whether a survey happens is the field work: travelling between sampling units and interviewing. <code>fieldopt</code> puts that cost next to the variance of the estimator so that both are visible when the design is chosen.</p>
+<p>Area-frame and dual-frame survey design under real field cost. Survey samples are usually designed for precision alone; the cost that actually decides whether a survey happens is the field work: travelling between sampling units and interviewing. <code>fieldopt</code> puts that cost next to the variance of the estimator so that both are visible when the design is chosen, and provides the pieces an agricultural survey with an area frame (grid cells, points inside them) and a list frame needs.</p>
 <ul>
 <li>
 <code><a href="reference/travel_matrix.html">travel_matrix()</a></code> builds the travel matrix between units from coordinates (great-circle or planar distances) or wraps a road-network matrix.</li>
@@ -88,11 +89,13 @@
 <li>
 <code><a href="reference/route_fieldwork.html">route_fieldwork()</a></code> routes the field work from a depot through the selected units, for one team or several, under route-length and stop limits (GRASP with 2-opt, Or-opt and an optimal split of the tour), and reports the gap to a lower bound.</li>
 <li>
-<code><a href="reference/select_units.html">select_units()</a></code> draws a spatially balanced probability sample with the local pivotal method, with equal or size-proportional inclusion probabilities.</li>
+<code><a href="reference/select_units.html">select_units()</a></code> draws a probability sample of segments or cells, within strata, by the local pivotal method (spatially balanced), by spatially ordered systematic sampling along a Hilbert curve with interpenetrating replicates, or by simple random sampling.</li>
 <li>
-<code><a href="reference/design_variance.html">design_variance()</a></code> gives the Horvitz-Thompson total and its local-mean variance estimate, with the simple-random-sampling variance as a reference.</li>
+<code><a href="reference/select_points.html">select_points()</a></code>, <code><a href="reference/expected_hits.html">expected_hits()</a></code> and <code><a href="reference/point_estimator.html">point_estimator()</a></code> implement point sampling inside the selected cells and the multiplicity estimator (each hit of an establishment counts, divided by its expected hits).</li>
 <li>
-<code><a href="reference/frame_allocation.html">frame_allocation()</a></code> allocates the sample across strata or frames for a target variance at minimum cost, or for a budget at minimum variance.</li>
+<code><a href="reference/segment_estimator.html">segment_estimator()</a></code> gives the closed, open and weighted segment estimators; <code><a href="reference/design_variance.html">design_variance()</a></code> the Horvitz-Thompson total with the variance estimator that matches the design (local-mean, replicates, SRS).</li>
+<li>
+<code><a href="reference/frame_allocation.html">frame_allocation()</a></code> allocates across strata for a target variance or a budget; <code><a href="reference/dual_frame_allocation.html">dual_frame_allocation()</a></code> is Hartley’s allocation for an area frame plus a list frame with overlap, with the optimal mixing weight or the screening design; <code><a href="reference/two_stage_allocation.html">two_stage_allocation()</a></code> is Cochran’s two-stage allocation with the cost function <code>c1 n + c2 n m</code>, where <code>c1</code> comes from the routing.</li>
 <li>
 <code><a href="reference/cost_variance_frontier.html">cost_variance_frontier()</a></code> simulates designs over a grid of sample sizes and returns the trade-off between field cost and variance.</li>
 </ul>
@@ -143,7 +146,7 @@
 <div class="section level2">
 <h2 id="related-work">Related work<a class="anchor" aria-label="anchor" href="#related-work"></a>
 </h2>
-<p>Spatially balanced sampling and its variance estimator follow Grafström, Lundström and Schelin (2012) and Grafström and Schelin (2014), as implemented in <code>BalancedSampling</code>; the allocation is Cochran’s (1977) cost-optimal allocation. What <code>fieldopt</code> adds is the routing and the cost model, so that the field cost of a design is computed instead of approximated by the sample size.</p>
+<p>Spatially balanced sampling and its variance estimator follow Grafström, Lundström and Schelin (2012) and Grafström and Schelin (2014), as implemented in <code>BalancedSampling</code>; the allocations are Cochran’s (1977) cost-optimal allocations and Hartley’s (1962, 1974) dual-frame design; the dual-frame <em>estimators</em> (Hartley, Fuller-Burmeister, Kalton-Anderson, pseudo-maximum likelihood, calibration) are in <code>Frames2</code>. What <code>fieldopt</code> adds is the design side with the routing and the cost model, so that the field cost of a design is computed instead of approximated by the sample size.</p>
 </div>
 <div class="section level2">
 <h2 id="authors">Authors<a class="anchor" aria-label="anchor" href="#authors"></a>

@@ -1,6 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://castlaboratory.github.io/fieldopt/404.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/LICENSE.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/articles/area-and-dual-frame.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/articles/fieldopt.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/articles/frames-and-allocation.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/articles/index.html</loc></url>
@@ -13,13 +14,19 @@
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/core_version.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/cost_variance_frontier.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/design_variance.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/dual_frame_allocation.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/expected_hits.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/field_cost_model.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/fieldopt-package.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/frame_allocation.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/index.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/point_estimator.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/reexports.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/segment_estimator.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/select_points.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/select_units.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/travel_matrix.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/two_stage_allocation.html</loc></url>
 </urlset>
 

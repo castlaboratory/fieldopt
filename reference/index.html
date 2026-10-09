@@ -21,6 +21,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Practice</h6></li>
+    <li><a class="dropdown-item" href="../articles/area-and-dual-frame.html">An area frame with points, a list frame, and their joint design</a></li>
     <li><a class="dropdown-item" href="../articles/routing-teams.html">Routing for one or several teams</a></li>
     <li><a class="dropdown-item" href="../articles/frames-and-allocation.html">Frames, strata and cost-aware allocation</a></li>
   </ul></li>
@@ -91,7 +92,7 @@
         </dt>
         <dd>Plot the routes</dd>
       </dl></div><div class="section level2">
-      <h2 id="selecting-units-and-estimating">Selecting units and estimating<a class="anchor" aria-label="anchor" href="#selecting-units-and-estimating"></a></h2>
+      <h2 id="selecting-units-and-points">Selecting units and points<a class="anchor" aria-label="anchor" href="#selecting-units-and-points"></a></h2>
 
 
 
@@ -105,9 +106,25 @@
           <code><a href="select_units.html">select_units()</a></code>
 
         </dt>
-        <dd>Select units with a spatially balanced probability sample</dd>
+        <dd>Select units with a spatially balanced or systematic probability sample</dd>
 
         <dt>
+
+          <code><a href="select_points.html">select_points()</a></code>
+
+        </dt>
+        <dd>Select points inside sampled grid cells</dd>
+      </dl></div><div class="section level2">
+      <h2 id="estimating">Estimating<a class="anchor" aria-label="anchor" href="#estimating"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="design_variance.html">design_variance()</a></code>
 
@@ -116,10 +133,54 @@
 
         <dt>
 
+          <code><a href="segment_estimator.html">segment_estimator()</a></code>
+
+        </dt>
+        <dd>Segment estimators of a total from an area sample of segments</dd>
+
+        <dt>
+
+          <code><a href="point_estimator.html">point_estimator()</a></code>
+
+        </dt>
+        <dd>Multiplicity (point) estimator of a total from an area sample of points</dd>
+
+        <dt>
+
+          <code><a href="expected_hits.html">expected_hits()</a></code>
+
+        </dt>
+        <dd>Expected number of point hits of each establishment</dd>
+      </dl></div><div class="section level2">
+      <h2 id="allocation">Allocation<a class="anchor" aria-label="anchor" href="#allocation"></a></h2>
+
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
           <code><a href="frame_allocation.html">frame_allocation()</a></code>
 
         </dt>
-        <dd>Cost-aware allocation across strata or frames</dd>
+        <dd>Cost-aware allocation across strata</dd>
+
+        <dt>
+
+          <code><a href="dual_frame_allocation.html">dual_frame_allocation()</a></code>
+
+        </dt>
+        <dd>Dual-frame allocation (area frame plus list frame with overlap)</dd>
+
+        <dt>
+
+          <code><a href="two_stage_allocation.html">two_stage_allocation()</a></code>
+
+        </dt>
+        <dd>Two-stage allocation with a field cost function</dd>
       </dl></div><div class="section level2">
       <h2 id="the-cost-variance-frontier">The cost-variance frontier<a class="anchor" aria-label="anchor" href="#the-cost-variance-frontier"></a></h2>
 

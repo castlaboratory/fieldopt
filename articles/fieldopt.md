@@ -76,21 +76,23 @@ longer. Making that tension explicit is the point of the package.
 units <- frame[frame$unit != "depot", ]
 s <- select_units(units, n = 12)
 s[s$sampled, c("unit", "x", "y", "pi")]
+#> Warning: Unknown or uninitialised column: `sampled`.
+#> Sample of 0 units from 12 by "lpm".
 #> # A tibble: 12 × 4
-#>    unit       x     y    pi
-#>    <chr>  <dbl> <dbl> <dbl>
-#>  1 s7    4.66   9.29    0.3
-#>  2 s8    8.61   2.95    0.3
-#>  3 s18   0.0120 0.459   0.3
-#>  4 s21   3.42   2.98    0.3
-#>  5 s23   2.33   5.66    0.3
-#>  6 s26   1.86   0.830   0.3
-#>  7 s27   4.11   6.30    0.3
-#>  8 s29   0.0543 5.72    0.3
-#>  9 s30   6.02   6.62    0.3
-#> 10 s31   9.11   8.78    0.3
-#> 11 s34   0.162  8.58    0.3
-#> 12 s40   4.47   9.00    0.3
+#>    unit      x     y    pi
+#>    <chr> <dbl> <dbl> <dbl>
+#>  1 s1    6.99   3.71   0.3
+#>  2 s2    5.57   8.75   0.3
+#>  3 s12   6.92   6.33   0.3
+#>  4 s14   8.49   8.86   0.3
+#>  5 s15   1.54   5.23   0.3
+#>  6 s19   3.18   9.58   0.3
+#>  7 s20   0.173  2.01   0.3
+#>  8 s24   0.614  4.56   0.3
+#>  9 s27   4.11   6.30   0.3
+#> 10 s32   1.75   3.79   0.3
+#> 11 s35   5.86   1.86   0.3
+#> 12 s37   2.10   7.18   0.3
 ```
 
 [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
@@ -108,12 +110,12 @@ r <- route_fieldwork(m, units = s$unit[s$sampled], depot = "depot",
 r
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 3 routes from "depot" through 12 units: total travel 47.06 distance (lower
-#> bound 32.89, gap 43.1%).
-#> Route 1 (19.58): s30 > s40 > s7 > s31 > s8
-#> Route 2 (21.24): s21 > s26 > s18 > s29 > s34
-#> Route 3 (6.229): s23 > s27
-#> Cost (BRL): travel 94.11 + units 360 + interviews 480 = 934.1.
+#> 3 routes from "depot" through 12 units: total travel 38.74 distance (lower
+#> bound 28.03, gap 38.2%).
+#> Route 1 (13.93): s27 > s15 > s24 > s20 > s32
+#> Route 2 (17.02): s37 > s19 > s2 > s14 > s12
+#> Route 3 (7.786): s1 > s35
+#> Cost (BRL): travel 77.47 + units 360 + interviews 480 = 917.5.
 autoplot(r)
 ```
 
@@ -129,10 +131,10 @@ random sampling is shown for comparison.
 ``` r
 
 design_variance(s, y = "crop")
-#> # A tibble: 1 × 7
-#>   total variance    se     cv variance_srs     n     N
-#>   <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int>
-#> 1 1225.    4278.  65.4 0.0534        9568.    12    40
+#> # A tibble: 1 × 8
+#>   total variance    se     cv variance_srs     n     N variance_method
+#>   <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>          
+#> 1 1265.    2175.  46.6 0.0369        7079.    12    40 local-mean
 sum(frame$crop, na.rm = TRUE)
 #> [1] 1241.481
 ```
@@ -156,12 +158,12 @@ f
 #> # A tibble: 6 × 8
 #>       n cost_mean cost_sd travel_mean routes_mean variance_mean cv_mean n_rep
 #> * <dbl>     <dbl>   <dbl>       <dbl>       <dbl>         <dbl>   <dbl> <dbl>
-#> 1     6      470.    5.81        24.9        2           17267.  0.102      8
-#> 2     9      700.    5.18        34.8        2.12         6412.  0.0623     8
-#> 3    12      924.    6.09        41.9        3            3449.  0.0467     8
-#> 4    16     1221.    6.18        50.7        4            1494.  0.0311     8
-#> 5    20     1517.    1.84        58.6        4.25          946.  0.0249     8
-#> 6    24     1810.    3.33        65.1        5.5           519.  0.0184     8
+#> 1     6      472.    6.62        26.0        2           19563.  0.107      8
+#> 2     9      699.    4.08        34.5        2.12         6200.  0.0630     8
+#> 3    12      925.    5.24        42.7        3            2972.  0.0434     8
+#> 4    16     1222.    7.82        51.2        4            1500.  0.0311     8
+#> 5    20     1518.    4.01        58.9        4.62         1013.  0.0257     8
+#> 6    24     1812.    2.52        66.2        5.25          542.  0.0187     8
 autoplot(f)
 ```
 

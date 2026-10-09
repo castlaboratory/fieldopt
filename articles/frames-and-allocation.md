@@ -55,8 +55,7 @@ b <- frame_allocation(strata, budget = 30000)
 b
 #> 
 #> ── Allocation ──────────────────────────────────────────────────────────────────
-#> Minimum variance for budget 30000: cost 29980, variance 17830000 (a bound on
-#> n_h was active).
+#> Minimum variance for budget 30000: cost 29980, variance 17830000.
 #> # A tibble: 3 × 5
 #>   stratum      size    sd  cost     n
 #>   <chr>       <dbl> <dbl> <dbl> <int>

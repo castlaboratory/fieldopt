@@ -1,10 +1,11 @@
-# Cost-aware allocation across strata or frames
+# Cost-aware allocation across strata
 
 Classical optimum allocation with a cost per unit in each stratum
 (Cochran 1977, Section 5.5): minimum cost for a target variance of the
-estimated total, or minimum variance for a budget. Frames (a list frame
-and an area frame) are treated as strata with their own variance and
-cost; the overlap of dual frames is not modelled here.
+estimated total, or minimum variance for a budget. For two frames with
+an overlap use
+[`dual_frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_allocation.md)
+instead.
 
 ## Usage
 
@@ -51,8 +52,7 @@ frame_allocation(strata, target_variance = 4e6)
 frame_allocation(strata, budget = 20000)
 #> 
 #> ── Allocation ──────────────────────────────────────────────────────────────────
-#> Minimum variance for budget 20000: cost 19980, variance 10230000 (a bound on
-#> n_h was active).
+#> Minimum variance for budget 20000: cost 19980, variance 10230000.
 #> # A tibble: 2 × 5
 #>   stratum  size    sd  cost     n
 #>   <chr>   <dbl> <dbl> <dbl> <int>

@@ -43,6 +43,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Practice</h6></li>
+    <li><a class="dropdown-item" href="../articles/area-and-dual-frame.html">An area frame with points, a list frame, and their joint design</a></li>
     <li><a class="dropdown-item" href="../articles/routing-teams.html">Routing for one or several teams</a></li>
     <li><a class="dropdown-item" href="../articles/frames-and-allocation.html">Frames, strata and cost-aware allocation</a></li>
   </ul>
@@ -149,21 +150,23 @@ explicit is the point of the package.</p>
 <code class="sourceCode R"><span><span class="va">units</span> <span class="op">&lt;-</span> <span class="va">frame</span><span class="op">[</span><span class="va">frame</span><span class="op">$</span><span class="va">unit</span> <span class="op">!=</span> <span class="st">"depot"</span>, <span class="op">]</span></span>
 <span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">units</span>, n <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="va">s</span><span class="op">[</span><span class="va">s</span><span class="op">$</span><span class="va">sampled</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unit"</span>, <span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"pi"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; Warning: Unknown or uninitialised column: `sampled`.</span></span>
+<span><span class="co">#&gt; Sample of 0 units from 12 by <span style="color: #0000BB;">"lpm"</span>.</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 12 × 4</span></span></span>
-<span><span class="co">#&gt;    unit       x     y    pi</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> s7    4.66   9.29    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> s8    8.61   2.95    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> s18   0.012<span style="text-decoration: underline;">0</span> 0.459   0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> s21   3.42   2.98    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> s23   2.33   5.66    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> s26   1.86   0.830   0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> s27   4.11   6.30    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> s29   0.054<span style="text-decoration: underline;">3</span> 5.72    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s30   6.02   6.62    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s31   9.11   8.78    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> s34   0.162  8.58    0.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> s40   4.47   9.00    0.3</span></span></code></pre></div>
+<span><span class="co">#&gt;    unit      x     y    pi</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> s1    6.99   3.71   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> s2    5.57   8.75   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> s12   6.92   6.33   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> s14   8.49   8.86   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> s15   1.54   5.23   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> s19   3.18   9.58   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> s20   0.173  2.01   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> s24   0.614  4.56   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> s27   4.11   6.30   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> s32   1.75   3.79   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> s35   5.86   1.86   0.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> s37   2.10   7.18   0.3</span></span></code></pre></div>
 <p><code><a href="../reference/route_fieldwork.html">route_fieldwork()</a></code> routes the field work from the depot
 through the selected units. Without limits it returns one tour; with a
 maximum length or a maximum number of stops per route, it splits the
@@ -177,12 +180,12 @@ visible.</p>
 <span><span class="va">r</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Field routes</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; 3 routes from <span style="color: #0000BB;">"depot"</span> through 12 units: total travel 47.06 distance (lower</span></span>
-<span><span class="co">#&gt; bound 32.89, gap 43.1%).</span></span>
-<span><span class="co">#&gt; Route 1 (19.58): s30 &gt; s40 &gt; s7 &gt; s31 &gt; s8</span></span>
-<span><span class="co">#&gt; Route 2 (21.24): s21 &gt; s26 &gt; s18 &gt; s29 &gt; s34</span></span>
-<span><span class="co">#&gt; Route 3 (6.229): s23 &gt; s27</span></span>
-<span><span class="co">#&gt; Cost (BRL): travel 94.11 + units 360 + interviews 480 = 934.1.</span></span>
+<span><span class="co">#&gt; 3 routes from <span style="color: #0000BB;">"depot"</span> through 12 units: total travel 38.74 distance (lower</span></span>
+<span><span class="co">#&gt; bound 28.03, gap 38.2%).</span></span>
+<span><span class="co">#&gt; Route 1 (13.93): s27 &gt; s15 &gt; s24 &gt; s20 &gt; s32</span></span>
+<span><span class="co">#&gt; Route 2 (17.02): s37 &gt; s19 &gt; s2 &gt; s14 &gt; s12</span></span>
+<span><span class="co">#&gt; Route 3 (7.786): s1 &gt; s35</span></span>
+<span><span class="co">#&gt; Cost (BRL): travel 77.47 + units 360 + interviews 480 = 917.5.</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fieldopt_files/figure-html/route-1.png" class="r-plt" alt="" width="624"></p>
 <p><code><a href="../reference/design_variance.html">design_variance()</a></code> gives the Horvitz-Thompson estimate of
@@ -193,10 +196,10 @@ variance the same sample size would give under simple random sampling is
 shown for comparison.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/design_variance.html">design_variance</a></span><span class="op">(</span><span class="va">s</span>, y <span class="op">=</span> <span class="st">"crop"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 7</span></span></span>
-<span><span class="co">#&gt;   total variance    se     cv variance_srs     n     N</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">1</span>225.    <span style="text-decoration: underline;">4</span>278.  65.4 0.053<span style="text-decoration: underline;">4</span>        <span style="text-decoration: underline;">9</span>568.    12    40</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 8</span></span></span>
+<span><span class="co">#&gt;   total variance    se     cv variance_srs     n     N variance_method</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">1</span>265.    <span style="text-decoration: underline;">2</span>175.  46.6 0.036<span style="text-decoration: underline;">9</span>        <span style="text-decoration: underline;">7</span>079.    12    40 local-mean</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">frame</span><span class="op">$</span><span class="va">crop</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1241.481</span></span></code></pre></div>
 </div>
@@ -217,12 +220,12 @@ planner faces.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
 <span><span class="co">#&gt;       n cost_mean cost_sd travel_mean routes_mean variance_mean cv_mean n_rep</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     6      470.    5.81        24.9        2           <span style="text-decoration: underline;">17</span>267.  0.102      8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     9      700.    5.18        34.8        2.12         <span style="text-decoration: underline;">6</span>412.  0.062<span style="text-decoration: underline;">3</span>     8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    12      924.    6.09        41.9        3            <span style="text-decoration: underline;">3</span>449.  0.046<span style="text-decoration: underline;">7</span>     8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    16     <span style="text-decoration: underline;">1</span>221.    6.18        50.7        4            <span style="text-decoration: underline;">1</span>494.  0.031<span style="text-decoration: underline;">1</span>     8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    20     <span style="text-decoration: underline;">1</span>517.    1.84        58.6        4.25          946.  0.024<span style="text-decoration: underline;">9</span>     8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    24     <span style="text-decoration: underline;">1</span>810.    3.33        65.1        5.5           519.  0.018<span style="text-decoration: underline;">4</span>     8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     6      472.    6.62        26.0        2           <span style="text-decoration: underline;">19</span>563.  0.107      8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     9      699.    4.08        34.5        2.12         <span style="text-decoration: underline;">6</span>200.  0.063<span style="text-decoration: underline;">0</span>     8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>    12      925.    5.24        42.7        3            <span style="text-decoration: underline;">2</span>972.  0.043<span style="text-decoration: underline;">4</span>     8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>    16     <span style="text-decoration: underline;">1</span>222.    7.82        51.2        4            <span style="text-decoration: underline;">1</span>500.  0.031<span style="text-decoration: underline;">1</span>     8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>    20     <span style="text-decoration: underline;">1</span>518.    4.01        58.9        4.62         <span style="text-decoration: underline;">1</span>013.  0.025<span style="text-decoration: underline;">7</span>     8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>    24     <span style="text-decoration: underline;">1</span>812.    2.52        66.2        5.25          542.  0.018<span style="text-decoration: underline;">7</span>     8</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fieldopt_files/figure-html/frontier-1.png" class="r-plt" alt="" width="624"></p>
 <p>The frontier makes two questions answerable with numbers: how much

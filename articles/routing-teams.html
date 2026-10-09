@@ -43,6 +43,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Practice</h6></li>
+    <li><a class="dropdown-item" href="../articles/area-and-dual-frame.html">An area frame with points, a list frame, and their joint design</a></li>
     <li><a class="dropdown-item" href="../articles/routing-teams.html">Routing for one or several teams</a></li>
     <li><a class="dropdown-item" href="../articles/frames-and-allocation.html">Frames, strata and cost-aware allocation</a></li>
   </ul>
@@ -106,11 +107,11 @@ organisations on one sample.</p>
 <span><span class="va">one</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Field routes</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; 1 route from <span style="color: #0000BB;">"depot"</span> through 18 units: total travel 272 km (lower bound 230,</span></span>
-<span><span class="co">#&gt; gap 18.3%).</span></span>
-<span><span class="co">#&gt; Route 1 (272): s2 &gt; s7 &gt; s57 &gt; s14 &gt; s47 &gt; s60 &gt; s35 &gt; s54 &gt; s55 &gt; s49 &gt; s19 &gt;</span></span>
-<span><span class="co">#&gt; s41 &gt; s1 &gt; s53 &gt; s26 &gt; s34 &gt; s11 &gt; s17</span></span>
-<span><span class="co">#&gt; Cost (BRL): travel 489.7 + units 720 + interviews 1296 = 2506.</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 route from <span style="color: #0000BB;">"depot"</span> through 18 units: total travel 281.1 km (lower bound</span></span>
+<span><span class="co">#&gt; 249.6, gap 12.6%).</span></span>
+<span><span class="co">#&gt; Route 1 (281.1): s30 &gt; s9 &gt; s32 &gt; s27 &gt; s48 &gt; s1 &gt; s29 &gt; s31 &gt; s43 &gt; s19 &gt; s6 &gt;</span></span>
+<span><span class="co">#&gt; s13 &gt; s54 &gt; s47 &gt; s4 &gt; s16 &gt; s12 &gt; s37</span></span>
+<span><span class="co">#&gt; Cost (BRL): travel 506 + units 720 + interviews 1296 = 2522.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="routes-limited-by-length">Routes limited by length<a class="anchor" aria-label="anchor" href="#routes-limited-by-length"></a>
@@ -124,13 +125,14 @@ limit (Prins 2004) and improves each route locally.</p>
 <span><span class="va">days</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Field routes</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; 4 routes from <span style="color: #0000BB;">"depot"</span> through 18 units: total travel 345.3 km (lower bound 230,</span></span>
-<span><span class="co">#&gt; gap 50.2%).</span></span>
-<span><span class="co">#&gt; Route 1 (90.66): s17 &gt; s53 &gt; s1 &gt; s41</span></span>
-<span><span class="co">#&gt; Route 2 (83.6): s34 &gt; s26 &gt; s11 &gt; s7</span></span>
-<span><span class="co">#&gt; Route 3 (94.05): s2 &gt; s57 &gt; s14 &gt; s47 &gt; s60 &gt; s35</span></span>
-<span><span class="co">#&gt; Route 4 (77.03): s54 &gt; s49 &gt; s19 &gt; s55</span></span>
-<span><span class="co">#&gt; Cost (BRL): travel 621.6 + units 720 + interviews 1296 = 2638.</span></span>
+<span><span class="co">#&gt; 5 routes from <span style="color: #0000BB;">"depot"</span> through 18 units: total travel 403.1 km (lower bound</span></span>
+<span><span class="co">#&gt; 249.6, gap 61.5%).</span></span>
+<span><span class="co">#&gt; Route 1 (86.76): s37 &gt; s54 &gt; s13 &gt; s6 &gt; s19 &gt; s43</span></span>
+<span><span class="co">#&gt; Route 2 (97.48): s47 &gt; s4 &gt; s16 &gt; s12</span></span>
+<span><span class="co">#&gt; Route 3 (88.51): s30 &gt; s9 &gt; s32</span></span>
+<span><span class="co">#&gt; Route 4 (99.02): s27 &gt; s48 &gt; s1 &gt; s29</span></span>
+<span><span class="co">#&gt; Route 5 (31.29): s31</span></span>
+<span><span class="co">#&gt; Cost (BRL): travel 725.5 + units 720 + interviews 1296 = 2741.</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">days</span><span class="op">)</span></span></code></pre></div>
 <p><img src="routing-teams_files/figure-html/days-1.png" class="r-plt" alt="" width="624"></p>
 </div>
@@ -145,14 +147,15 @@ instead.</p>
 <span><span class="va">stops</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Field routes</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; 5 routes from <span style="color: #0000BB;">"depot"</span> through 18 units: total travel 383.4 km (lower bound 230,</span></span>
-<span><span class="co">#&gt; gap 66.7%).</span></span>
-<span><span class="co">#&gt; Route 1 (90.66): s17 &gt; s53 &gt; s1 &gt; s41</span></span>
-<span><span class="co">#&gt; Route 2 (83.6): s34 &gt; s26 &gt; s11 &gt; s7</span></span>
-<span><span class="co">#&gt; Route 3 (39.02): s2 &gt; s57</span></span>
-<span><span class="co">#&gt; Route 4 (93.14): s14 &gt; s47 &gt; s60 &gt; s35</span></span>
-<span><span class="co">#&gt; Route 5 (77.03): s54 &gt; s49 &gt; s19 &gt; s55</span></span>
-<span><span class="co">#&gt; Cost (BRL): travel 690.2 + units 720 + interviews 1296 = 2706.</span></span></code></pre></div>
+<span><span class="co">#&gt; 6 routes from <span style="color: #0000BB;">"depot"</span> through 18 units: total travel 406.2 km (lower bound</span></span>
+<span><span class="co">#&gt; 249.6, gap 62.7%).</span></span>
+<span><span class="co">#&gt; Route 1 (19.98): s30</span></span>
+<span><span class="co">#&gt; Route 2 (97.48): s12 &gt; s16 &gt; s4 &gt; s47</span></span>
+<span><span class="co">#&gt; Route 3 (120.2): s9 &gt; s32 &gt; s27 &gt; s48</span></span>
+<span><span class="co">#&gt; Route 4 (79.38): s31 &gt; s1 &gt; s29 &gt; s43</span></span>
+<span><span class="co">#&gt; Route 5 (82.91): s6 &gt; s19 &gt; s13 &gt; s54</span></span>
+<span><span class="co">#&gt; Route 6 (6.175): s37</span></span>
+<span><span class="co">#&gt; Cost (BRL): travel 731.1 + units 720 + interviews 1296 = 2747.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="comparing">Comparing<a class="anchor" aria-label="anchor" href="#comparing"></a>
@@ -163,9 +166,9 @@ instead.</p>
 <span>           travel_km <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">one</span><span class="op">$</span><span class="va">total</span>, <span class="va">days</span><span class="op">$</span><span class="va">total</span>, <span class="va">stops</span><span class="op">$</span><span class="va">total</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>           cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">one</span><span class="op">$</span><span class="va">cost</span><span class="op">[[</span><span class="st">"total"</span><span class="op">]</span><span class="op">]</span>, <span class="va">days</span><span class="op">$</span><span class="va">cost</span><span class="op">[[</span><span class="st">"total"</span><span class="op">]</span><span class="op">]</span>, <span class="va">stops</span><span class="op">$</span><span class="va">cost</span><span class="op">[[</span><span class="st">"total"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        organisation routes travel_km cost</span></span>
-<span><span class="co">#&gt; 1          one tour      1     272.0 2506</span></span>
-<span><span class="co">#&gt; 2  100 km per route      4     345.3 2638</span></span>
-<span><span class="co">#&gt; 3 4 stops per route      5     383.4 2706</span></span></code></pre></div>
+<span><span class="co">#&gt; 1          one tour      1     281.1 2522</span></span>
+<span><span class="co">#&gt; 2  100 km per route      5     403.1 2741</span></span>
+<span><span class="co">#&gt; 3 4 stops per route      6     406.2 2747</span></span></code></pre></div>
 <p>The travel grows with the number of routes because every route starts
 and ends at the depot; the question for the planner is whether the extra
 kilometres are cheaper than the extra days or teams, which is a cost
@@ -199,7 +202,7 @@ gaps of 20 to 40 percent are normal for good solutions.</p>
 <span><span class="va">long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span><span class="va">m</span>, units <span class="op">=</span> <span class="va">sel</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, iterations <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>quick <span class="op">=</span> <span class="va">quick</span><span class="op">$</span><span class="va">total</span>, long <span class="op">=</span> <span class="va">long</span><span class="op">$</span><span class="va">total</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    quick     long </span></span>
-<span><span class="co">#&gt; 272.0344 272.0344</span></span></code></pre></div>
+<span><span class="co">#&gt; 281.1368 281.1368</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -16,12 +16,12 @@
 Source:
 [`DESCRIPTION`](https://github.com/castlaboratory/fieldopt/blob/main/DESCRIPTION)
 
-Leite A, Ospina R, Ferraz C (2026). *fieldopt: Field-Survey Design under
-Real Field Cost*. R package version 0.1.0,
+Leite A, Ospina R, Ferraz C (2026). *fieldopt: Area-Frame and Dual-Frame
+Survey Design under Real Field Cost*. R package version 0.1.0,
 <https://castlaboratory.github.io/fieldopt/>.
 
     @Manual{,
-      title = {fieldopt: Field-Survey Design under Real Field Cost},
+      title = {fieldopt: Area-Frame and Dual-Frame Survey Design under Real Field Cost},
       author = {André Leite and Raydonal Ospina and Cristiano Ferraz},
       year = {2026},
       note = {R package version 0.1.0},
