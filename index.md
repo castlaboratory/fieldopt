@@ -10,7 +10,9 @@ frame (grid cells, points inside them) and a list frame needs.
 
 - [`travel_matrix()`](https://castlaboratory.github.io/fieldopt/reference/travel_matrix.md)
   builds the travel matrix between units from coordinates (great-circle
-  or planar distances) or wraps a road-network matrix.
+  or planar distances, optionally times a detour factor), from a road
+  network through OSRM (durations or distances, in blocks), or wraps a
+  matrix computed elsewhere.
 - [`field_cost_model()`](https://castlaboratory.github.io/fieldopt/reference/field_cost_model.md)
   turns travel, visits and interviews into money or time.
 - [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)

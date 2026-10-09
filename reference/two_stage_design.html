@@ -88,7 +88,7 @@ model's per-interview cost is <code>c2</code>; the travel and per-visit costs ma
 <span>  strata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  selection <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lpm"</span>, <span class="st">"systematic"</span>, <span class="st">"srs"</span><span class="op">)</span>,</span>
 <span>  matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"haversine"</span>, <span class="st">"euclidean"</span><span class="op">)</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"haversine"</span>, <span class="st">"euclidean"</span>, <span class="st">"osrm"</span><span class="op">)</span>,</span>
 <span>  max_length <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  max_stops <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  n_rep <span class="op">=</span> <span class="fl">5</span>,</span>
@@ -161,7 +161,8 @@ coordinates otherwise).</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>Distance method when <code>matrix</code> is <code>NULL</code>.</p></dd>
+<dd><p>Distance method of <code><a href="travel_matrix.html">travel_matrix()</a></code> when <code>matrix</code> is
+<code>NULL</code> (<code>"osrm"</code> queries the road network once for the whole frame).</p></dd>
 
 
 <dt id="arg-max-length-max-stops">max_length, max_stops<a class="anchor" aria-label="anchor" href="#arg-max-length-max-stops"></a></dt>

@@ -28,6 +28,12 @@
   accepts `strata`, `selection` and `replicates`, a list of per-stratum
   allocations in `n_grid`, and reports `cost_per_unit`.
 
+- [`travel_matrix()`](https://castlaboratory.github.io/fieldopt/reference/travel_matrix.md)
+  gains a `detour` factor for straight-line distances and
+  `method = "osrm"`, road durations or distances from an OSRM server
+  through the `osrm` package, requested in blocks; the frontier and the
+  routed designs accept the same method.
+
 - [`routed_unit_cost()`](https://castlaboratory.github.io/fieldopt/reference/routed_unit_cost.md),
   [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
   and

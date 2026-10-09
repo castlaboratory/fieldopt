@@ -23,7 +23,7 @@ routed_unit_cost(
   selection = c("lpm", "systematic", "srs"),
   replicates = 1,
   matrix = NULL,
-  method = c("haversine", "euclidean"),
+  method = c("haversine", "euclidean", "osrm"),
   max_length = Inf,
   max_stops = Inf,
   n_rep = 10,
@@ -80,7 +80,10 @@ routed_unit_cost(
 
 - method:
 
-  Distance method when `matrix` is `NULL`.
+  Distance method of
+  [`travel_matrix()`](https://castlaboratory.github.io/fieldopt/reference/travel_matrix.md)
+  when `matrix` is `NULL` (`"osrm"` queries the road network once for
+  the whole frame).
 
 - max_length, max_stops:
 
