@@ -292,23 +292,23 @@ gives the design in which the area sample does not use the overlap.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Dual-frame allocation</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Minimum cost for target variance 878900: n_A = 81 (frame A, cost 167.7/unit),</span></span>
-<span><span class="co">#&gt; n_B = 136 (frame B, cost 45/unit), theta = 0.143 (optimised).</span></span>
-<span><span class="co">#&gt; Cost 19700; variance 875300 (frame A 694000, frame B 181000); CV 4.99% of the</span></span>
+<span><span class="co">#&gt; n_B = 135 (frame B, cost 45/unit), theta = 0.16 (optimised).</span></span>
+<span><span class="co">#&gt; Cost 19660; variance 877200 (frame A 697000, frame B 180000); CV 5% of the</span></span>
 <span><span class="co">#&gt; total 18750.</span></span>
-<span><span class="co">#&gt; Expected overlap units: 11.6 in the A sample, 113.3 in the B sample.</span></span>
+<span><span class="co">#&gt; Expected overlap units: 11.6 in the A sample, 112.5 in the B sample.</span></span>
 <span><span class="va">df</span><span class="op">$</span><span class="va">history</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 7</span></span></span>
 <span><span class="co">#&gt;   round cost_a   n_a   n_b theta   cost variance</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1   190.    80   141 0.169 <span style="text-decoration: underline;">21</span>553.  <span style="text-decoration: underline;">875</span>550.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2   168.    81   136 0.142 <span style="text-decoration: underline;">19</span>690.  <span style="text-decoration: underline;">875</span>348.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3   168.    81   136 0.143 <span style="text-decoration: underline;">19</span>704.  <span style="text-decoration: underline;">875</span>314.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1   190.    80   141 0.155 <span style="text-decoration: underline;">21</span>553.  <span style="text-decoration: underline;">871</span>821.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2   168.    81   135 0.16  <span style="text-decoration: underline;">19</span>645.  <span style="text-decoration: underline;">877</span>223.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3   168.    81   135 0.16  <span style="text-decoration: underline;">19</span>659.  <span style="text-decoration: underline;">877</span>223.</span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 8</span></span></span>
 <span><span class="co">#&gt;   frame     n cost_per_unit   cost  deff variance overlap_units</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> A        81          168. <span style="text-decoration: underline;">13</span>584. 0.839  <span style="text-decoration: underline;">694</span>252.          11.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> B       136           45   <span style="text-decoration: underline;">6</span>120  1      <span style="text-decoration: underline;">181</span>061.         113. </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> A        81          168. <span style="text-decoration: underline;">13</span>584. 0.839  <span style="text-decoration: underline;">697</span>399.          11.6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> B       135           45   <span style="text-decoration: underline;">6</span>075  1      <span style="text-decoration: underline;">179</span>823.         112. </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: weight_on_overlap &lt;dbl&gt;</span></span></span>
 <span><span class="fu"><a href="../reference/dual_frame_allocation.html">dual_frame_allocation</a></span><span class="op">(</span><span class="va">domains</span>, cost_a <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">cost_a</span>, cost_b <span class="op">=</span> <span class="fl">45</span>, deff_a <span class="op">=</span> <span class="va">deff</span><span class="op">$</span><span class="va">deff</span>,</span>
 <span>                      theta <span class="op">=</span> <span class="st">"screening"</span>, target_cv <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
@@ -316,7 +316,7 @@ gives the design in which the area sample does not use the overlap.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Dual-frame allocation</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Minimum cost for target variance 878900: n_A = 89 (frame A, cost 167.7/unit),</span></span>
 <span><span class="co">#&gt; n_B = 151 (frame B, cost 45/unit), theta = 0 (fixed).</span></span>
-<span><span class="co">#&gt; Cost 21720; variance 876100 (frame A 708000, frame B 168000); CV 4.99% of the</span></span>
+<span><span class="co">#&gt; Cost 21720; variance 875000 (frame A 708000, frame B 167000); CV 4.99% of the</span></span>
 <span><span class="co">#&gt; total 18750.</span></span>
 <span><span class="co">#&gt; Expected overlap units: 12.7 in the A sample, 125.8 in the B sample.</span></span></code></pre></div>
 </div>

@@ -103,7 +103,10 @@ the sample is; take it from <code><a href="cost_variance_frontier.html">cost_var
 
 <dl><dt id="arg-n-primary-m-secondary">n_primary, m_secondary<a class="anchor" aria-label="anchor" href="#arg-n-primary-m-secondary"></a></dt>
 <dd><p>Primary units in the population and secondary
-units per primary unit (an average when they differ).</p></dd>
+units per primary unit (an average when they differ; need not be a whole
+number). The allocation tries every whole <code>m</code> up to <code>m_secondary</code> and
+keeps the cheapest pair meeting the target (or the least variance within
+the budget), so small populations are handled exactly.</p></dd>
 
 
 <dt id="arg-s-between-s-within">s2_between, s2_within<a class="anchor" aria-label="anchor" href="#arg-s-between-s-within"></a></dt>
@@ -143,8 +146,8 @@ is given), <code>bounded</code>.</p>
 <span class="r-in"><span><span class="fu">two_stage_allocation</span><span class="op">(</span><span class="fl">5000</span>, <span class="fl">20</span>, <span class="fl">4</span>, <span class="fl">25</span>, c1 <span class="op">=</span> <span class="fl">300</span>, c2 <span class="op">=</span> <span class="fl">20</span>, target_cv <span class="op">=</span> <span class="fl">0.03</span>, mean <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Two-stage allocation</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> n = 38 primary units with m = 12 secondary units each (optimal m 11.68): cost</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 20520, variance of the total 1.264e+09 (SE 35550, CV 2.96%).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> n = 36 primary units with m = 13 secondary units each (optimal m 11.68): cost</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 20160, variance of the total 1.29e+09 (SE 35920, CV 2.99%).</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

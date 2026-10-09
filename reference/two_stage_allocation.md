@@ -36,7 +36,10 @@ two_stage_allocation(
 - n_primary, m_secondary:
 
   Primary units in the population and secondary units per primary unit
-  (an average when they differ).
+  (an average when they differ; need not be a whole number). The
+  allocation tries every whole `m` up to `m_secondary` and keeps the
+  cheapest pair meeting the target (or the least variance within the
+  budget), so small populations are handled exactly.
 
 - s2_between, s2_within:
 
@@ -73,6 +76,6 @@ two_stage_allocation(n_primary = 5000, m_secondary = 20, s2_between = 4, s2_with
 two_stage_allocation(5000, 20, 4, 25, c1 = 300, c2 = 20, target_cv = 0.03, mean = 12)
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
-#> n = 38 primary units with m = 12 secondary units each (optimal m 11.68): cost
-#> 20520, variance of the total 1.264e+09 (SE 35550, CV 2.96%).
+#> n = 36 primary units with m = 13 secondary units each (optimal m 11.68): cost
+#> 20160, variance of the total 1.29e+09 (SE 35920, CV 2.99%).
 ```

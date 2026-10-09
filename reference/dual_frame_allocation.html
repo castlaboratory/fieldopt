@@ -105,8 +105,8 @@ covers them), the usual practice when the list holds the large producers.</p>
 
 <dl><dt id="arg-domains">domains<a class="anchor" aria-label="anchor" href="#arg-domains"></a></dt>
 <dd><p>Data frame with one row per domain <code>a</code>, <code>ab</code>, <code>b</code> (column
-<code>domain</code>) and columns <code>size</code> (units), <code>mean</code> and <code>sd</code> of the study
-variable.</p></dd>
+<code>domain</code>) and columns <code>size</code> (units), <code>mean</code> and <code>sd</code> (standard
+deviation with divisor <code>size - 1</code>) of the study variable.</p></dd>
 
 
 <dt id="arg-cost-a-cost-b">cost_a, cost_b<a class="anchor" aria-label="anchor" href="#arg-cost-a-cost-b"></a></dt>
@@ -161,7 +161,7 @@ surveys. <em>JASA</em>, 101(475), 1019–1030.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Dual-frame allocation</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Minimum variance for budget 1e+05: n_A = 312 (frame A, cost 200/unit), n_B =</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 940 (frame B, cost 40/unit), theta = 0.085 (optimised).</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Cost 1e+05; variance 11780000 (frame A 8860000, frame B 2920000); CV 2.64% of</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Cost 1e+05; variance 11780000 (frame A 8860000, frame B 2910000); CV 2.64% of</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> the total 130000.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Expected overlap units: 49.3 in the A sample, 705 in the B sample.</span>
 <span class="r-in"><span><span class="fu">dual_frame_allocation</span><span class="op">(</span><span class="va">domains</span>, cost_a <span class="op">=</span> <span class="fl">200</span>, cost_b <span class="op">=</span> <span class="fl">40</span>, theta <span class="op">=</span> <span class="st">"screening"</span>, target_cv <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></span>
@@ -169,7 +169,7 @@ surveys. <em>JASA</em>, 101(475), 1019–1030.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Dual-frame allocation</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Minimum cost for target variance 42250000: n_A = 108 (frame A, cost 200/unit),</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> n_B = 323 (frame B, cost 40/unit), theta = 0 (fixed).</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Cost 34520; variance 42070000 (frame A 27800000, frame B 14300000); CV 4.99% of</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Cost 34520; variance 42060000 (frame A 27800000, frame B 14300000); CV 4.99% of</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> the total 130000.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Expected overlap units: 17.1 in the A sample, 242.2 in the B sample.</span>
 </code></pre></div>

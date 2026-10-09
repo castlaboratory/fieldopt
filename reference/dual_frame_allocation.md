@@ -35,7 +35,8 @@ dual_frame_allocation(
 - domains:
 
   Data frame with one row per domain `a`, `ab`, `b` (column `domain`)
-  and columns `size` (units), `mean` and `sd` of the study variable.
+  and columns `size` (units), `mean` and `sd` (standard deviation with
+  divisor `size - 1`) of the study variable.
 
 - cost_a, cost_b:
 
@@ -88,7 +89,7 @@ dual_frame_allocation(domains, cost_a = 200, cost_b = 40, budget = 1e5)
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
 #> Minimum variance for budget 1e+05: n_A = 312 (frame A, cost 200/unit), n_B =
 #> 940 (frame B, cost 40/unit), theta = 0.085 (optimised).
-#> Cost 1e+05; variance 11780000 (frame A 8860000, frame B 2920000); CV 2.64% of
+#> Cost 1e+05; variance 11780000 (frame A 8860000, frame B 2910000); CV 2.64% of
 #> the total 130000.
 #> Expected overlap units: 49.3 in the A sample, 705 in the B sample.
 dual_frame_allocation(domains, cost_a = 200, cost_b = 40, theta = "screening", target_cv = 0.05)
@@ -96,7 +97,7 @@ dual_frame_allocation(domains, cost_a = 200, cost_b = 40, theta = "screening", t
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
 #> Minimum cost for target variance 42250000: n_A = 108 (frame A, cost 200/unit),
 #> n_B = 323 (frame B, cost 40/unit), theta = 0 (fixed).
-#> Cost 34520; variance 42070000 (frame A 27800000, frame B 14300000); CV 4.99% of
+#> Cost 34520; variance 42060000 (frame A 27800000, frame B 14300000); CV 4.99% of
 #> the total 130000.
 #> Expected overlap units: 17.1 in the A sample, 242.2 in the B sample.
 ```

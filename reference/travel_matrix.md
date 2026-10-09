@@ -88,6 +88,10 @@ road).
 - from a matrix computed elsewhere (`matrix`), with the coordinates used
   only for names and plots.
 
+Road matrices need not be symmetric (one-way streets, different
+durations by direction); the routing solver prices every leg in the
+direction travelled.
+
 ## Examples
 
 ``` r

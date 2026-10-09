@@ -58,7 +58,8 @@ dual_frame_design(
 - domains:
 
   Data frame with one row per domain `a`, `ab`, `b` (column `domain`)
-  and columns `size` (units), `mean` and `sd` of the study variable.
+  and columns `size` (units), `mean` and `sd` (standard deviation with
+  divisor `size - 1`) of the study variable.
 
 - cost_b:
 
@@ -157,9 +158,8 @@ dual_frame_design(frame, "depot", model, domains, cost_b = 45, deff_a = 1.5,
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
 #> Minimum cost for target variance 119000: n_A = 114 (frame A, cost 103.7/unit),
-#> n_B = 100 (frame B, cost 45/unit), theta = 0.096 (optimised).
-#> Cost 16320; variance 119000 (frame A 119000, frame B 0); CV 5% of the total
-#> 6900.
-#> Expected overlap units: 13.4 in the A sample, 80 in the B sample; a bound on a
-#> sample size was active.
+#> n_B = 99 (frame B, cost 45/unit), theta = 0.135 (optimised).
+#> Cost 16280; variance 118500 (frame A 118000, frame B 538); CV 4.99% of the
+#> total 6900.
+#> Expected overlap units: 13.4 in the A sample, 79.2 in the B sample.
 ```

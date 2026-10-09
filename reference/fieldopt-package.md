@@ -13,7 +13,7 @@ Horvitz-Thompson estimation with local-mean or replicate variances;
 cost-aware allocation across strata, Hartley's dual-frame allocation
 with an overlap, and two-stage allocation with a cost function; and the
 cost-variance frontier of a design by simulation. The computational
-engine is the Rust crate fieldopt-core.
+engine is the Rust crate 'fieldopt-core'.
 
 ## See also
 

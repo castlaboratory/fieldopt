@@ -111,7 +111,7 @@ r
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
 #> 3 routes from "depot" through 12 units: total travel 38.74 distance (lower
-#> bound 28.03, gap 38.2%).
+#> bound 25.87, gap 49.7%).
 #> Route 1 (13.93): s27 > s15 > s24 > s20 > s32
 #> Route 2 (17.02): s37 > s19 > s2 > s14 > s12
 #> Route 3 (7.786): s1 > s35

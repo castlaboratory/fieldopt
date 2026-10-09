@@ -234,23 +234,23 @@ df
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
 #> Minimum cost for target variance 878900: n_A = 81 (frame A, cost 167.7/unit),
-#> n_B = 136 (frame B, cost 45/unit), theta = 0.143 (optimised).
-#> Cost 19700; variance 875300 (frame A 694000, frame B 181000); CV 4.99% of the
+#> n_B = 135 (frame B, cost 45/unit), theta = 0.16 (optimised).
+#> Cost 19660; variance 877200 (frame A 697000, frame B 180000); CV 5% of the
 #> total 18750.
-#> Expected overlap units: 11.6 in the A sample, 113.3 in the B sample.
+#> Expected overlap units: 11.6 in the A sample, 112.5 in the B sample.
 df$history
 #> # A tibble: 3 × 7
 #>   round cost_a   n_a   n_b theta   cost variance
 #>   <int>  <dbl> <int> <int> <dbl>  <dbl>    <dbl>
-#> 1     1   190.    80   141 0.169 21553.  875550.
-#> 2     2   168.    81   136 0.142 19690.  875348.
-#> 3     3   168.    81   136 0.143 19704.  875314.
+#> 1     1   190.    80   141 0.155 21553.  871821.
+#> 2     2   168.    81   135 0.16  19645.  877223.
+#> 3     3   168.    81   135 0.16  19659.  877223.
 tidy(df)
 #> # A tibble: 2 × 8
 #>   frame     n cost_per_unit   cost  deff variance overlap_units
 #>   <chr> <int>         <dbl>  <dbl> <dbl>    <dbl>         <dbl>
-#> 1 A        81          168. 13584. 0.839  694252.          11.6
-#> 2 B       136           45   6120  1      181061.         113. 
+#> 1 A        81          168. 13584. 0.839  697399.          11.6
+#> 2 B       135           45   6075  1      179823.         112. 
 #> # ℹ 1 more variable: weight_on_overlap <dbl>
 dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$deff,
                       theta = "screening", target_cv = 0.05)
@@ -258,7 +258,7 @@ dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$de
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
 #> Minimum cost for target variance 878900: n_A = 89 (frame A, cost 167.7/unit),
 #> n_B = 151 (frame B, cost 45/unit), theta = 0 (fixed).
-#> Cost 21720; variance 876100 (frame A 708000, frame B 168000); CV 4.99% of the
+#> Cost 21720; variance 875000 (frame A 708000, frame B 167000); CV 4.99% of the
 #> total 18750.
 #> Expected overlap units: 12.7 in the A sample, 125.8 in the B sample.
 ```

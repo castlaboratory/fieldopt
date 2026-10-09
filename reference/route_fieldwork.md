@@ -67,7 +67,8 @@ route_fieldwork(
 
 An object of class `fieldopt_routes`: `routes` (a tibble with columns
 `route`, `stop`, `unit`), `lengths`, `total`, `lower_bound`, `gap`,
-`best_iteration`, `cost` (when a model is given) and the inputs.
+`best_iteration`, `cost` (when a model is given), the inputs and the
+travel matrix.
 
 ## Examples
 
@@ -82,7 +83,7 @@ r
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
 #> 4 routes from "depot" through 12 units: total travel 61.76 distance (lower
-#> bound 23.8, gap 159%).
+#> bound 18.79, gap 229%).
 #> Route 1 (4.333): s12
 #> Route 2 (30.53): s2 > s9 > s6 > s4 > s7
 #> Route 3 (22.47): s8 > s3 > s1 > s5 > s11

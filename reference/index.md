@@ -13,6 +13,10 @@
   : Route the field work
 - [`autoplot(`*`<fieldopt_routes>`*`)`](https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_routes.md)
   : Plot the routes
+- [`tidy(`*`<fieldopt_routes>`*`)`](https://castlaboratory.github.io/fieldopt/reference/routes-methods.md)
+  [`glance(`*`<fieldopt_routes>`*`)`](https://castlaboratory.github.io/fieldopt/reference/routes-methods.md)
+  [`glance(`*`<fieldopt_frontier>`*`)`](https://castlaboratory.github.io/fieldopt/reference/routes-methods.md)
+  : Tidy and glance methods for routes and frontiers
 
 ## Selecting units and points
 
@@ -21,6 +25,8 @@
   sample
 - [`select_points()`](https://castlaboratory.github.io/fieldopt/reference/select_points.md)
   : Select points inside sampled grid cells
+- [`autoplot(`*`<fieldopt_sample>`*`)`](https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_sample.md)
+  : Plot a sample of units
 
 ## Estimating
 

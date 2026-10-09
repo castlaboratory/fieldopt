@@ -48,7 +48,7 @@ days
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
 #> 5 routes from "depot" through 18 units: total travel 403.1 km (lower bound
-#> 249.6, gap 61.5%).
+#> 213.2, gap 89%).
 #> Route 1 (86.76): s37 > s54 > s13 > s6 > s19 > s43
 #> Route 2 (97.48): s47 > s4 > s16 > s12
 #> Route 3 (88.51): s30 > s9 > s32
@@ -73,7 +73,7 @@ stops
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
 #> 6 routes from "depot" through 18 units: total travel 406.2 km (lower bound
-#> 249.6, gap 62.7%).
+#> 213.2, gap 90.5%).
 #> Route 1 (19.98): s30
 #> Route 2 (97.48): s12 > s16 > s4 > s47
 #> Route 3 (120.2): s9 > s32 > s27 > s48

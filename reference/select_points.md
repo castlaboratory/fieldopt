@@ -66,6 +66,7 @@ s <- select_units(cells, n = 12, seed = 2)
 p <- select_points(s, points_per_cell = 9, cell_size = 1, layout = "systematic")
 nrow(p); head(p)
 #> [1] 108
+#> 6 systematic points in 1 sampled cell of size 1 x 1.
 #> # A tibble: 6 × 7
 #>   unit  point     x     y pi_cell points_in_cell density
 #>   <chr> <int> <dbl> <dbl>   <dbl>          <dbl>   <dbl>
