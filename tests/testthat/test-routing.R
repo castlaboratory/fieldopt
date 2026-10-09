@@ -1,0 +1,55 @@
+square <- function() {
+  pts <- data.frame(unit = c("depot", "a", "b", "c", "d"), x = c(0, 1, 1, 0, 0.5), y = c(0, 0, 1, 1, 0.5))
+  travel_matrix(pts, method = "euclidean")
+}
+
+test_that("a single route visits every unit once and is near the lower bound", {
+  m <- square()
+  r <- route_fieldwork(m, units = c("a", "b", "c", "d"), depot = "depot", iterations = 30)
+  expect_s3_class(r, "fieldopt_routes")
+  expect_equal(r$n_routes, 1)
+  expect_setequal(r$routes$unit, c("a", "b", "c", "d"))
+  expect_equal(nrow(r$routes), 4)
+  expect_equal(r$total, sum(r$lengths))
+  expect_gte(r$total, r$lower_bound - 1e-9)
+  # optimum of this instance is 3 + sqrt(2) (the square plus a detour through the centre)
+  expect_lte(r$total, 3 + sqrt(2) + 1e-6)
+  expect_message(print(r), "1 route")
+})
+
+test_that("limits split the tour into feasible routes", {
+  m <- square()
+  r <- route_fieldwork(m, units = c("a", "b", "c", "d"), depot = "depot", max_stops = 2, iterations = 30)
+  expect_equal(r$n_routes, 2)
+  expect_true(all(table(r$routes$route) <= 2))
+  r2 <- route_fieldwork(m, units = c("a", "b", "c", "d"), depot = "depot", max_length = 3, iterations = 30)
+  expect_true(all(r2$lengths <= 3 + 1e-9))
+  expect_gte(r2$n_routes, 2)
+  expect_setequal(r2$routes$unit, c("a", "b", "c", "d"))
+  expect_error(route_fieldwork(m, c("a", "b"), "depot", max_length = 1), "and back exceeds")
+})
+
+test_that("indices, names and the cost model are handled", {
+  m <- square()
+  r1 <- route_fieldwork(m, units = 2:5, depot = 1, iterations = 10)
+  r2 <- route_fieldwork(m, units = c("a", "b", "c", "d"), depot = "depot", iterations = 10)
+  expect_equal(r1$total, r2$total)
+  expect_error(route_fieldwork(m, c("a", "zz"), "depot"), "Unknown units")
+  expect_error(route_fieldwork(m, c("a", "a"), "depot"), "distinct")
+  expect_error(route_fieldwork(m, c("a", "depot"), "depot"), "depot cannot")
+  expect_error(route_fieldwork(unclass(m), "a", "depot"), "travel_matrix")
+  cm <- field_cost_model(per_travel = 10, per_unit = 1)
+  r3 <- route_fieldwork(m, c("a", "b"), "depot", iterations = 10, cost_model = cm)
+  expect_equal(unname(r3$cost[["total"]]), 10 * r3$total + 2)
+  expect_message(print(r3), "Cost")
+})
+
+test_that("routes are deterministic in the seed and plot", {
+  set.seed(1)
+  pts <- data.frame(unit = c("depot", paste0("s", 1:15)), x = c(5, runif(15, 0, 10)), y = c(5, runif(15, 0, 10)))
+  m <- travel_matrix(pts, method = "euclidean")
+  a <- route_fieldwork(m, paste0("s", 1:15), "depot", max_stops = 6, iterations = 40, seed = 7)
+  b <- route_fieldwork(m, paste0("s", 1:15), "depot", max_stops = 6, iterations = 40, seed = 7)
+  expect_identical(a$routes, b$routes)
+  expect_s3_class(autoplot(a), "ggplot")
+})

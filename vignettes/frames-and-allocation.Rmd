@@ -1,0 +1,74 @@
+---
+title: "Frames, strata and cost-aware allocation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Frames, strata and cost-aware allocation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+Agricultural and establishment surveys often combine a list frame (known
+farms, cheap to reach by phone or on a planned visit) and an area frame
+(segments of territory, expensive to reach, complete in coverage). Even
+within one frame, strata differ in the cost of a unit. `frame_allocation()`
+is Cochran's (1977, Section 5.5) allocation with a cost per unit in each
+stratum, in its two forms.
+
+```{r setup}
+library(fieldopt)
+strata <- data.frame(stratum = c("list: large", "list: small", "area"),
+                     size = c(300, 2500, 900),
+                     sd = c(80, 12, 35),
+                     cost = c(60, 35, 190))
+strata
+```
+
+## Minimum cost for a target variance
+
+Fix the precision wanted for the estimated total and find the cheapest
+allocation that reaches it. The optimum has `n_h` proportional to
+`N_h S_h / sqrt(c_h)`, rounded up and kept between 2 and `N_h`.
+
+```{r variance}
+a <- frame_allocation(strata, target_variance = 2.5e7)
+a
+```
+
+## Minimum variance for a budget
+
+Fix the budget instead and find the allocation with the smallest variance
+within it. Rounding is repaired so that the cost never exceeds the budget.
+
+```{r budget}
+b <- frame_allocation(strata, budget = 30000)
+b
+```
+
+## Where the field cost comes in
+
+The `cost` column above is a planning value per unit. For the area frame it
+should include the travel, and that is what the routing part of the package
+estimates: run `cost_variance_frontier()` on the area frame with a cost model,
+read the mean cost per unit at the sample size under consideration, and use
+it as the stratum cost. The allocation then reflects how expensive the
+segments really are to visit, and the loop can be iterated once or twice
+until the stratum costs and sample sizes agree.
+
+```{r loop, eval = FALSE}
+f <- cost_variance_frontier(area_frame, depot = "depot", cost_model = model,
+                            n_grid = c(40, 60, 80, 100), y = "crop")
+per_unit <- f$cost_mean / f$n
+strata$cost[strata$stratum == "area"] <- per_unit[which.min(abs(f$n - a$n[3]))]
+frame_allocation(strata, target_variance = 2.5e7)
+```
+
+Overlap between the frames (farms present in both) is not modelled here;
+the allocation treats the frames as strata of a single design.
+
+## References
+
+Cochran, W. G. (1977). *Sampling Techniques*, 3rd ed. Wiley.

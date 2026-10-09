@@ -1,0 +1,22 @@
+test_that("the frontier reports cost and variance per sample size", {
+  set.seed(4)
+  fr <- data.frame(unit = c("depot", paste0("s", 1:30)), x = c(5, runif(30, 0, 10)), y = c(5, runif(30, 0, 10)))
+  fr$crop <- c(NA, 20 + 3 * fr$x[-1] + rnorm(30))
+  cm <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10, interviews_per_unit = 4)
+  f <- cost_variance_frontier(fr, "depot", cm, n_grid = c(6, 12), y = "crop", method = "euclidean", n_rep = 2, iterations = 10)
+  expect_s3_class(f, "fieldopt_frontier")
+  expect_equal(f$n, c(6, 12))
+  expect_true(all(diff(f$cost_mean) > 0))
+  expect_true(all(diff(f$variance_mean) < 0))
+  expect_equal(f$n_rep, c(2, 2))
+  expect_s3_class(autoplot(f), "ggplot")
+  g <- cost_variance_frontier(fr, "depot", cm, n_grid = 6, method = "euclidean", n_rep = 2, iterations = 10)
+  expect_false("variance_mean" %in% names(g))
+  expect_s3_class(autoplot(g), "ggplot")
+  expect_error(cost_variance_frontier(fr, "nope", cm, 6, method = "euclidean"), "not found")
+  expect_error(cost_variance_frontier(fr[, -1], "depot", cm, 6, method = "euclidean"), "unit")
+})
+
+test_that("core version is reported", {
+  expect_match(core_version(), "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+})

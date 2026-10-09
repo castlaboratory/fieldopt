@@ -1,0 +1,10 @@
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/castlaboratory/fieldopt-core?rev=40137daabf069c9c4795d77e61e7b1a9f2aa3f98"]
+git = "https://github.com/castlaboratory/fieldopt-core"
+rev = "40137daabf069c9c4795d77e61e7b1a9f2aa3f98"
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"

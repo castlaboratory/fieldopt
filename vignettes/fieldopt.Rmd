@@ -1,0 +1,133 @@
+---
+title: "Get started with fieldopt"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started with fieldopt}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 6.5, fig.height = 4.5, dpi = 96)
+```
+
+A survey that goes to the field has two costs that textbooks keep apart: the
+statistical cost, the variance of the estimator for a given sample size, and
+the field cost, the travel between units and the interviews, which is what the
+budget actually pays for. `fieldopt` puts the two side by side. This vignette
+walks through one design from the frame to the cost-variance frontier.
+
+## A frame with a depot
+
+The frame is a data frame with one row per sampling unit (a segment, a farm, a
+census block) and its coordinates. One row is the depot, the office the teams
+leave from and return to. Here the frame is synthetic: forty segments in a
+10 x 10 km square, with a crop area that trends from west to east.
+
+```{r setup}
+library(fieldopt)
+set.seed(2026)
+frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
+                    x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
+frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40, sd = 2))
+head(frame)
+```
+
+## Travel and cost
+
+`travel_matrix()` computes the matrix of travel distances between all units.
+With longitude and latitude it uses great-circle distances in kilometres; with
+planar coordinates, as here, Euclidean distances. A matrix computed on a road
+network (for example with OSRM) can be passed through the `matrix` argument
+and is the better input when it exists.
+
+```{r travel}
+m <- travel_matrix(frame, method = "euclidean")
+m
+```
+
+`field_cost_model()` turns a routing solution into money: a cost per unit of
+travel, a fixed cost per visited unit (access, setting up) and a cost per
+interview.
+
+```{r cost}
+model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
+                          interviews_per_unit = 4, currency = "BRL")
+model
+```
+
+## Select, route, estimate
+
+`select_units()` draws a spatially balanced probability sample with the local
+pivotal method: the inclusion probabilities are known, and units close to each
+other are rarely selected together. Spatial balance usually lowers the
+variance of totals of spatially structured variables; it also spreads the
+units over the territory, which is exactly what makes the field work longer.
+Making that tension explicit is the point of the package.
+
+```{r select}
+units <- frame[frame$unit != "depot", ]
+s <- select_units(units, n = 12)
+s[s$sampled, c("unit", "x", "y", "pi")]
+```
+
+`route_fieldwork()` routes the field work from the depot through the selected
+units. Without limits it returns one tour; with a maximum length or a maximum
+number of stops per route, it splits the work into routes, one per team or per
+day. The solver is a GRASP heuristic with local search and an optimal split of
+the tour, and reports the gap to a lower bound so that the quality of the
+solution is visible.
+
+```{r route}
+r <- route_fieldwork(m, units = s$unit[s$sampled], depot = "depot",
+                     max_stops = 5, cost_model = model)
+r
+autoplot(r)
+```
+
+`design_variance()` gives the Horvitz-Thompson estimate of the total of `crop`
+and its variance by the local-mean estimator of Grafström and Schelin (2014),
+which suits spatially balanced samples and needs no joint inclusion
+probabilities. The variance the same sample size would give under simple
+random sampling is shown for comparison.
+
+```{r estimate}
+design_variance(s, y = "crop")
+sum(frame$crop, na.rm = TRUE)
+```
+
+## The cost-variance frontier
+
+A design is chosen by its sample size, its routing limits and its cost model.
+`cost_variance_frontier()` repeats the select-route-price-estimate cycle for a
+grid of sample sizes and returns the mean cost and the mean variance at each
+size: the frontier a survey planner faces.
+
+```{r frontier}
+f <- cost_variance_frontier(frame, depot = "depot", cost_model = model,
+                            n_grid = c(6, 9, 12, 16, 20, 24), y = "crop",
+                            method = "euclidean", max_stops = 5,
+                            n_rep = 8, iterations = 60)
+f
+autoplot(f)
+```
+
+The frontier makes two questions answerable with numbers: how much the next
+unit of precision costs in the field, and how much a different field
+organisation (more teams, longer days, a closer depot) would change that
+price. The vignettes `routing-teams` and `frames-and-allocation` take those
+questions up.
+
+## References
+
+Cochran, W. G. (1977). *Sampling Techniques*, 3rd ed. Wiley.
+
+Grafström, A., Lundström, N. L. P. and Schelin, L. (2012). Spatially balanced
+sampling through the pivotal method. *Biometrics*, 68(2), 514--520.
+
+Grafström, A. and Schelin, L. (2014). How to select representative samples.
+*Scandinavian Journal of Statistics*, 41(2), 277--290.
+
+Prins, C. (2004). A simple and effective evolutionary algorithm for the
+vehicle routing problem. *Computers & Operations Research*, 31(12),
+1985--2002.
