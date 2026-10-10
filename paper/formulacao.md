@@ -179,6 +179,14 @@ classical allocation with a routed `c_1` is enough and the package is the contri
 **G2 (is balance worth its travel).** Decided by E1: report the region of
 `(deff_sp, ρ)` where lpm wins at equal budget, on real frames.
 
+*Outcome of E1 (2026-10-10, `experiments/e1_spatial_balance.md`).* The travel
+ratio ρ is 1.07–1.15 at small n and 1.01–1.09 at large n, so at equal budget a
+balanced design affords 90–97 % of the srs sample size; it wins whenever
+`deff_sp` is below that ratio. With spatial correlation over more than a few
+cells (`deff_sp` 0.4–0.8) it wins in 98–100 % of the cases and cuts the variance
+by a third to a half; without correlation it loses 1–9 % (worst 18 %). G2
+passes: balance is worth its travel for spatially structured variables.
+
 ## 7. Estimation and inference
 
 - Variance under lpm and cube: the local-mean estimator (Grafström–Schelin); under
