@@ -42,7 +42,9 @@ back on the geometries for maps.
 
 ## Travel and cost
 
-`travel_matrix()` computes the matrix of travel distances between all units.
+`travel_matrix()` computes the matrix of travel distances between all units
+(or, given a sample and the depot as `bases`, only between the depot and
+the sampled units, which is what the routing needs).
 With longitude and latitude it uses great-circle distances in kilometres; with
 planar coordinates, as here, Euclidean distances. A matrix computed on a road
 network (for example with OSRM) can be passed through the `matrix` argument
@@ -73,21 +75,22 @@ units over the territory, which is exactly what makes the field work longer.
 Making that tension explicit is the point of the package.
 
 ```{r select}
-units <- frame[frame$unit != "depot", ]
-s <- select_units(units, n = 12)
-s[s$sampled, c("unit", "x", "y", "pi")]
+s <- frame[frame$unit != "depot", ] |> select_units(n = 12)
+s |> sampled() |> subset(select = c(unit, x, y, pi))
 ```
 
 `route_fieldwork()` routes the field work from the depot through the selected
 units. Without limits it returns one tour; with a maximum length or a maximum
 number of stops per route, it splits the work into routes, one per team or per
-day. The solver is a GRASP heuristic with local search and an optimal split of
-the tour, and reports the gap to a lower bound so that the quality of the
-solution is visible.
+day. Small instances are solved exactly; larger ones by a hybrid genetic
+search with an optimal split of the tour and a local search, with a lower
+bound and, for single tours, a proof of optimality, so that the quality of
+the solution is visible. The sample can be piped straight into the routing.
 
 ```{r route}
-r <- route_fieldwork(m, units = s$unit[s$sampled], depot = "depot",
-                     max_stops = 5, cost_model = model)
+r <- s |>
+  travel_matrix(bases = frame[frame$unit == "depot", ], method = "euclidean") |>
+  route_fieldwork(units = s, depot = "depot", max_stops = 5, cost_model = model)
 r
 autoplot(r)
 ```

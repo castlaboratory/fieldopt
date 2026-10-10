@@ -25,7 +25,8 @@ route_fieldwork(
 \arguments{
 \item{matrix}{A \code{\link[=travel_matrix]{travel_matrix()}}.}
 
-\item{units}{Names (or indices in the matrix) of the units to visit.}
+\item{units}{Names (or indices in the matrix) of the units to visit, or a
+\code{\link[=select_units]{select_units()}} sample, whose sampled units are visited.}
 
 \item{depot}{Name (or index) of the depot.}
 

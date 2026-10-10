@@ -24,7 +24,15 @@
 #'
 #' @param coords Data frame or matrix with two coordinate columns: `lat`, `lon`
 #'   (degrees) for `"haversine"` and `"osrm"`, or `x`, `y` (planar, any unit)
-#'   for `"euclidean"`. Row names, or a column `unit`, name the units.
+#'   for `"euclidean"`. Row names, or a column `unit`, name the units. A
+#'   [select_units()] sample is accepted and only its sampled units are used,
+#'   so that `frame |> select_units(n) |> travel_matrix(bases = towns)` builds
+#'   the matrix of the field work.
+#' @param bases Optional data frame of depots (a `unit` column and the same
+#'   coordinate columns) put in front of `coords`.
+#' @param speed Optional speed in coordinate units per hour (kilometres per
+#'   hour with `"haversine"`): the distances are turned into minutes and
+#'   `unit` becomes `"min"`. Ignored for `"osrm"` durations.
 #' @param method `"haversine"`, `"euclidean"` or `"osrm"`.
 #' @param matrix Optional square numeric matrix of travel costs already
 #'   computed; when given, `method` is ignored except for the coordinate
@@ -58,10 +66,32 @@
 #' }
 travel_matrix <- function(coords, method = c("haversine", "euclidean", "osrm"), matrix = NULL, unit = NULL,
                           detour = 1, measure = c("duration", "distance"),
-                          server = getOption("osrm.server"), profile = getOption("osrm.profile"), block = 100) {
+                          server = getOption("osrm.server"), profile = getOption("osrm.profile"), block = 100,
+                          bases = NULL, speed = NULL) {
   method <- rlang::arg_match(method)
   measure <- rlang::arg_match(measure)
+  if (inherits(coords, "fieldopt_sample")) {
+    cc <- attr(coords, "coords")
+    if (method == "haversine" && !identical(cc, c("lat", "lon")) || method == "euclidean" && !identical(cc, c("x", "y"))) {
+      method <- if (identical(cc, c("lat", "lon"))) "haversine" else if (identical(cc, c("x", "y"))) "euclidean" else method
+    }
+    coords <- tibble::as_tibble(unclass(coords))[coords$sampled, ]
+  }
   coords <- as.data.frame(coords)
+  if (!is.null(bases)) {
+    bases <- as.data.frame(bases)
+    if (!"unit" %in% names(bases)) cli::cli_abort("{.arg bases} needs a column {.field unit}.")
+    cols_needed <- if (method == "euclidean") c("x", "y") else c("lat", "lon")
+    if (!all(cols_needed %in% names(bases))) cli::cli_abort("{.arg bases} needs columns {.field {cols_needed}}.")
+    if (!"unit" %in% names(coords)) coords$unit <- if (!is.null(rownames(coords)) && !all(rownames(coords) == seq_len(nrow(coords)))) rownames(coords) else paste0("u", seq_len(nrow(coords)))
+    common <- intersect(names(bases), names(coords))
+    coords <- rbind(bases[, common, drop = FALSE], coords[, common, drop = FALSE])
+    rownames(coords) <- NULL
+  }
+  if (!is.null(speed)) {
+    if (!is.numeric(speed) || length(speed) != 1L || is.na(speed) || speed <= 0) cli::cli_abort("{.arg speed} must be a single positive number.")
+    if (method == "osrm" && measure == "duration") speed <- NULL
+  }
   names_ <- if ("unit" %in% names(coords)) as.character(coords$unit) else if (!is.null(rownames(coords)) && !all(rownames(coords) == seq_len(nrow(coords)))) rownames(coords) else paste0("u", seq_len(nrow(coords)))
   if (anyDuplicated(names_)) cli::cli_abort("Unit names must be distinct.")
   cols <- if (method == "euclidean") c("x", "y") else c("lat", "lon")
@@ -90,6 +120,7 @@ travel_matrix <- function(coords, method = c("haversine", "euclidean", "osrm"), 
     m <- matrix(travel_matrix_rs(a, b, method), n, n, byrow = TRUE) * detour
     if (is.null(unit)) unit <- if (method == "haversine") "km" else "distance"
   }
+  if (!is.null(speed)) { m <- m / speed * 60; if (is.null(unit) || unit %in% c("km", "distance")) unit <- "min" }
   dimnames(m) <- list(names_, names_)
   structure(m, class = c("fieldopt_matrix", "matrix", "array"),
             coords = data.frame(unit = names_, a = a, b = b, stringsAsFactors = FALSE),

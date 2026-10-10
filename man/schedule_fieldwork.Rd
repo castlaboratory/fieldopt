@@ -25,7 +25,7 @@ schedule_fieldwork(
 \arguments{
 \item{matrix}{A \code{\link[=travel_matrix]{travel_matrix()}} holding the units and the bases.}
 
-\item{units}{Names of the units to visit.}
+\item{units}{Names of the units to visit, or a \code{\link[=select_units]{select_units()}} sample.}
 
 \item{teams}{Named vector: number of teams per base (names are units of
 the matrix that act as bases). A single unnamed number with one base is

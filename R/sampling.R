@@ -602,3 +602,20 @@ ratio_estimator <- function(sample, y, x, x_total = NULL) {
                  ratio = R, x_total = x_total, variance_ht = ht$variance, variance_srs = res$variance_srs * (x_total / x_ht)^2,
                  n = res$n, N = res$N, variance_method = res$variance_method)
 }
+
+#' The sampled units of a sample
+#'
+#' The rows of a [select_units()] sample that were selected, as a plain
+#' tibble, for pipelines: `frame |> select_units(n) |> sampled()`.
+#'
+#' @param sample A [select_units()] sample.
+#' @return A tibble with the sampled rows (coordinates, `pi` and the other
+#'   columns).
+#' @export
+#' @examples
+#' cells <- expand.grid(x = 1:6, y = 1:6)
+#' cells |> select_units(n = 5, seed = 1) |> sampled()
+sampled <- function(sample) {
+  if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
+  tibble::as_tibble(unclass(sample))[sample$sampled, ]
+}

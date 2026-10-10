@@ -17,7 +17,8 @@
 #' seconds).
 #'
 #' @param matrix A [travel_matrix()].
-#' @param units Names (or indices in the matrix) of the units to visit.
+#' @param units Names (or indices in the matrix) of the units to visit, or a
+#'   [select_units()] sample, whose sampled units are visited.
 #' @param depot Name (or index) of the depot.
 #' @param max_length Maximum length of a route, depot to depot: travel plus
 #'   the service time of its units when `service_time` is given; `Inf` for
@@ -76,6 +77,7 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
   if (!is.null(time_limit) && (!is.numeric(time_limit) || length(time_limit) != 1L || is.na(time_limit) || time_limit <= 0)) cli::cli_abort("{.arg time_limit} must be a positive number of seconds.")
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix)
+  if (inherits(units, "fieldopt_sample")) units <- units$unit[units$sampled]
   idx <- function(v, what) {
     if (is.character(v)) { bad <- setdiff(v, nm); if (length(bad)) cli::cli_abort("Unknown {what} {.val {bad}}."); match(v, nm) }
     else { v <- as.integer(v); if (any(is.na(v) | v < 1 | v > length(nm))) cli::cli_abort("{what} indices out of range."); v }

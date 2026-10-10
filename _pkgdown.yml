@@ -31,7 +31,7 @@ reference:
 - title: Routing the field work
   contents: [route_fieldwork, schedule_fieldwork, schedule_calendar, autoplot.fieldopt_routes, autoplot.fieldopt_schedule, routes-methods]
 - title: Selecting units and points
-  contents: [select_units, select_points, spatial_balance, autoplot.fieldopt_sample]
+  contents: [select_units, sampled, select_points, spatial_balance, autoplot.fieldopt_sample]
 - title: Estimating
   contents: [design_variance, ratio_estimator, dual_frame_estimator, as_svydesign, frame_overlap, segment_estimator, point_estimator, expected_hits, point_design_effect]
 - title: Allocation

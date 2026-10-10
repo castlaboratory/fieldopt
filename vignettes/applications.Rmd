@@ -39,16 +39,16 @@ set.seed(31)
 lakes <- data.frame(unit = paste0("lake", 1:300), x = runif(300, 0, 200), y = runif(300, 0, 120))
 lakes$altitude <- 200 + 8 * lakes$y + rnorm(300, sd = 40)
 lakes$surface <- exp(rnorm(300, 2, 0.8))
-s <- select_units(lakes, n = 40, method = "cube", balance = c("altitude", "surface"), seed = 2)
-rbind(frame = c(altitude = mean(lakes$altitude), surface = mean(lakes$surface)),
-      sample = c(mean(lakes$altitude[s$sampled]), mean(lakes$surface[s$sampled])))
+s <- lakes |> select_units(n = 40, method = "cube", balance = c("altitude", "surface"), seed = 2)
+rbind(frame = colMeans(lakes[, c("altitude", "surface")]),
+      sample = colMeans(sampled(s)[, c("altitude", "surface")]))
 #>        altitude  surface
 #> frame  685.1421 10.18864
 #> sample 674.4446 10.28326
 harbour <- data.frame(unit = "harbour", x = 100, y = 0)
-m <- travel_matrix(rbind(harbour, lakes[s$sampled, c("unit", "x", "y")]), method = "euclidean", unit = "min")
-r <- route_fieldwork(m, units = lakes$unit[s$sampled], depot = "harbour", max_length = 600,
-                     service_time = 240, iterations = 100)
+r <- s |>
+  travel_matrix(bases = harbour, method = "euclidean", speed = 60) |>      # 60 km/h: minutes
+  route_fieldwork(units = s, depot = "harbour", max_length = 600, service_time = 240, iterations = 100)
 c(days = r$n_routes, longest_day = round(max(r$durations)))
 #>        days longest_day 
 #>          36         598
@@ -72,12 +72,12 @@ two_stage_allocation(n_primary = 400, m_secondary = mean(ea$households), s2_betw
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
 #> n = 249 primary units with m = 10 secondary units each (optimal m 10.52): cost
 #> 132000, variance of the total 621600 (SE 788.4, CV 3%).
-s <- select_units(ea, n = 36, size = "households", seed = 9)
 offices <- data.frame(unit = c("office_w", "office_e"), x = c(12, 48), y = c(20, 20))
-m <- travel_matrix(rbind(offices, ea[s$sampled, c("unit", "x", "y")]), method = "euclidean", unit = "min")
-m <- travel_matrix(rbind(offices, ea[s$sampled, c("unit", "x", "y")]), method = "euclidean", matrix = 3 * unclass(m), unit = "min")
-sch <- schedule_fieldwork(m, units = ea$unit[s$sampled], teams = c(office_w = 3, office_e = 2), days = 10,
-                          max_length = 480, service_time = 300, iterations = 60)
+s <- ea |> select_units(n = 36, size = "households", seed = 9)
+sch <- s |>
+  travel_matrix(bases = offices, method = "euclidean", speed = 20) |>      # 20 km/h in town: minutes
+  schedule_fieldwork(units = s, teams = c(office_w = 3, office_e = 2), days = 10,
+                     max_length = 480, service_time = 300, iterations = 60)
 sch$summary
 #> # A tibble: 2 × 7
 #>   base     units teams routes days_needed days_available fits 

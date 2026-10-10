@@ -16,7 +16,7 @@
 #' base would need (`fits` is `FALSE`).
 #'
 #' @param matrix A [travel_matrix()] holding the units and the bases.
-#' @param units Names of the units to visit.
+#' @param units Names of the units to visit, or a [select_units()] sample.
 #' @param teams Named vector: number of teams per base (names are units of
 #'   the matrix that act as bases). A single unnamed number with one base is
 #'   accepted when `bases` is given.
@@ -60,6 +60,7 @@ schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_len
   }
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix); m <- unclass(matrix)
+  if (inherits(units, "fieldopt_sample")) units <- units$unit[units$sampled]
   if (is.null(names(teams))) {
     if (is.null(bases) || length(bases) != length(teams)) cli::cli_abort("{.arg teams} must be named by base, or {.arg bases} must name one base per entry.")
     names(teams) <- bases

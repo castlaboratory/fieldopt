@@ -6,6 +6,12 @@
   `route_fieldwork()` charges `per_route` in its objective too. On the 23
   Cordeau multi-depot instances the solver reaches or beats the best known
   solution on 11 and stays within 1.6% on the rest, in 1 to 26 seconds.
+* Pipe-friendly inputs: `travel_matrix()` takes a sample (its sampled units
+  only) with `bases` and a `speed` that turns distances into minutes;
+  `route_fieldwork()` and `schedule_fieldwork()` take the sample as `units`;
+  `sampled()` returns the selected rows, so a plan reads
+  `frame |> select_units(n) |> travel_matrix(bases = towns, speed = 60) |>
+  schedule_fieldwork(units = s, ...)`.
 * Connectors: `as_svydesign()` hands a sample to the `survey` package (a
   replicate-weight design for replicated systematic samples, Brewer's or the
   simple-random-sampling approximation otherwise) for calibration, domains and

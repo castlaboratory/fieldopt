@@ -13,13 +13,18 @@ travel_matrix(
   measure = c("duration", "distance"),
   server = getOption("osrm.server"),
   profile = getOption("osrm.profile"),
-  block = 100
+  block = 100,
+  bases = NULL,
+  speed = NULL
 )
 }
 \arguments{
 \item{coords}{Data frame or matrix with two coordinate columns: \code{lat}, \code{lon}
 (degrees) for \code{"haversine"} and \code{"osrm"}, or \code{x}, \code{y} (planar, any unit)
-for \code{"euclidean"}. Row names, or a column \code{unit}, name the units.}
+for \code{"euclidean"}. Row names, or a column \code{unit}, name the units. A
+\code{\link[=select_units]{select_units()}} sample is accepted and only its sampled units are used,
+so that \code{frame |> select_units(n) |> travel_matrix(bases = towns)} builds
+the matrix of the field work.}
 
 \item{method}{\code{"haversine"}, \code{"euclidean"} or \code{"osrm"}.}
 
@@ -42,6 +47,13 @@ options.}
 
 \item{block}{For \code{"osrm"}: number of origins and of destinations per
 request (\code{block^2} cells each).}
+
+\item{bases}{Optional data frame of depots (a \code{unit} column and the same
+coordinate columns) put in front of \code{coords}.}
+
+\item{speed}{Optional speed in coordinate units per hour (kilometres per
+hour with \code{"haversine"}): the distances are turned into minutes and
+\code{unit} becomes \code{"min"}. Ignored for \code{"osrm"} durations.}
 }
 \value{
 A square numeric matrix of class \code{fieldopt_matrix} with unit names
