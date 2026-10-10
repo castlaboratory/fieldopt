@@ -1,12 +1,18 @@
 # Two-stage allocation with the primary-unit cost taken from the routing
 
 [`two_stage_allocation()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_allocation.md)
-needs the cost `c1` of visiting a primary unit, which depends on how
-many units are visited. This function iterates: it allocates with a
-starting `c1`, routes a sample of the allocated size to measure the cost
-per unit, allocates again, and stops when the number of primary units no
-longer changes (or after `max_iter` rounds). The cost model's
-per-interview cost is `c2`; the travel and per-visit costs make `c1`.
+needs the cost `c1` of visiting a primary unit, which is not a constant:
+a tour shares its travel among the units it visits, so the routed cost
+`G(n)` of visiting `n` units grows like `c0 + a n + b sqrt(n)`
+(Beardwood, Halton and Hammersley). This function measures `G(n)` by
+routing samples at a few sizes around the current allocation, fits that
+curve, and re-allocates with the **marginal** cost `G'(n)` in place of
+`c1`; with a nonlinear cost the optimal number of secondary units is
+Cochran's formula with the marginal, not the average, cost per primary
+unit. Under a budget the number of primary units then comes from the
+fitted curve, so the design spends the budget at its real routed cost.
+It stops when `n` no longer changes (or after `max_iter` rounds; a
+two-cycle stops with the better of the two designs).
 
 ## Usage
 
@@ -23,7 +29,7 @@ two_stage_design(
   budget = NULL,
   mean = NULL,
   c1_start = NULL,
-  max_iter = 6,
+  max_iter = 8,
   size = NULL,
   strata = NULL,
   selection = c("lpm", "systematic", "srs"),
@@ -73,7 +79,8 @@ two_stage_design(
 
 - c1_start:
 
-  Starting value of the cost per primary unit.
+  Starting value of the cost per primary unit (default: the per-visit
+  cost plus the travel cost of the median trip from the depot).
 
 - max_iter:
 
@@ -114,7 +121,7 @@ two_stage_design(
 
 - n_rep:
 
-  Routed samples per round.
+  Routed samples per sample size of the cost curve.
 
 - iterations:
 
@@ -126,9 +133,26 @@ two_stage_design(
 
 ## Value
 
-The final `fieldopt_two_stage` allocation with an extra element
-`history` (a tibble with one row per round: `round`, `c1`, `n`, `m`,
-`cost`, `variance_total`) and `c1`.
+The final `fieldopt_two_stage` allocation, with `cost` the routed cost
+`G(n) + c2 n m`, and the extra elements `c1` (the marginal cost used),
+`c1_average` (`G(n)/n`), `cost_curve` (the routed points: `n`,
+`cost_mean`, `cost_sd`), `cost_coef` (`c0`, `a`, `b`), `history` (one
+row per round: `round`, `c1`, `c1_average`, `n`, `m`, `cost`,
+`variance_total`) and `converged`.
+
+## Details
+
+Using the average cost `G(n)/n` instead takes too few primary units: in
+the package's experiments the marginal rule was within 0.2 percent of
+the cost of the best design found by exhaustive search, the average rule
+up to 3 percent above it, and a constant `c1` guessed from depot
+distances 7 to 19 percent above.
+
+## References
+
+Cochran, W. G. (1977). *Sampling Techniques*, 3rd ed., Section 10.6.
+Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The shortest
+path through many points. *Proc. Cambridge Phil. Soc.*, 55, 299-327.
 
 ## Examples
 
@@ -148,6 +172,6 @@ two_stage_design(frame, "depot", model,
 )
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
-#> n = 55 primary units with m = 4 secondary units each (optimal m 4): cost 6892,
-#> variance of the total 1785000 (SE 1336, CV 4.95%).
+#> n = 55 primary units with m = 4 secondary units each (optimal m 3.87): cost
+#> 6899, variance of the total 1785000 (SE 1336, CV 4.95%).
 ```

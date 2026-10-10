@@ -1,11 +1,17 @@
 # Dual-frame allocation with the area-frame cost taken from the routing
 
 [`dual_frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_allocation.md)
-needs the cost per unit of the area frame, which depends on how many
-area units are visited. This function iterates between the allocation
-and the routing of a sample of `n_a` area units until `n_a` stabilises.
-The cost model prices the area units; `cost_b` is the list cost per
-unit.
+needs the cost per unit of the area frame, which is not a constant: the
+routed cost `G(n_a)` of visiting `n_a` area units grows like
+`c0 + a n_a + b sqrt(n_a)`. As
+[`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md),
+this function measures that curve by routing samples at a few sizes,
+fits it, and re-allocates with the **marginal** cost `G'(n_a)` as
+`cost_a`, which sets the split between the frames and `theta`; under a
+budget the sample sizes then come from the fitted curve, keeping that
+split, so the design spends the budget at its real routed cost. The cost
+model prices the area units (visits, interviews and travel); `cost_b` is
+the list cost per unit.
 
 ## Usage
 
@@ -24,7 +30,7 @@ dual_frame_design(
   budget = NULL,
   interviews_per_unit = NULL,
   cost_a_start = NULL,
-  max_iter = 6,
+  max_iter = 8,
   size = NULL,
   strata = NULL,
   selection = c("lpm", "systematic", "srs"),
@@ -128,7 +134,7 @@ dual_frame_design(
 
 - n_rep:
 
-  Routed samples per round.
+  Routed samples per sample size of the cost curve.
 
 - iterations:
 
@@ -140,8 +146,11 @@ dual_frame_design(
 
 ## Value
 
-The final `fieldopt_dual_frame` allocation with `history` (one row per
-round: `round`, `cost_a`, `n_a`, `n_b`, `theta`, `cost`, `variance`).
+The final `fieldopt_dual_frame` allocation, with `cost` the routed cost
+`G(n_a) + cost_b n_b`, `cost_a` the marginal cost used, `cost_a_average`
+(`G(n_a)/n_a`), `cost_curve`, `cost_coef`, `history` (one row per round:
+`round`, `cost_a`, `cost_a_average`, `n_a`, `n_b`, `theta`, `cost`,
+`variance`) and `converged`.
 
 ## Examples
 
@@ -164,9 +173,9 @@ dual_frame_design(frame, "depot", model, domains,
 )
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 119000: n_A = 114 (frame A, cost 103.7/unit),
-#> n_B = 99 (frame B, cost 45/unit), theta = 0.135 (optimised).
-#> Cost 16270; variance 118500 (frame A 118000, frame B 538); CV 4.99% of the
+#> Minimum cost for target variance 119000: n_A = 114 (frame A, cost 102.2/unit),
+#> n_B = 99 (frame B, cost 45/unit), theta = 0.116 (optimised).
+#> Cost 16290; variance 118800 (frame A 118000, frame B 545); CV 4.99% of the
 #> total 6900.
 #> Expected overlap units: 13.4 in the A sample, 79.2 in the B sample.
 ```

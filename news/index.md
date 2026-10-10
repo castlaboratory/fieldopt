@@ -2,6 +2,18 @@
 
 ## fieldopt 0.1.0
 
+- [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
+  and
+  [`dual_frame_design()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_design.md)
+  fit the routed cost curve `G(n) = c0 + a n + b sqrt(n)` from samples
+  routed at a few sizes and allocate with the marginal cost `G'(n)`,
+  which is what Cochran’s and Hartley’s rules need when the cost is not
+  linear; under a budget the sample sizes come from the fitted curve, so
+  the design spends the budget at its real routed cost. The previous
+  loop used the average cost and took 3 to 12 percent too few primary
+  units. Results gain `c1_average` (or `cost_a_average`), `cost_curve`
+  and `cost_coef`.
+
 - [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
   solves the assignment of units to bases and the routes jointly, as one
   multi-depot problem with a route limit per base and the `per_route`

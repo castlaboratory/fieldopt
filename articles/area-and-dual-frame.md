@@ -176,7 +176,7 @@ routed_unit_cost(
 #> # A tibble: 1 × 6
 #>       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep
 #>   <dbl>         <dbl>           <dbl>     <dbl>       <dbl> <dbl>
-#> 1   100          167.            2.66    16666.           1     3
+#> 1   100          167.            2.66    16665.           1     3
 ```
 
 ## The design effect of point sampling
@@ -213,10 +213,15 @@ tracks the empirical variance; the design effect is what enters
 With the between-cell and within-cell variance components (from a pilot
 or from the frame) and the costs per cell and per point, Cochran’s rule
 gives the number of points per cell and then the number of cells for a
-target precision.
+target precision. The cost per cell is not a constant: a route shares
+its travel among the cells it visits, so the routed cost of `n` cells
+grows like `c0 + a n + b sqrt(n)`.
 [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
-measures the cost per cell by routing a sample of the allocated size and
-iterates until the number of cells settles.
+routes samples at a few sizes, fits that curve and allocates with the
+**marginal** cost of a cell, which is what Cochran’s rule needs when the
+cost is not linear (the average cost per cell would give too few cells),
+iterating until the number of cells settles. The history shows the
+marginal cost used in each round next to the average.
 
 ``` r
 
@@ -233,11 +238,20 @@ ts
 #> n = 158 primary units with m = 9 secondary units each (optimal m 9): cost
 #> 45860, variance of the total 1256000 (SE 1121, CV 4.99%).
 ts$history
-#> # A tibble: 2 × 6
-#>   round    c1     n     m   cost variance_total
-#>   <int> <dbl> <int> <int>  <dbl>          <dbl>
-#> 1     1  90.1   158     9 49786.       1255934.
-#> 2     2  65.3   158     9 45861.       1255934.
+#> # A tibble: 2 × 7
+#>   round    c1 c1_average     n     m   cost variance_total
+#>   <int> <dbl>      <dbl> <int> <int>  <dbl>          <dbl>
+#> 1     1  90.1       65.3   158     9 45863.       1255934.
+#> 2     2  62.4       65.3   158     9 45863.       1255934.
+ts$cost_curve
+#> # A tibble: 5 × 3
+#>       n cost_mean cost_sd
+#>   <int>     <dbl>   <dbl>
+#> 1    95     6357.    6.51
+#> 2   126     8310.   12.0 
+#> 3   158    10312.   11.8 
+#> 4   198    12805.   11.7 
+#> 5   253    16209.   12.0
 ```
 
 ## Dual-frame allocation: area plus list
@@ -248,9 +262,10 @@ frame only (`a`); a few specialised units are on the list only (`b`).
 Given the sizes, means and standard deviations of the three domains, the
 cost per list unit and the design effect from the simulation,
 [`dual_frame_design()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_design.md)
-runs Hartley’s allocation with the area cost measured by routing,
-iterating until the area sample size settles; `theta = "screening"`
-gives the design in which the area sample does not use the overlap.
+runs Hartley’s allocation with the marginal routed cost of an area unit,
+in the same way, iterating until the area sample size settles;
+`theta = "screening"` gives the design in which the area sample does not
+use the overlap.
 
 ``` r
 
@@ -267,24 +282,24 @@ df <- dual_frame_design(
 df
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 878900: n_A = 74 (frame A, cost 167.9/unit),
-#> n_B = 131 (frame B, cost 45/unit), theta = 0.145 (optimised).
-#> Cost 18320; variance 877200 (frame A 685000, frame B 192000); CV 5% of the
+#> Minimum cost for target variance 878900: n_A = 75 (frame A, cost 163.2/unit),
+#> n_B = 129 (frame B, cost 45/unit), theta = 0.163 (optimised).
+#> Cost 18380; variance 874000 (frame A 679000, frame B 195000); CV 4.99% of the
 #> total 18750.
-#> Expected overlap units: 10.6 in the A sample, 109.2 in the B sample.
+#> Expected overlap units: 10.7 in the A sample, 107.5 in the B sample.
 df$history
-#> # A tibble: 3 × 7
-#>   round cost_a   n_a   n_b theta   cost variance
-#>   <int>  <dbl> <int> <int> <dbl>  <dbl>    <dbl>
-#> 1     1   190.    73   136 0.161 19998.  875540.
-#> 2     2   168.    74   131 0.145 18318.  877192.
-#> 3     3   168.    74   131 0.145 18317.  877194.
+#> # A tibble: 3 × 8
+#>   round cost_a cost_a_average   n_a   n_b theta   cost variance
+#>   <int>  <dbl>          <dbl> <int> <int> <dbl>  <dbl>    <dbl>
+#> 1     1   190.           168.    73   136 0.161 18373.  875540.
+#> 2     2   163.           168.    75   129 0.163 18385.  874014.
+#> 3     3   163.           168.    75   129 0.163 18385.  873960.
 tidy(df)
 #> # A tibble: 2 × 8
 #>   frame     n cost_per_unit   cost  deff variance overlap_units
 #>   <chr> <int>         <dbl>  <dbl> <dbl>    <dbl>         <dbl>
-#> 1 A        74          168. 12422. 0.753  685047.          10.6
-#> 2 B       131           45   5895  1      192148.         109. 
+#> 1 A        75          163. 12237. 0.753  679357.          10.7
+#> 2 B       129           45   5805  1      194603.         108. 
 #> # ℹ 1 more variable: weight_on_overlap <dbl>
 dual_frame_allocation(
   domains,
@@ -293,11 +308,11 @@ dual_frame_allocation(
 )
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 878900: n_A = 82 (frame A, cost 167.9/unit),
-#> n_B = 146 (frame B, cost 45/unit), theta = 0 (fixed).
-#> Cost 20330; variance 871300 (frame A 692000, frame B 179000); CV 4.98% of the
+#> Minimum cost for target variance 878900: n_A = 82 (frame A, cost 163.2/unit),
+#> n_B = 144 (frame B, cost 45/unit), theta = 0 (fixed).
+#> Cost 19860; variance 876100 (frame A 692000, frame B 184000); CV 4.99% of the
 #> total 18750.
-#> Expected overlap units: 11.7 in the A sample, 121.7 in the B sample.
+#> Expected overlap units: 11.7 in the A sample, 120 in the B sample.
 ```
 
 ## Estimating from both frames
