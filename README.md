@@ -116,6 +116,8 @@ autoplot(f)
 
 ## How it works
 
+<img src="man/figures/lifecycle.svg" alt="Life cycle of a field survey with fieldopt and the packages it talks to" width="100%" />
+
 <img src="man/figures/architecture.svg" alt="Architecture of fieldopt: R package, extendr bindings and the fieldopt-core Rust crate" width="100%" />
 
 <img src="man/figures/workflow.svg" alt="Workflow of fieldopt: frame, travel matrix, selection, routing and the schedule, cost and variance, and the frontier" width="100%" />

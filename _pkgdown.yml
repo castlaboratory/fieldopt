@@ -51,4 +51,7 @@ articles:
   contents: [fieldopt]
 - title: Practice
   navbar: Practice
-  contents: [area-and-dual-frame, routing-teams, frames-and-allocation]
+  contents: [survey-plan, area-and-dual-frame, routing-teams, frames-and-allocation]
+- title: Applications and validation
+  navbar: Applications
+  contents: [applications, validation]
