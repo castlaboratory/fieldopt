@@ -2,11 +2,16 @@
 
 #' Route the field work
 #'
-#' Finds low-cost routes from a depot through the selected units with GRASP
-#' (randomised greedy construction, 2-opt and Or-opt local search, optimal
-#' split of the tour into routes under the limits). One route when the limits
-#' allow it, several otherwise (one per team or per day). The solution is a
-#' heuristic; the gap to a lower bound is reported.
+#' Finds low-cost routes from a depot through the selected units: one route
+#' when the limits allow it, several otherwise (one per team or per day).
+#' Instances of up to 13 units are solved exactly (dynamic programming over
+#' subsets). Larger ones go to a hybrid genetic search (Vidal 2022): a
+#' population of giant tours, order crossover, the optimal split of Prins
+#' (2004) under the limits, and a local search with granular neighbourhoods
+#' (2-opt, Or-opt, relocate, swap, 2-opt*). The `gap` to a lower bound is
+#' reported: the Held-Karp bound for a single tour on a symmetric matrix
+#' (usually within a few percent of the optimum), a loose bound otherwise;
+#' `optimal` says when the solution is proven optimal.
 #'
 #' @param matrix A [travel_matrix()].
 #' @param units Names (or indices in the matrix) of the units to visit.
@@ -18,15 +23,27 @@
 #' @param service_time Time spent at each unit (interviews, measurements), in
 #'   the unit of the travel matrix: a single number, or a vector named by
 #'   unit. It counts towards `max_length` and is reported in `durations`.
-#' @param iterations GRASP iterations.
-#' @param alpha Greediness of the construction in `[0, 1]` (0 greedy, 1 random).
+#' @param demand Load each unit adds to its route (interviews to make,
+#'   samples to carry): a single number or a vector named by unit.
+#' @param capacity Maximum load of a route; `Inf` for none.
+#' @param iterations Offspring of the genetic search (ignored when the
+#'   instance is solved exactly).
+#' @param alpha Greediness of the constructions that seed the population, in
+#'   `[0, 1]` (0 greedy, 1 random).
 #' @param seed Seed of the solver.
 #' @param cost_model Optional [field_cost_model()] to price the solution.
 #' @return An object of class `fieldopt_routes`: `routes` (a tibble with
 #'   columns `route`, `stop`, `unit`), `lengths` (travel per route),
-#'   `durations` (travel plus service), `total`, `lower_bound`, `gap`,
-#'   `best_iteration`, `cost` (when a model is given), the inputs and the
-#'   travel matrix.
+#'   `durations` (travel plus service), `loads`, `total`, `lower_bound`,
+#'   `gap`, `optimal`, `best_iteration`, `cost` (when a model is given), the
+#'   inputs and the travel matrix.
+#' @references Vidal, T. (2022). Hybrid genetic search for the CVRP:
+#'   open-source implementation and SWAP* neighborhood. *Computers &
+#'   Operations Research*, 140, 105643. Prins, C. (2004). A simple and
+#'   effective evolutionary algorithm for the vehicle routing problem.
+#'   *Computers & Operations Research*, 31, 1985-2002. Held, M. and Karp,
+#'   R. M. (1971). The traveling-salesman problem and minimum spanning trees:
+#'   part II. *Mathematical Programming*, 1, 6-25.
 #' @export
 #' @examples
 #' set.seed(1)
@@ -37,7 +54,7 @@
 #'                      iterations = 50)
 #' r
 route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = Inf, service_time = 0,
-                            iterations = 200, alpha = 0.3, seed = 1, cost_model = NULL) {
+                            demand = 0, capacity = Inf, iterations = 200, alpha = 0.3, seed = 1, cost_model = NULL) {
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix)
   idx <- function(v, what) {
@@ -51,23 +68,28 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
   for (v in c("iterations", "alpha")) if (!is.numeric(get(v)) || length(get(v)) != 1L) cli::cli_abort("{.arg {v}} must be a single number.")
   check_seed(seed)
   service <- service_vector(service_time, nm)
+  dem <- service_vector(demand, nm, arg = "demand")
+  if (!is.numeric(capacity) || length(capacity) != 1L || is.na(capacity) || capacity < 0) cli::cli_abort("{.arg capacity} must be a single non-negative number.")
+  heavy <- nm[u][dem[u] > capacity]
+  if (length(heavy)) cli::cli_abort("The demand of {.val {heavy}} exceeds {.arg capacity} = {capacity}.")
   if (is.finite(max_length)) {
     far <- nm[u][unclass(matrix)[d, u] + unclass(matrix)[u, d] + service[u] > max_length]
     if (length(far)) cli::cli_abort(c("A route from {.val {nm[d]}} to {.val {far}} and back exceeds {.arg max_length} = {max_length}.",
                                       i = "Raise {.arg max_length}, move the depot or drop {cli::qty(length(far))}{?this unit/these units}."))
   }
   if (is.finite(max_stops) && max_stops < 1) cli::cli_abort("{.arg max_stops} must be at least 1.")
-  res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, u - 1L, service, as.numeric(max_length),
-                  as.numeric(max_stops), as.integer(iterations), alpha, seed)
+  res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, u - 1L, service, dem, as.numeric(max_length),
+                  as.numeric(max_stops), as.numeric(capacity), as.integer(iterations), alpha, seed)
   routes <- do.call(rbind, lapply(seq_along(res$routes), function(k) {
     r <- res$routes[[k]] + 1L
     tibble::tibble(route = k, stop = seq_along(r), unit = nm[r])
   }))
-  out <- list(routes = routes, lengths = res$lengths, durations = res$durations, total = res$total, lower_bound = res$lower_bound,
+  out <- list(routes = routes, lengths = res$lengths, durations = res$durations, loads = res$loads, total = res$total,
+              lower_bound = res$lower_bound, optimal = res$optimal,
               gap = if (res$lower_bound > 0) (res$total - res$lower_bound) / res$lower_bound else NA_real_,
               best_iteration = res$best_iteration,
               n_routes = length(res$routes), depot = nm[d], units = nm[u],
-              limits = c(max_length = max_length, max_stops = max_stops), service_time = service,
+              limits = c(max_length = max_length, max_stops = max_stops, capacity = capacity), service_time = service, demand = dem,
               options = list(iterations = iterations, alpha = alpha, seed = seed),
               travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"),
               matrix = matrix)
@@ -80,22 +102,23 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
 }
 
 # Service time as a vector over the rows of the matrix (names `nm`).
-service_vector <- function(service_time, nm) {
-  if (!is.numeric(service_time) || anyNA(service_time) || any(service_time < 0)) cli::cli_abort("{.arg service_time} must be non-negative numbers.")
+service_vector <- function(service_time, nm, arg = "service_time") {
+  if (!is.numeric(service_time) || anyNA(service_time) || any(service_time < 0)) cli::cli_abort("{.arg {arg}} must be non-negative numbers.")
   if (length(service_time) == 1L) return(rep(as.numeric(service_time), length(nm)))
   if (!is.null(names(service_time))) {
     out <- rep(0, length(nm)); hit <- match(names(service_time), nm)
-    if (anyNA(hit)) cli::cli_abort("Unknown unit{?s} in {.arg service_time}: {.val {names(service_time)[is.na(hit)]}}.")
+    bad <- names(service_time)[is.na(hit)]
+    if (length(bad)) cli::cli_abort("Unknown {cli::qty(length(bad))}unit{?s} in {.arg {arg}}: {.val {bad}}.")
     out[hit] <- as.numeric(service_time); return(out)
   }
-  if (length(service_time) != length(nm)) cli::cli_abort("{.arg service_time} must be a single number, a vector named by unit, or one value per row of the matrix.")
+  if (length(service_time) != length(nm)) cli::cli_abort("{.arg {arg}} must be a single number, a vector named by unit, or one value per row of the matrix.")
   as.numeric(service_time)
 }
 
 #' @export
 print.fieldopt_routes <- function(x, ...) {
   cli::cli_h1("Field routes")
-  cli::cli_text("{x$n_routes} route{?s} from {.val {x$depot}} through {length(x$units)} unit{?s}: total travel {signif(x$total, 4)} {x$travel_unit} (lower bound {signif(x$lower_bound, 4)}{if (is.na(x$gap)) '' else paste0(', gap ', signif(100 * x$gap, 3), '%')}).")
+  cli::cli_text("{x$n_routes} route{?s} from {.val {x$depot}} through {length(x$units)} unit{?s}: total travel {signif(x$total, 4)} {x$travel_unit}{if (isTRUE(x$optimal)) ' (proven optimal)' else paste0(' (lower bound ', signif(x$lower_bound, 4), if (is.na(x$gap)) '' else paste0(', gap ', signif(100 * x$gap, 3), '%'), ')')}.")
   served <- any(x$service_time > 0)
   for (k in seq_len(x$n_routes)) {
     r <- x$routes$unit[x$routes$route == k]

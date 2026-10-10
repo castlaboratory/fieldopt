@@ -135,16 +135,43 @@ head(sch$calendar[, c("base", "team", "day", "stops", "travel", "duration")])
 autoplot(sch)
 ```
 
-## Solver settings
+## The solver and how good it is
 
-`iterations` is the number of GRASP restarts; `alpha` the greediness of the
-construction (0 is pure greedy, 1 pure random). The default 200 iterations
-with `alpha = 0.3` is enough for a few hundred units; the `gap` field reports
-how far the solution is from a two-edge lower bound, which is loose, so gaps
-of 20 to 40 percent are normal for good solutions.
+Instances of up to 13 units are solved exactly, by dynamic programming over
+subsets (the optimal tour of every subset, then the optimal partition into
+feasible routes), and `optimal` is `TRUE`. Larger instances go to a hybrid
+genetic search in the spirit of Vidal (2022): a population of giant tours,
+order crossover, the optimal split of Prins (2004) under the limits, and a
+local search with granular neighbourhoods made of 2-opt, Or-opt, relocate,
+swap and 2-opt* moves. `iterations` is the number of offspring; `alpha` the
+greediness of the constructions that seed the population.
+
+The `gap` is measured against a lower bound. For a single tour on a
+symmetric matrix it is the Held-Karp 1-tree bound, usually within one or two
+percent of the optimum, so a small gap means a solution close to optimal.
+With several routes the only cheap bound is loose (half the sum of the
+cheapest incoming and outgoing edge at each node), and gaps of 50 to 70
+percent are normal for solutions that are in fact within one percent of the
+optimum; judge those by the benchmark below rather than by the gap.
 
 ```{r settings}
 quick <- route_fieldwork(m, units = sel, depot = "depot", iterations = 10, seed = 2)
 long <- route_fieldwork(m, units = sel, depot = "depot", iterations = 500, seed = 2)
-c(quick = quick$total, long = long$total)
+c(quick = quick$total, long = long$total, bound = long$lower_bound)
 ```
+
+The solver was run on classical benchmark instances with rounded Euclidean
+distances, as the libraries define them (script in the `fieldopt-core`
+repository, `examples/benchmark.rs`; one core of a laptop):
+
+| Set | Instances | Offspring | Optimal | Mean gap | Largest gap | Time per instance |
+|---|---|---|---|---|---|---|
+| TSPLIB (eil51, berlin52, st70, eil76, rat99, kroA100, eil101) | 7 | 2000 | 7 of 7 | 0.00% | 0.00% | 0.6 to 1.8 s |
+| Augerat set A (CVRP, 31 to 79 customers, capacity) | 27 | 2000 | 17 of 27 | 0.30% | 1.14% | 0.3 to 1.6 s |
+| Augerat set A | 27 | 200 (default) | 9 of 27 | 0.57% | 1.86% | under 0.2 s |
+
+For field work, with tens of segments per base and daily limits, the
+default settings are therefore enough; raise `iterations` to a few thousand
+when the instance has hundreds of units or when a route plan will be used
+as is.
+

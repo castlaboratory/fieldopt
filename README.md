@@ -21,10 +21,12 @@ inside them) and a list frame needs.
 - `field_cost_model()` turns travel, team-days, visits and interviews into
   money or time.
 - `route_fieldwork()` routes the field work from a depot through the selected
-  units, for one team or several, under daily limits of length (travel plus
-  the service time at each unit) and stops (GRASP with 2-opt, Or-opt and an
-  optimal split of the tour, on symmetric or road-network matrices), and
-  reports the gap to a lower bound.
+  units, for one team or several, under daily limits of duration (travel plus
+  the service time at each unit), stops and capacity, on symmetric or
+  road-network matrices: exact up to 13 units, otherwise a hybrid genetic
+  search with the optimal split of the tour and a granular local search
+  (optimal on the classical TSPLIB instances, within 1.2% on the Augerat CVRP
+  set A), with the Held-Karp bound and a proof of optimality when it closes.
 - `schedule_fieldwork()` assigns the units to several bases, routes each
   base and distributes the routes over the teams and the days available: a
   calendar that says whether the field work fits.

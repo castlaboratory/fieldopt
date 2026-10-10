@@ -10,10 +10,10 @@ NULL
 #' @noRd
 travel_matrix_rs <- function(a, b, method) .Call(wrap__travel_matrix_rs, a, b, method)
 
-#' GRASP routing. `matrix` is the row-major n x n travel matrix; `depot` and
-#' `units` are 0-based indices; `service` has one entry per node (or none).
+#' Routing. `matrix` is the row-major n x n travel matrix; `depot` and
+#' `units` are 0-based indices; `service` and `demand` have one entry per node (or none).
 #' @noRd
-route_rs <- function(matrix, n, depot, units, service, max_length, max_stops, iterations, alpha, seed) .Call(wrap__route_rs, matrix, n, depot, units, service, max_length, max_stops, iterations, alpha, seed)
+route_rs <- function(matrix, n, depot, units, service, demand, max_length, max_stops, capacity, iterations, alpha, seed) .Call(wrap__route_rs, matrix, n, depot, units, service, demand, max_length, max_stops, capacity, iterations, alpha, seed)
 
 #' Size-proportional inclusion probabilities summing to `n`.
 #' @noRd

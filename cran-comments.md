@@ -26,7 +26,7 @@ First submission.
   offline with `cargo build --offline -j 2`; nothing is downloaded during the
   installation. The crates and their authors and licences are listed in
   `inst/AUTHORS` and acknowledged in `Authors@R`. The computational crate
-  `fieldopt-core` (0.4.0) is written by the package authors and published on
+  `fieldopt-core` (0.5.0) is written by the package authors and published on
   crates.io. The R wrappers of the Rust functions are shipped in the package
   (`R/extendr-wrappers.R`); the installation runs a single `cargo build`.
 * Examples run in under two seconds each; the only `\dontrun{}` example

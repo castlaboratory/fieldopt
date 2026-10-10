@@ -108,7 +108,7 @@ tidy.fieldopt_routes <- function(x, ...) {
 #' @export
 glance.fieldopt_routes <- function(x, ...) {
   out <- tibble::tibble(n_units = length(x$units), n_routes = x$n_routes, total = x$total, lower_bound = x$lower_bound,
-                        gap = x$gap, longest_route = max(x$lengths), travel_unit = x$travel_unit)
+                        gap = x$gap, optimal = isTRUE(x$optimal), longest_route = max(x$lengths), travel_unit = x$travel_unit)
   if (!is.null(x$cost)) out$cost <- x$cost[["total"]]
   out
 }

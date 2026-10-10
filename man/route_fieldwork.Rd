@@ -11,6 +11,8 @@ route_fieldwork(
   max_length = Inf,
   max_stops = Inf,
   service_time = 0,
+  demand = 0,
+  capacity = Inf,
   iterations = 200,
   alpha = 0.3,
   seed = 1,
@@ -34,9 +36,16 @@ none.}
 the unit of the travel matrix: a single number, or a vector named by
 unit. It counts towards \code{max_length} and is reported in \code{durations}.}
 
-\item{iterations}{GRASP iterations.}
+\item{demand}{Load each unit adds to its route (interviews to make,
+samples to carry): a single number or a vector named by unit.}
 
-\item{alpha}{Greediness of the construction in \verb{[0, 1]} (0 greedy, 1 random).}
+\item{capacity}{Maximum load of a route; \code{Inf} for none.}
+
+\item{iterations}{Offspring of the genetic search (ignored when the
+instance is solved exactly).}
+
+\item{alpha}{Greediness of the constructions that seed the population, in
+\verb{[0, 1]} (0 greedy, 1 random).}
 
 \item{seed}{Seed of the solver.}
 
@@ -45,16 +54,21 @@ unit. It counts towards \code{max_length} and is reported in \code{durations}.}
 \value{
 An object of class \code{fieldopt_routes}: \code{routes} (a tibble with
 columns \code{route}, \code{stop}, \code{unit}), \code{lengths} (travel per route),
-\code{durations} (travel plus service), \code{total}, \code{lower_bound}, \code{gap},
-\code{best_iteration}, \code{cost} (when a model is given), the inputs and the
-travel matrix.
+\code{durations} (travel plus service), \code{loads}, \code{total}, \code{lower_bound},
+\code{gap}, \code{optimal}, \code{best_iteration}, \code{cost} (when a model is given), the
+inputs and the travel matrix.
 }
 \description{
-Finds low-cost routes from a depot through the selected units with GRASP
-(randomised greedy construction, 2-opt and Or-opt local search, optimal
-split of the tour into routes under the limits). One route when the limits
-allow it, several otherwise (one per team or per day). The solution is a
-heuristic; the gap to a lower bound is reported.
+Finds low-cost routes from a depot through the selected units: one route
+when the limits allow it, several otherwise (one per team or per day).
+Instances of up to 13 units are solved exactly (dynamic programming over
+subsets). Larger ones go to a hybrid genetic search (Vidal 2022): a
+population of giant tours, order crossover, the optimal split of Prins
+(2004) under the limits, and a local search with granular neighbourhoods
+(2-opt, Or-opt, relocate, swap, 2-opt*). The \code{gap} to a lower bound is
+reported: the Held-Karp bound for a single tour on a symmetric matrix
+(usually within a few percent of the optimum), a loose bound otherwise;
+\code{optimal} says when the solution is proven optimal.
 }
 \examples{
 set.seed(1)
@@ -64,4 +78,13 @@ m <- travel_matrix(pts, method = "euclidean")
 r <- route_fieldwork(m, units = paste0("s", 1:12), depot = "depot", max_stops = 5,
                      iterations = 50)
 r
+}
+\references{
+Vidal, T. (2022). Hybrid genetic search for the CVRP:
+open-source implementation and SWAP* neighborhood. \emph{Computers &
+Operations Research}, 140, 105643. Prins, C. (2004). A simple and
+effective evolutionary algorithm for the vehicle routing problem.
+\emph{Computers & Operations Research}, 31, 1985-2002. Held, M. and Karp,
+R. M. (1971). The traveling-salesman problem and minimum spanning trees:
+part II. \emph{Mathematical Programming}, 1, 6-25.
 }
