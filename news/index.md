@@ -9,8 +9,8 @@
   2-opt\*); the Held-Karp bound replaces the two-edge bound for single
   tours and `optimal` reports proven optimality;
   [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
-  gains `demand` and `capacity`. On TSPLIB and Augerat’s set A the
-  solver is optimal or within 1.2% of the optimum in about a second.
+  gains `demand` and `capacity`. On TSPLIB and Augerat set A the solver
+  is optimal or within 1.2% of the optimum in about a second.
 
 - New tools (engine `fieldopt-core` 0.4.0):
   [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
