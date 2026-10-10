@@ -10,7 +10,7 @@ use fieldopt_core::{
     local_pivotal, spatial_balance, srs_variance, systematic_replicates, two_stage_for_budget, two_stage_for_variance,
     Domain, DualFrame, GraspOptions, Matrix, RouteLimits, Stratum, Target, TwoStage,
 };
-use fieldopt_core::routing::solve_routes;
+use fieldopt_core::routing::{solve_fleet, Fleet};
 
 fn err<T>(r: std::result::Result<T, String>) -> extendr_api::Result<T> {
     r.map_err(Error::Other)
@@ -33,24 +33,33 @@ fn travel_matrix_rs(a: &[f64], b: &[f64], method: &str) -> extendr_api::Result<V
     Ok(m.as_slice().to_vec())
 }
 
-/// Routing. `matrix` is the row-major n x n travel matrix; `depot` and
-/// `units` are 0-based indices; `service` and `demand` have one entry per node (or none).
+/// Routing. `matrix` is the row-major n x n travel matrix; `depots` and
+/// `units` are 0-based indices; `routes_available` has one entry per depot (negative for no
+/// limit); `fixed_cost` is the cost of a route in travel units; `service` and `demand` have
+/// one entry per node (or none).
 /// @noRd
 #[extendr]
-fn route_rs(matrix: &[f64], n: i32, depot: i32, units: &[i32], service: &[f64], demand: &[f64], max_length: f64, max_stops: f64,
-            capacity: f64, iterations: i32, time_limit: f64, alpha: f64, seed: f64) -> extendr_api::Result<List> {
+fn route_rs(matrix: &[f64], n: i32, depots: &[i32], routes_available: &[f64], fixed_cost: f64, units: &[i32], service: &[f64],
+            demand: &[f64], max_length: f64, max_stops: f64, capacity: f64, iterations: i32, time_limit: f64, alpha: f64,
+            seed: f64) -> extendr_api::Result<List> {
     let m = err(Matrix::from_vec(n as usize, matrix.to_vec()))?;
     let units: Vec<usize> = units.iter().map(|&u| u as usize).collect();
+    let fleet = Fleet {
+        depots: depots.iter().map(|&d| d as usize).collect(),
+        routes_available: routes_available.iter().map(|&k| if k.is_finite() && k >= 0.0 { k as usize } else { usize::MAX }).collect(),
+        fixed_cost,
+    };
     let limits = RouteLimits {
         max_length: if max_length.is_finite() { max_length } else { f64::INFINITY },
         max_stops: if max_stops.is_finite() { max_stops as usize } else { usize::MAX },
         capacity: if capacity.is_finite() { capacity } else { f64::INFINITY },
     };
     let options = GraspOptions { iterations: iterations as usize, time_limit: if time_limit.is_finite() { time_limit } else { f64::INFINITY }, alpha, seed: seed as u64 };
-    let sol = err(solve_routes(&m, depot as usize, &units, service, demand, limits, options))?;
+    let sol = err(solve_fleet(&m, &fleet, &units, service, demand, limits, options))?;
     let routes: Vec<Robj> = sol.routes.iter().map(|r| r.iter().map(|&u| u as i32).collect::<Vec<i32>>().into()).collect();
     Ok(list!(
         routes = List::from_values(routes),
+        route_depots = sol.route_depots.iter().map(|&d| d as i32).collect::<Vec<i32>>(),
         lengths = sol.lengths,
         durations = sol.durations,
         loads = sol.loads,

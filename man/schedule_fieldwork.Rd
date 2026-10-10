@@ -13,9 +13,8 @@ schedule_fieldwork(
   max_length = Inf,
   max_stops = Inf,
   service_time = 0,
-  assign = c("nearest", "balanced"),
   cost_model = NULL,
-  iterations = 100,
+  iterations = 200,
   time_limit = NULL,
   alpha = 0.3,
   seed = 1,
@@ -38,16 +37,11 @@ accepted when \code{bases} is given.}
 \item{max_length, max_stops, service_time}{Daily limits of a route, as in
 \code{\link[=route_fieldwork]{route_fieldwork()}}.}
 
-\item{assign}{\code{"nearest"} or \code{"balanced"} (see Details).}
-
 \item{cost_model}{Optional \code{\link[=field_cost_model]{field_cost_model()}}; its \code{per_route} cost is
-charged once per team-day.}
+charged once per team-day and enters the objective.}
 
 \item{iterations, time_limit, alpha, seed, engine}{Solver settings of
-\code{\link[=route_fieldwork]{route_fieldwork()}}. With \code{engine = "vrpr"} the assignment of units to
-bases and the routes are optimised jointly (a multi-depot problem with
-\code{teams * days} routes available per base and the \code{per_route} cost of the
-cost model in the objective), and \code{assign} is ignored.}
+\code{\link[=route_fieldwork]{route_fieldwork()}}; both engines solve the multi-depot problem jointly.}
 }
 \value{
 An object of class \code{fieldopt_schedule}: \code{calendar} (a tibble with
@@ -58,19 +52,19 @@ one row per route: \code{base}, \code{team}, \code{day}, \code{route}, \code{sto
 it fits), \code{fits} and \code{cost}.
 }
 \description{
-Assigns the units to visit to bases (depots), routes the units of each
-base under the daily limits with \code{\link[=route_fieldwork]{route_fieldwork()}} (one route is one
-team-day), and distributes the routes over the teams of the base and the
-days available, longest routes first, so that the teams finish as evenly
-as possible. The result is a calendar: which team visits which units on
-which day, and whether the work fits in the days available.
+Solves the assignment of the units to bases (depots) and their routing
+jointly, as one multi-depot problem: every route (one team-day) leaves
+from and returns to one base, each base may send at most \code{teams * days}
+routes, and the objective is the total travel plus the \code{per_route} cost of
+the cost model for every route opened. The routes of each base are then
+distributed over its teams and the days available, longest routes first,
+so that the teams finish as evenly as possible. The result is a calendar:
+which team visits which units on which day, and whether the work fits.
 }
 \details{
-Units go to their nearest base by default. With \code{assign = "balanced"},
-units are moved from bases whose expected number of routes exceeds the
-team-days available to the base with spare capacity that costs them the
-least extra travel; the final routing decides the actual number of routes,
-so the calendar still reports when a base is short of days.
+When the team-days of the bases are not enough, the routes are solved
+without the limit per base and the calendar reports how many days each
+base would need (\code{fits} is \code{FALSE}).
 }
 \examples{
 set.seed(5)

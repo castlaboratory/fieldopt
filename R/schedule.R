@@ -2,18 +2,18 @@
 
 #' Schedule the field work of several teams from several bases
 #'
-#' Assigns the units to visit to bases (depots), routes the units of each
-#' base under the daily limits with [route_fieldwork()] (one route is one
-#' team-day), and distributes the routes over the teams of the base and the
-#' days available, longest routes first, so that the teams finish as evenly
-#' as possible. The result is a calendar: which team visits which units on
-#' which day, and whether the work fits in the days available.
+#' Solves the assignment of the units to bases (depots) and their routing
+#' jointly, as one multi-depot problem: every route (one team-day) leaves
+#' from and returns to one base, each base may send at most `teams * days`
+#' routes, and the objective is the total travel plus the `per_route` cost of
+#' the cost model for every route opened. The routes of each base are then
+#' distributed over its teams and the days available, longest routes first,
+#' so that the teams finish as evenly as possible. The result is a calendar:
+#' which team visits which units on which day, and whether the work fits.
 #'
-#' Units go to their nearest base by default. With `assign = "balanced"`,
-#' units are moved from bases whose expected number of routes exceeds the
-#' team-days available to the base with spare capacity that costs them the
-#' least extra travel; the final routing decides the actual number of routes,
-#' so the calendar still reports when a base is short of days.
+#' When the team-days of the bases are not enough, the routes are solved
+#' without the limit per base and the calendar reports how many days each
+#' base would need (`fits` is `FALSE`).
 #'
 #' @param matrix A [travel_matrix()] holding the units and the bases.
 #' @param units Names of the units to visit.
@@ -24,14 +24,10 @@
 #' @param bases Optional names of the bases when `teams` is unnamed.
 #' @param max_length,max_stops,service_time Daily limits of a route, as in
 #'   [route_fieldwork()].
-#' @param assign `"nearest"` or `"balanced"` (see Details).
 #' @param cost_model Optional [field_cost_model()]; its `per_route` cost is
-#'   charged once per team-day.
+#'   charged once per team-day and enters the objective.
 #' @param iterations,time_limit,alpha,seed,engine Solver settings of
-#'   [route_fieldwork()]. With `engine = "vrpr"` the assignment of units to
-#'   bases and the routes are optimised jointly (a multi-depot problem with
-#'   `teams * days` routes available per base and the `per_route` cost of the
-#'   cost model in the objective), and `assign` is ignored.
+#'   [route_fieldwork()]; both engines solve the multi-depot problem jointly.
 #' @return An object of class `fieldopt_schedule`: `calendar` (a tibble with
 #'   one row per route: `base`, `team`, `day`, `route`, `stops`, `travel`,
 #'   `duration`, and `units` as a list column), `assignment` (unit, base),
@@ -49,9 +45,8 @@
 #' sch
 #' sch$calendar
 schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_length = Inf, max_stops = Inf,
-                               service_time = 0, assign = c("nearest", "balanced"), cost_model = NULL,
-                               iterations = 100, time_limit = NULL, alpha = 0.3, seed = 1, engine = c("fieldopt", "vrpr")) {
-  assign <- rlang::arg_match(assign)
+                               service_time = 0, cost_model = NULL, iterations = 200, time_limit = NULL, alpha = 0.3,
+                               seed = 1, engine = c("fieldopt", "vrpr")) {
   engine <- rlang::arg_match(engine)
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix); m <- unclass(matrix)
@@ -66,63 +61,48 @@ schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_len
   if (any(units %in% bases)) cli::cli_abort("A base cannot be among the units to visit.")
   if (anyDuplicated(units) || anyDuplicated(bases)) cli::cli_abort("{.arg units} and the bases must be distinct.")
   check_seed(seed)
-  # assignment of units to bases
-  dist_to <- m[units, bases, drop = FALSE] + t(m[bases, units, drop = FALSE])  # out and back
-  base_of <- bases[apply(dist_to, 1, which.min)]
-  joint <- NULL
-  if (engine == "vrpr") {
-    service <- service_vector(service_time, nm)
-    joint <- route_with_vrpr(matrix, units = units, bases = bases, vehicles = teams * days, max_length = max_length, max_stops = max_stops,
-                             service = service, demand = rep(0, length(nm)), capacity = Inf,
-                             per_route = if (is.null(cost_model)) 0 else cost_model$per_route, per_travel = if (is.null(cost_model)) 1 else cost_model$per_travel,
-                             time_limit = if (is.null(time_limit)) 5 else time_limit, seed = seed)
-    for (k in seq_along(joint$routes)) base_of[match(joint$routes[[k]], units)] <- joint$base[k]
-  } else if (assign == "balanced" && length(bases) > 1) {
-    service <- service_vector(service_time, nm)
-    # expected routes per base from a crude capacity: stops per route and length per route
-    expected_routes <- function(b, us) {
-      if (!length(us)) return(0)
-      by_stops <- if (is.finite(max_stops)) ceiling(length(us) / max_stops) else 1
-      by_length <- if (is.finite(max_length)) {
-        # a nearest-neighbour chain is a cheap proxy of the tour length
-        tour <- us[order(m[b, us])]; len <- m[b, tour[1]] + sum(m[cbind(tour[-length(tour)], tour[-1])]) + m[tour[length(tour)], b]
-        ceiling((len + sum(service[match(us, nm)])) / max_length)
-      } else 1
-      max(by_stops, by_length)
-    }
-    capacity <- teams * days
-    for (it in seq_len(length(units))) {
-      load <- vapply(bases, function(b) expected_routes(b, units[base_of == b]), numeric(1))
-      over <- bases[load > capacity]
-      if (!length(over)) break
-      best <- NULL
-      for (i in which(base_of %in% over)) {
-        for (b in setdiff(bases, base_of[i])) {
-          if (expected_routes(b, c(units[base_of == b], units[i])) <= capacity[b]) {
-            extra <- dist_to[i, b] - dist_to[i, base_of[i]]
-            if (is.null(best) || extra < best$extra) best <- list(i = i, b = b, extra = extra)
-          }
-        }
-      }
-      if (is.null(best)) break
-      base_of[best$i] <- best$b
+  if (!is.null(cost_model) && !inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
+  service <- service_vector(service_time, nm)
+  per_route <- if (is.null(cost_model)) 0 else cost_model$per_route
+  per_travel <- if (is.null(cost_model)) 1 else cost_model$per_travel
+  bi <- match(bases, nm); ui <- match(units, nm)
+  solve_joint <- function(vehicles) {
+    if (engine == "vrpr") {
+      joint <- route_with_vrpr(matrix, units = units, bases = bases, vehicles = vehicles, max_length = max_length, max_stops = max_stops,
+                               service = service, demand = rep(0, length(nm)), capacity = Inf, per_route = per_route, per_travel = per_travel,
+                               time_limit = if (is.null(time_limit)) 5 else time_limit, seed = seed)
+      list(routes = joint$routes, base = joint$base)
+    } else {
+      check_seed(seed)
+      fixed <- if (per_route > 0 && per_travel > 0) per_route / per_travel else 0
+      res <- route_rs(as.numeric(t(m)), nrow(m), bi - 1L, as.numeric(vehicles), fixed, ui - 1L, service, rep(0, length(nm)),
+                      as.numeric(max_length), as.numeric(max_stops), Inf, as.integer(iterations),
+                      if (is.null(time_limit)) Inf else as.numeric(time_limit), alpha, seed)
+      list(routes = lapply(res$routes, function(r) nm[r + 1L]), base = nm[res$route_depots + 1L])
     }
   }
+  joint <- tryCatch(solve_joint(teams * days), error = function(e) {
+    if (!grepl("routes available|unplanned", conditionMessage(e))) stop(e)
+    NULL
+  })
+  if (is.null(joint)) {  # not enough team-days: solve without the limit per base and report the shortfall
+    joint <- solve_joint(rep(-1, length(bases)))
+  }
+  joint_routes <- joint$routes; joint_base <- joint$base
+  base_of <- units; for (k in seq_along(joint_routes)) base_of[match(joint_routes[[k]], units)] <- joint_base[k]
   assignment <- tibble::tibble(unit = units, base = base_of)
-  # routing per base and distribution over teams and days
+  # one fieldopt_routes object per base, from the joint solution, then teams and days
   routes <- list(); cal <- list(); summ <- list(); cost <- 0
   for (b in bases) {
-    us <- units[base_of == b]
-    if (!length(us)) {
+    ks <- which(joint_base == b)
+    if (!length(ks)) {
       summ[[b]] <- tibble::tibble(base = b, units = 0L, teams = unname(teams[b]), routes = 0L, days_needed = 0L, days_available = days, fits = TRUE)
       next
     }
-    r <- route_fieldwork(matrix, units = us, depot = b, max_length = max_length, max_stops = max_stops,
-                         service_time = service_time, iterations = iterations, time_limit = time_limit, alpha = alpha, seed = seed,
-                         cost_model = cost_model, engine = engine)
+    r <- routes_object(matrix, joint_routes[ks], depot = b, service = service, demand = rep(0, length(nm)),
+                       limits = c(max_length = max_length, max_stops = max_stops, capacity = Inf), cost_model = cost_model, engine = engine)
     routes[[b]] <- r
     if (!is.null(r$cost)) cost <- cost + r$cost[["total"]]
-    # longest-processing-time first over the teams of the base
     ord <- order(r$durations, decreasing = TRUE)
     team_days <- rep(0L, teams[b]); team_time <- rep(0, teams[b])
     rows <- lapply(ord, function(k) {
@@ -133,7 +113,7 @@ schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_len
     })
     cal[[b]] <- do.call(rbind, rows)
     needed <- max(team_days)
-    summ[[b]] <- tibble::tibble(base = b, units = length(us), teams = unname(teams[b]), routes = r$n_routes,
+    summ[[b]] <- tibble::tibble(base = b, units = length(unlist(joint_routes[ks])), teams = unname(teams[b]), routes = r$n_routes,
                                 days_needed = needed, days_available = days, fits = needed <= days)
   }
   calendar <- if (length(cal)) do.call(rbind, cal) else tibble::tibble()

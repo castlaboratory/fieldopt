@@ -34,9 +34,9 @@ test_that("schedules assign units to bases, teams and days", {
   expect_equal(nrow(sch$summary), 2)
   expect_equal(sch$summary$days_needed, unname(vapply(sch$summary$base, function(b) max(sch$calendar$day[sch$calendar$base == b]), numeric(1))))
   expect_equal(sch$fits, all(sch$summary$fits))
-  # nearest base
-  d <- unclass(m); near <- ifelse(d[paste0("s", 1:30), "base1"] <= d[paste0("s", 1:30), "base2"], "base1", "base2")
-  expect_equal(sch$assignment$base, unname(near))
+  # every unit is served from one base and the per-base route limits hold
+  expect_true(all(sch$assignment$base %in% c("base1", "base2")))
+  expect_true(all(sch$summary$routes <= sch$summary$teams * 4))
   # a team never has two routes on the same day
   expect_false(anyDuplicated(sch$calendar[, c("team", "day")]) > 0)
   expect_equal(nrow(tidy(sch)), 30)
@@ -45,13 +45,19 @@ test_that("schedules assign units to bases, teams and days", {
   expect_equal(g$cost, sum(vapply(sch$routes, function(r) r$cost[["total"]], numeric(1))))
   expect_s3_class(autoplot(sch), "ggplot")
   expect_message(print(sch), "Field schedule")
-  # balanced assignment moves units to the base with spare capacity
-  near2 <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 3, base2 = 1), days = 2, max_stops = 4, iterations = 20)
-  expect_false(near2$fits)
-  bal <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 3, base2 = 1), days = 2, max_stops = 4,
-                            assign = "balanced", iterations = 20)
-  expect_true(bal$fits)
-  expect_gt(sum(bal$assignment$base == "base1"), sum(near2$assignment$base == "base1"))
+  # a tight fleet at one base pushes units to the other base
+  tight <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 3, base2 = 1), days = 2, max_stops = 4, iterations = 50)
+  expect_true(tight$fits)
+  expect_lte(tight$summary$routes[tight$summary$base == "base2"], 2)
+  # a fixed cost per route reduces the number of routes when the limits allow
+  cheap <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 2), days = 5, max_stops = 8, iterations = 50)
+  dear <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 2), days = 5, max_stops = 8, iterations = 50,
+                             cost_model = field_cost_model(per_travel = 1, per_route = 1000))
+  expect_lte(nrow(dear$calendar), nrow(cheap$calendar))
+  short <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 1, base2 = 1), days = 1, max_stops = 4, iterations = 20)
+  expect_false(short$fits)
+  expect_true(any(short$summary$days_needed > 1))
+  expect_setequal(unlist(short$calendar$units), paste0("s", 1:30))
   expect_error(schedule_fieldwork(m, paste0("s", 1:30), teams = c(2, 1), days = 3), "named")
   expect_error(schedule_fieldwork(m, paste0("s", 1:30), teams = c(base1 = 2), days = 0), "days")
   expect_error(schedule_fieldwork(m, c("base2", "s1"), teams = c(base1 = 1, base2 = 1), days = 3), "base cannot")

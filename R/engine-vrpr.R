@@ -23,7 +23,7 @@ route_with_vrpr <- function(matrix, units, bases, vehicles, max_length, max_stop
   model <- vrpr::add_clients(model, clients)
   fixed <- if (per_travel > 0) round(per_route / per_travel * scale) else 0
   for (k in seq_along(bases)) {
-    model <- vrpr::add_vehicle_type(model, num_available = as.integer(vehicles[k]), capacity = if (is.finite(capacity)) capacity else sum(demand[ui]) + 1,
+    model <- vrpr::add_vehicle_type(model, num_available = as.integer(if (vehicles[k] < 0) length(units) else vehicles[k]), capacity = if (is.finite(capacity)) capacity else sum(demand[ui]) + 1,
                                     fixed_cost = fixed, max_duration = if (is.finite(max_length)) round(max_length * scale) else Inf, depot = k)
   }
   dist <- round(m[idx, idx, drop = FALSE] * scale); dimnames(dist) <- NULL

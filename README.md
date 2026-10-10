@@ -29,9 +29,10 @@ inside them) and a list frame needs.
   set A instances, largest gap 0.15%), with the Held-Karp bound and a proof of
   optimality when it closes;
   `engine = "vrpr"` hands the same problem to the PyVRP solver.
-- `schedule_fieldwork()` assigns the units to several bases, routes each
-  base and distributes the routes over the teams and the days available: a
-  calendar that says whether the field work fits.
+- `schedule_fieldwork()` solves the multi-depot problem of several bases
+  with their teams and days (assignment, routes and the number of team-days
+  at once) and distributes the routes over the teams and the days available:
+  a calendar that says whether the field work fits.
 - `select_units()` draws a probability sample of segments or cells, within
   strata, by the local pivotal method (spatially balanced), by spatially
   ordered systematic sampling along a Hilbert curve with interpenetrating

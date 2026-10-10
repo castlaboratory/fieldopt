@@ -31,10 +31,11 @@
 #' @param time_limit Seconds of search instead of `iterations` (`NULL` for
 #'   none); the only stopping rule of the `"vrpr"` engine (default 5 s).
 #' @param engine `"fieldopt"` (the built-in solver) or `"vrpr"`, the PyVRP
-#'   solver through the `vrpr` package (in Suggests): stronger on large
-#'   instances and with long runs, with the same inputs and outputs, except
-#'   that it takes one of `max_stops` and `capacity`, gives no lower bound and
-#'   charges a cost model's `per_route` inside its objective.
+#'   solver through the `vrpr` package (in Suggests), with the same inputs and
+#'   outputs, except that it takes one of `max_stops` and `capacity` and gives
+#'   no lower bound. Both engines charge a cost model's `per_route` inside the
+#'   objective (as `per_route / per_travel` travel units per route), so the
+#'   number of routes is itself optimised when a cost model is given.
 #' @param alpha Greediness of the constructions that seed the population, in
 #'   `[0, 1]` (0 greedy, 1 random).
 #' @param seed Seed of the solver.
@@ -101,7 +102,8 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
     res$loads <- vapply(v$routes, function(r) sum(dem[match(r, nm)]), numeric(1))
     res$total <- sum(res$lengths); res$lower_bound <- NA_real_; res$optimal <- FALSE; res$best_iteration <- NA_integer_
   } else {
-    res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, u - 1L, service, dem, as.numeric(max_length),
+    fixed <- if (!is.null(cost_model) && cost_model$per_route > 0 && cost_model$per_travel > 0) cost_model$per_route / cost_model$per_travel else 0
+    res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, -1, fixed, u - 1L, service, dem, as.numeric(max_length),
                     as.numeric(max_stops), as.numeric(capacity), as.integer(iterations), if (is.null(time_limit)) Inf else as.numeric(time_limit), alpha, seed)
   }
   routes <- do.call(rbind, lapply(seq_along(res$routes), function(k) {
@@ -189,4 +191,27 @@ autoplot.fieldopt_routes <- function(object, ...) {
     ggplot2::labs(x = if (geo) "longitude" else "x", y = if (geo) "latitude" else "y", colour = "route") +
     (if (geo) ggplot2::coord_quickmap() else ggplot2::coord_equal()) +
     ggplot2::theme_minimal() + ggplot2::theme(legend.position = "bottom")
+}
+
+# Build a `fieldopt_routes` object from routes given as character vectors of
+# unit names (used by the schedule and by the vrpr engine).
+routes_object <- function(matrix, route_list, depot, service, demand, limits, cost_model = NULL, engine = "fieldopt",
+                          lower_bound = NA_real_, optimal = FALSE, best_iteration = NA_integer_) {
+  nm <- rownames(matrix); mm <- unclass(matrix)
+  lengths <- vapply(route_list, function(r) mm[depot, r[1]] + sum(mm[cbind(r[-length(r)], r[-1])]) + mm[r[length(r)], depot], numeric(1))
+  durations <- lengths + vapply(route_list, function(r) sum(service[match(r, nm)]), numeric(1))
+  loads <- vapply(route_list, function(r) sum(demand[match(r, nm)]), numeric(1))
+  units <- unlist(route_list); u <- match(units, nm)
+  routes <- do.call(rbind, lapply(seq_along(route_list), function(k) tibble::tibble(route = k, stop = seq_along(route_list[[k]]), unit = route_list[[k]])))
+  total <- sum(lengths)
+  out <- list(routes = routes, lengths = lengths, durations = durations, loads = loads, total = total, lower_bound = lower_bound,
+              optimal = optimal, gap = if (!is.na(lower_bound) && lower_bound > 0) (total - lower_bound) / lower_bound else NA_real_,
+              best_iteration = best_iteration, n_routes = length(route_list), depot = depot, units = units, limits = limits,
+              service_time = service, demand = demand, options = list(), engine = engine,
+              travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"), matrix = matrix)
+  if (!is.null(cost_model)) {
+    out$cost <- cost_of(cost_model, total, length(u), u, n_routes = length(route_list))
+    out$cost_model <- cost_model
+  }
+  structure(out, class = "fieldopt_routes")
 }

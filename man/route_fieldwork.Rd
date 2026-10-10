@@ -57,10 +57,11 @@ none); the only stopping rule of the \code{"vrpr"} engine (default 5 s).}
 \item{cost_model}{Optional \code{\link[=field_cost_model]{field_cost_model()}} to price the solution.}
 
 \item{engine}{\code{"fieldopt"} (the built-in solver) or \code{"vrpr"}, the PyVRP
-solver through the \code{vrpr} package (in Suggests): stronger on large
-instances and with long runs, with the same inputs and outputs, except
-that it takes one of \code{max_stops} and \code{capacity}, gives no lower bound and
-charges a cost model's \code{per_route} inside its objective.}
+solver through the \code{vrpr} package (in Suggests), with the same inputs and
+outputs, except that it takes one of \code{max_stops} and \code{capacity} and gives
+no lower bound. Both engines charge a cost model's \code{per_route} inside the
+objective (as \code{per_route / per_travel} travel units per route), so the
+number of routes is itself optimised when a cost model is given.}
 }
 \value{
 An object of class \code{fieldopt_routes}: \code{routes} (a tibble with
