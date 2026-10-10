@@ -28,14 +28,17 @@ segments of about 1 km²) with a list of large producers alongside.
 
 ```{r frame}
 library(fieldopt)
+library(dplyr, warn.conflicts = FALSE)
+library(tidyr)
 set.seed(2026)
 side <- 30
-cells <- expand.grid(x = seq_len(side), y = seq_len(side))
-cells$unit <- paste0("c", seq_len(nrow(cells)))
-use <- 0.5 * cells$x / side + 0.3 * sin(cells$y / 4) + rnorm(nrow(cells), sd = 0.15)
-cells$intensity <- cut(use, c(-Inf, 0.25, 0.5, Inf), c("low", "mid", "high"))
-cells$size <- c(low = 1, mid = 2, high = 4)[as.character(cells$intensity)]
-table(cells$intensity)
+cells <- expand_grid(x = seq_len(side), y = seq_len(side)) |>
+  mutate(unit = paste0("c", row_number()),
+         use = 0.5 * x / side + 0.3 * sin(y / 4) + rnorm(n(), sd = 0.15),
+         intensity = cut(use, c(-Inf, 0.25, 0.5, Inf), c("low", "mid", "high")),
+         size = c(low = 1, mid = 2, high = 4)[as.character(intensity)]) |>
+  select(-use)
+cells |> count(intensity)
 ```
 
 Each cell holds a few establishments; the agricultural area of an
@@ -44,10 +47,11 @@ cell has two establishments with 40 % and 20 % of its area, and a crop value
 per establishment that follows the intensity.
 
 ```{r establishments}
-areas <- rbind(
-  data.frame(establishment = paste0(cells$unit, "-1"), unit = cells$unit, area = 0.4),
-  data.frame(establishment = paste0(cells$unit, "-2"), unit = cells$unit, area = 0.2))
-areas$y <- round(rgamma(nrow(areas), shape = 4, rate = 4 / (20 * areas$area * cells$size[match(areas$unit, cells$unit)])), 1)
+areas <- bind_rows(cells |> transmute(unit, establishment = paste0(unit, "-1"), area = 0.4),
+                   cells |> transmute(unit, establishment = paste0(unit, "-2"), area = 0.2)) |>
+  left_join(cells |> select(unit, size), by = "unit") |>
+  mutate(y = round(rgamma(n(), shape = 4, rate = 4 / (20 * area * size)), 1)) |>
+  select(-size)
 truth <- sum(areas$y)
 truth
 ```
@@ -76,11 +80,12 @@ hits establishment 1 with probability 0.4, establishment 2 with probability
 
 ```{r field}
 set.seed(8)
-u <- runif(nrow(points))
-which_e <- ifelse(u < 0.4, "-1", ifelse(u < 0.6, "-2", NA))
-hits <- data.frame(unit = points$unit, establishment = paste0(points$unit, which_e))[!is.na(which_e), ]
-hits$y <- areas$y[match(hits$establishment, areas$establishment)]
-nrow(hits); length(unique(hits$establishment))
+hits <- points |>
+  mutate(u = runif(n()), which = case_when(u < 0.4 ~ "-1", u < 0.6 ~ "-2")) |>
+  filter(!is.na(which)) |>
+  transmute(unit, establishment = paste0(unit, which)) |>
+  left_join(areas |> select(establishment, y), by = "establishment")
+c(hits = nrow(hits), establishments = n_distinct(hits$establishment))
 ```
 
 ## The multiplicity estimator
@@ -92,7 +97,7 @@ and their point densities.
 
 ```{r estimate}
 eh <- expected_hits(areas, cells_s, points_per_cell = ppc, cell_size = 1)
-hits$expected_hits <- eh$expected_hits[match(hits$establishment, eh$establishment)]
+hits <- hits |> left_join(eh |> select(establishment, expected_hits), by = "establishment")
 point_estimator(hits, cells_s)
 truth
 ```
@@ -103,8 +108,8 @@ sample with four interpenetrating replicates give a replicate-based variance
 instead:
 
 ```{r systematic}
-cells_r <- select_units(cells, n = n_h, strata = "intensity", method = "systematic", replicates = 4, seed = 7)
-cells_r$crop <- tapply(areas$y, areas$unit, sum)[cells_r$unit]
+cells <- cells |> left_join(areas |> group_by(unit) |> summarise(crop = sum(y)), by = "unit")
+cells_r <- cells |> select_units(n = n_h, strata = "intensity", method = "systematic", replicates = 4, seed = 7)
 design_variance(cells_r, "crop")
 ```
 
@@ -116,7 +121,7 @@ below need, and it depends on how many cells are visited and how spread they
 are, which is why it is computed rather than assumed.
 
 ```{r cost}
-frame <- rbind(data.frame(unit = "depot", x = side / 2, y = side / 2), cells[, c("unit", "x", "y")])
+frame <- bind_rows(tibble(unit = "depot", x = side / 2, y = side / 2), cells |> select(unit, x, y))
 model <- field_cost_model(per_travel = 2.5, per_unit = 60, per_interview = 25,
                           interviews_per_unit = 4, currency = "BRL")
 routed_unit_cost(frame, "depot", model, n = sum(n_h), method = "euclidean",
@@ -149,10 +154,9 @@ precision. `two_stage_design()` measures the cost per cell by routing a
 sample of the allocated size and iterates until the number of cells settles.
 
 ```{r twostage}
-cell_tot <- tapply(areas$y, areas$unit, sum)
 ts <- two_stage_design(frame, "depot", model, m_secondary = 9,
-                       s2_between = var(cell_tot / 9), s2_within = var(areas$y) * 2,
-                       target_cv = 0.05, mean = mean(cell_tot) / 9,
+                       s2_between = var(cells$crop / 9), s2_within = var(areas$y) * 2,
+                       target_cv = 0.05, mean = mean(cells$crop) / 9,
                        method = "euclidean", n_rep = 3, iterations = 60)
 ts
 ts$history
@@ -170,9 +174,9 @@ the area sample size settles; `theta = "screening"` gives the design in
 which the area sample does not use the overlap.
 
 ```{r dualframe}
-domains <- data.frame(domain = c("a", "ab", "b"),
-                      size = c(1500, 250, 50),
-                      mean = c(6, 30, 45), sd = c(5, 20, 35))
+domains <- tibble(domain = c("a", "ab", "b"),
+                  size = c(1500, 250, 50),
+                  mean = c(6, 30, 45), sd = c(5, 20, 35))
 df <- dual_frame_design(frame, "depot", model, domains, cost_b = 45, deff_a = deff$deff,
                         target_cv = 0.05, method = "euclidean", n_rep = 3, iterations = 60)
 df
@@ -200,15 +204,15 @@ difference between the two estimates of the overlap size. The variances come
 from the variance estimator of each design.
 
 ```{r dual-estimate}
-cells$domain <- ifelse(cells$intensity == "high" & runif(nrow(cells)) < 0.6, "ab", "a")
-cells$crop_est <- ifelse(cells$domain == "ab", 60, 12) + rnorm(nrow(cells), sd = 3)
-ab <- cells[cells$domain == "ab", ]   # the overlap: the same holdings, seen from the list
-list_frame <- data.frame(unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:12)),
-                         x = runif(nrow(ab) + 12), y = runif(nrow(ab) + 12),
-                         domain = rep(c("ab", "b"), c(nrow(ab), 12)),
-                         crop_est = c(ab$crop_est, 90 + rnorm(12, sd = 5)))
-sa <- select_units(cells, n = 40, strata = "intensity", seed = 3)
-sb <- select_units(list_frame, n = 20, method = "srs", seed = 4)
+cells <- cells |>
+  mutate(domain = if_else(intensity == "high" & runif(n()) < 0.6, "ab", "a"),
+         crop_est = if_else(domain == "ab", 60, 12) + rnorm(n(), sd = 3))
+overlap <- cells |> filter(domain == "ab")      # the same holdings, seen from the list
+list_frame <- bind_rows(overlap |> transmute(unit = paste0("l", row_number()), domain, crop_est),
+                        tibble(unit = paste0("b", 1:12), domain = "b", crop_est = 90 + rnorm(12, sd = 5))) |>
+  mutate(x = runif(n()), y = runif(n()))
+sa <- cells |> select_units(n = 40, strata = "intensity", seed = 3)
+sb <- list_frame |> select_units(n = 20, method = "srs", seed = 4)
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain")
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", theta = "screening")
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", estimator = "fuller-burmeister")
@@ -241,13 +245,13 @@ Horvitz-Thompson estimates of the auxiliaries match their totals.
 (Stevens and Olsen's Voronoi measure: zero is perfect).
 
 ```{r auxiliaries}
-cells$farmland <- cells$size * runif(nrow(cells), 15, 35)
-cells$crop_r <- 0.5 * cells$farmland + rnorm(nrow(cells), sd = 3)
-s_lpm <- select_units(cells, n = 40, strata = "intensity", seed = 5)
-ratio_estimator(s_lpm, y = "crop_r", x = "farmland")[, c("total", "se", "variance", "variance_ht")]
-s_cube <- select_units(cells, n = 40, strata = "intensity", method = "cube", balance = "farmland", seed = 5)
-c(lpm = spatial_balance(s_lpm), cube = spatial_balance(s_cube),
-  srs = spatial_balance(select_units(cells, n = 40, strata = "intensity", method = "srs", seed = 5)))
+cells <- cells |> mutate(farmland = size * runif(n(), 15, 35), crop_r = 0.5 * farmland + rnorm(n(), sd = 3))
+s_lpm <- cells |> select_units(n = 40, strata = "intensity", seed = 5)
+ratio_estimator(s_lpm, y = "crop_r", x = "farmland") |> select(total, se, variance, variance_ht)
+s_cube <- cells |> select_units(n = 40, strata = "intensity", method = "cube", balance = "farmland", seed = 5)
+s_srs <- cells |> select_units(n = 40, strata = "intensity", method = "srs", seed = 5)
+tibble(design = c("lpm", "cube", "srs"),
+       balance = c(spatial_balance(s_lpm), spatial_balance(s_cube), spatial_balance(s_srs)))
 ```
 
 ## References

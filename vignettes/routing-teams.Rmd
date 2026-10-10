@@ -20,22 +20,22 @@ cost differs. This vignette compares those organisations on one sample.
 
 ``` r
 library(fieldopt)
+library(dplyr, warn.conflicts = FALSE)
 set.seed(7)
-frame <- data.frame(unit = c("depot", paste0("s", 1:60)),
-                    lat = c(-8.05, -8.05 + runif(60, -0.25, 0.25)),
-                    lon = c(-35.00, -35.00 + runif(60, -0.35, 0.35)))
+frame <- tibble(unit = c("depot", paste0("s", 1:60)),
+                lat = c(-8.05, -8.05 + runif(60, -0.25, 0.25)),
+                lon = c(-35.00, -35.00 + runif(60, -0.35, 0.35)))
 m <- travel_matrix(frame)
 model <- field_cost_model(per_travel = 1.8, per_unit = 40, per_interview = 12,
                           interviews_per_unit = 6, currency = "BRL")
-s <- frame[-1, ] |> select_units(n = 18, seed = 3)
-sel <- s$unit[s$sampled]
+s <- frame |> filter(unit != "depot") |> select_units(n = 18, seed = 3)
 ```
 
 ## One tour
 
 
 ``` r
-one <- route_fieldwork(m, units = sel, depot = "depot", cost_model = model)
+one <- route_fieldwork(m, units = s, depot = "depot", cost_model = model)
 one
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
@@ -53,7 +53,7 @@ here 100 km. The solver splits the tour optimally under that limit (Prins
 
 
 ``` r
-days <- route_fieldwork(m, units = sel, depot = "depot", max_length = 100,
+days <- route_fieldwork(m, units = s, depot = "depot", max_length = 100,
                         cost_model = model)
 days
 #> 
@@ -76,7 +76,7 @@ A team that can interview at most four units a day has a stop limit instead.
 
 
 ``` r
-stops <- route_fieldwork(m, units = sel, depot = "depot", max_stops = 4,
+stops <- route_fieldwork(m, units = s, depot = "depot", max_stops = 4,
                          cost_model = model)
 stops
 #> 
@@ -95,14 +95,16 @@ stops
 
 
 ``` r
-data.frame(organisation = c("one tour", "100 km per route", "4 stops per route"),
-           routes = c(one$n_routes, days$n_routes, stops$n_routes),
-           travel_km = round(c(one$total, days$total, stops$total), 1),
-           cost = round(c(one$cost[["total"]], days$cost[["total"]], stops$cost[["total"]])))
-#>        organisation routes travel_km cost
-#> 1          one tour      1     260.6 2485
-#> 2  100 km per route      4     354.8 2655
-#> 3 4 stops per route      5     372.0 2686
+bind_rows(`one tour` = glance(one), `100 km per route` = glance(days), `4 stops per route` = glance(stops),
+          .id = "organisation") |>
+  select(organisation, n_routes, travel_km = total, cost) |>
+  mutate(across(c(travel_km, cost), round))
+#> # A tibble: 3 × 4
+#>   organisation      n_routes travel_km  cost
+#>   <chr>                <int>     <dbl> <dbl>
+#> 1 one tour                 1       261  2485
+#> 2 100 km per route         4       355  2655
+#> 3 4 stops per route        5       372  2686
 ```
 
 The travel grows with the number of routes because every route starts and
@@ -135,7 +137,7 @@ m_detour
 
 ``` r
 m_road <- travel_matrix(frame, method = "osrm", measure = "duration")
-route_fieldwork(m_road, units = sel, depot = "depot", max_length = 480)   # 8 hours per route
+route_fieldwork(m_road, units = s, depot = "depot", max_length = 480)   # 8 hours per route
 ```
 
 The `snap` attribute of an OSRM matrix gives the distance from each unit to
@@ -156,7 +158,7 @@ daily <- field_cost_model(per_travel = 0.5, per_route = 400, per_unit = 20, per_
                           interviews_per_unit = 3, currency = "BRL")
 day <- frame |>
   travel_matrix(detour = 1.3, speed = 60) |>                    # kilometres at 60 km/h: minutes
-  route_fieldwork(units = sel, depot = "depot", max_length = 480, service_time = 120,
+  route_fieldwork(units = s, depot = "depot", max_length = 480, service_time = 120,
                   iterations = 50, cost_model = daily)
 day
 #> 
@@ -172,9 +174,9 @@ day
 #> Cost (BRL): travel 285.7 + routes 2400 + units 360 + interviews 810 = 3856.
 glance(day)
 #> # A tibble: 1 × 9
-#>   n_units n_routes total lower_bound   gap optimal longest_route travel_unit
-#>     <int>    <int> <dbl>       <dbl> <dbl> <lgl>           <dbl> <chr>      
-#> 1      18        6  571.        247.  1.32 FALSE            116. min        
+#>   n_units n_routes  total lower_bound    gap optimal longest_route travel_unit
+#>     <int>    <int>  <dbl>       <dbl>  <dbl> <lgl>           <dbl> <chr>      
+#> 1      18        6 571.38      246.68 1.3163 FALSE          115.98 min        
 #> # ℹ 1 more variable: cost <dbl>
 ```
 
@@ -187,7 +189,7 @@ calendar says who goes where on which day and whether the work fits.
 
 
 ``` r
-bases <- data.frame(unit = c("depot", "base2"), lat = c(-8.05, -8.30), lon = c(-35.00, -35.30))
+bases <- tibble(unit = c("depot", "base2"), lat = c(-8.05, -8.30), lon = c(-35.00, -35.30))
 sch <- s |>
   travel_matrix(bases = bases, detour = 1.3, speed = 60) |>
   schedule_fieldwork(units = s, teams = c(depot = 1, base2 = 1), days = 6,
@@ -199,16 +201,16 @@ sch
 #> "depot": 15 units, 1 team, 5 routes, 5 of 6 days.
 #> "base2": 3 units, 1 team, 1 route, 1 of 6 days.
 #> Cost (BRL): 3852.
-head(sch$calendar[, c("base", "team", "day", "stops", "travel", "duration")])
+sch$calendar |> select(base, team, day, stops, travel, duration) |> head()
 #> # A tibble: 6 × 6
-#>   base  team      day stops travel duration
-#>   <chr> <chr>   <int> <int>  <dbl>    <dbl>
-#> 1 base2 base2-1     1     3   97.7     458.
-#> 2 depot depot-1     1     3  116.      476.
-#> 3 depot depot-1     2     3  113.      473.
-#> 4 depot depot-1     3     3   99.3     459.
-#> 5 depot depot-1     4     3   80.0     440.
-#> 6 depot depot-1     5     3   58.6     419.
+#>   base  team      day stops  travel duration
+#>   <chr> <chr>   <int> <int>   <dbl>    <dbl>
+#> 1 base2 base2-1     1     3  97.735   457.73
+#> 2 depot depot-1     1     3 115.98    475.98
+#> 3 depot depot-1     2     3 113.02    473.02
+#> 4 depot depot-1     3     3  99.319   459.32
+#> 5 depot depot-1     4     3  80.049   440.05
+#> 6 depot depot-1     5     3  58.638   418.64
 autoplot(sch)
 ```
 
@@ -228,7 +230,7 @@ solves that distribution exactly as a small integer programme with the
 
 
 ``` r
-off <- data.frame(team = "depot-1", day = 1, available = FALSE)
+off <- tibble(team = "depot-1", day = 1, available = FALSE)
 cal <- schedule_calendar(sch, availability = off)
 cal$summary
 #> # A tibble: 2 × 7
@@ -265,11 +267,13 @@ optimum; judge those by the benchmark below rather than by the gap.
 
 
 ``` r
-quick <- route_fieldwork(m, units = sel, depot = "depot", iterations = 10, seed = 2)
-long <- route_fieldwork(m, units = sel, depot = "depot", iterations = 500, seed = 2)
-c(quick = quick$total, long = long$total, bound = long$lower_bound)
-#>    quick     long    bound 
-#> 260.6363 260.6363 260.6363
+r_quick <- route_fieldwork(m, units = s, depot = "depot", iterations = 10, seed = 2)
+r_long <- route_fieldwork(m, units = s, depot = "depot", iterations = 500, seed = 2)
+tibble(quick = r_quick$total, long = r_long$total, bound = r_long$lower_bound)
+#> # A tibble: 1 × 3
+#>    quick   long  bound
+#>    <dbl>  <dbl>  <dbl>
+#> 1 260.64 260.64 260.64
 ```
 
 The solver was run on classical benchmark instances with rounded Euclidean
@@ -311,10 +315,12 @@ optimises the assignment of units to bases jointly with the routes.
 
 
 ``` r
-v <- route_fieldwork(m, units = sel, depot = "depot", max_length = 100,
+v <- route_fieldwork(m, units = s, depot = "depot", max_length = 100,
                      cost_model = model, engine = "vrpr", time_limit = 1)
-c(fieldopt = days$total, vrpr = v$total)
-#> fieldopt     vrpr 
-#> 354.8313 354.8313
+tibble(fieldopt = days$total, vrpr = v$total)
+#> # A tibble: 1 × 2
+#>   fieldopt   vrpr
+#>      <dbl>  <dbl>
+#> 1   354.83 354.83
 ```
 

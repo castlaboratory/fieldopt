@@ -22,10 +22,11 @@ stratum, in its two forms.
 
 ```{r setup}
 library(fieldopt)
-strata <- data.frame(stratum = c("list: large", "list: small", "area"),
-                     size = c(300, 2500, 900),
-                     sd = c(80, 12, 35),
-                     cost = c(60, 35, 190))
+library(dplyr, warn.conflicts = FALSE)
+strata <- tibble(stratum = c("list: large", "list: small", "area"),
+                 size = c(300, 2500, 900),
+                 sd = c(80, 12, 35),
+                 cost = c(60, 35, 190))
 strata
 ```
 
@@ -63,9 +64,10 @@ until the stratum costs and sample sizes agree.
 ```{r loop, eval = FALSE}
 f <- cost_variance_frontier(area_frame, depot = "depot", cost_model = model,
                             n_grid = c(40, 60, 80, 100), y = "crop")
-per_unit <- f$cost_mean / f$n
-strata$cost[strata$stratum == "area"] <- per_unit[which.min(abs(f$n - a$n[3]))]
-frame_allocation(strata, target_variance = 2.5e7)
+area_cost <- f |> slice_min(abs(n - a$n[3]), n = 1) |> pull(cost_per_unit)
+strata |>
+  mutate(cost = if_else(stratum == "area", area_cost, cost)) |>
+  frame_allocation(target_variance = 2.5e7)
 ```
 
 Overlap between the frames (farms present in both) is not modelled here;
@@ -80,9 +82,9 @@ the multipliers say which targets bind, and `glance()` shows the variance
 attained for each.
 
 ```{r multi}
-multi <- data.frame(stratum = c("list", "area-high", "area-low"),
-                    size = c(2000, 300, 500), cost = c(40, 200, 160),
-                    sd_crop = c(12, 35, 18), sd_cattle = c(30, 10, 25))
+multi <- tibble(stratum = c("list", "area-high", "area-low"),
+                size = c(2000, 300, 500), cost = c(40, 200, 160),
+                sd_crop = c(12, 35, 18), sd_cattle = c(30, 10, 25))
 ma <- multivariate_allocation(multi, sd = c("sd_crop", "sd_cattle"),
                               target_cv = c(0.04, 0.06), totals = c(120000, 90000))
 ma

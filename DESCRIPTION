@@ -44,11 +44,13 @@ Suggests:
     highs,
     knitr,
     osrm,
+    purrr,
     Matrix,
     rmarkdown,
     sf,
     survey,
     testthat (>= 3.0.0),
+    tidyr,
     vrpr
 VignetteBuilder: 
     knitr

@@ -28,11 +28,11 @@ leave from and return to. Here the frame is synthetic: forty segments in a
 
 ```{r setup}
 library(fieldopt)
+library(dplyr, warn.conflicts = FALSE)
 set.seed(2026)
-frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
-                    x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
-frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40, sd = 2))
-head(frame)
+frame <- tibble(unit = c("depot", paste0("s", 1:40)), x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))) |>
+  mutate(crop = if_else(unit == "depot", NA_real_, 20 + 3 * x + rnorm(n(), sd = 2)))
+frame
 ```
 
 A real frame usually starts as a spatial object: `as_frame()` turns an `sf`
@@ -75,8 +75,8 @@ units over the territory, which is exactly what makes the field work longer.
 Making that tension explicit is the point of the package.
 
 ```{r select}
-s <- frame[frame$unit != "depot", ] |> select_units(n = 12)
-s |> sampled() |> subset(select = c(unit, x, y, pi))
+s <- frame |> filter(unit != "depot") |> select_units(n = 12)
+s |> sampled() |> select(unit, x, y, pi)
 ```
 
 `route_fieldwork()` routes the field work from the depot through the selected
@@ -89,7 +89,7 @@ the solution is visible. The sample can be piped straight into the routing.
 
 ```{r route}
 r <- s |>
-  travel_matrix(bases = frame[frame$unit == "depot", ], method = "euclidean") |>
+  travel_matrix(bases = frame |> filter(unit == "depot"), method = "euclidean") |>
   route_fieldwork(units = s, depot = "depot", max_stops = 5, cost_model = model)
 r
 autoplot(r)

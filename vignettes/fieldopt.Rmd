@@ -29,18 +29,25 @@ leave from and return to. Here the frame is synthetic: forty segments in a
 
 ``` r
 library(fieldopt)
+library(dplyr, warn.conflicts = FALSE)
 set.seed(2026)
-frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
-                    x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
-frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40, sd = 2))
-head(frame)
-#>    unit        x         y     crop
-#> 1 depot 5.000000 5.0000000       NA
-#> 2    s1 6.986735 3.7120180 38.64570
-#> 3    s2 5.565305 8.7477840 38.25191
-#> 4    s3 1.401400 4.3459731 21.79576
-#> 5    s4 2.857233 4.4013678 29.18513
-#> 6    s5 5.553690 0.8195683 34.99375
+frame <- tibble(unit = c("depot", paste0("s", 1:40)), x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))) |>
+  mutate(crop = if_else(unit == "depot", NA_real_, 20 + 3 * x + rnorm(n(), sd = 2)))
+frame
+#> # A tibble: 41 × 4
+#>    unit      x     y  crop
+#>    <chr> <dbl> <dbl> <dbl>
+#>  1 depot 5     5      NA  
+#>  2 s1    6.99  3.71   42.5
+#>  3 s2    5.57  8.75   34.3
+#>  4 s3    1.40  4.35   24.8
+#>  5 s4    2.86  4.40   26.9
+#>  6 s5    5.55  0.820  39.5
+#>  7 s6    0.251 0.346  22.2
+#>  8 s7    4.66  9.29   33.2
+#>  9 s8    8.61  2.95   47.4
+#> 10 s9    2.53  5.19   28.4
+#> # ℹ 31 more rows
 ```
 
 A real frame usually starts as a spatial object: `as_frame()` turns an `sf`
@@ -89,8 +96,8 @@ Making that tension explicit is the point of the package.
 
 
 ``` r
-s <- frame[frame$unit != "depot", ] |> select_units(n = 12)
-s |> sampled() |> subset(select = c(unit, x, y, pi))
+s <- frame |> filter(unit != "depot") |> select_units(n = 12)
+s |> sampled() |> select(unit, x, y, pi)
 #> # A tibble: 12 × 4
 #>    unit       x     y    pi
 #>    <chr>  <dbl> <dbl> <dbl>
@@ -119,7 +126,7 @@ the solution is visible. The sample can be piped straight into the routing.
 
 ``` r
 r <- s |>
-  travel_matrix(bases = frame[frame$unit == "depot", ], method = "euclidean") |>
+  travel_matrix(bases = frame |> filter(unit == "depot"), method = "euclidean") |>
   route_fieldwork(units = s, depot = "depot", max_stops = 5, cost_model = model)
 r
 #> 
@@ -147,9 +154,9 @@ design_variance(s, y = "crop")
 #> # A tibble: 1 × 8
 #>   total variance    se     cv variance_srs     n     N variance_method
 #>   <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>          
-#> 1 1218.    3295.  57.4 0.0471        6196.    12    40 local-mean
+#> 1 1254.    3158.  56.2 0.0448        5874.    12    40 local-mean
 sum(frame$crop, na.rm = TRUE)
-#> [1] 1241.481
+#> [1] 1241.484
 ```
 
 ## The cost-variance frontier
@@ -169,12 +176,12 @@ f
 #> # A tibble: 6 × 9
 #>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
 #> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>
-#> 1     6      475.   6.08           79.2        27.6           2        20214.
-#> 2     9      701.   4.64           77.9        35.5           2         6631.
-#> 3    12      925.   8.47           77.1        42.7           3         3205.
-#> 4    16     1218.   6.22           76.1        48.9           4         1632.
-#> 5    20     1517.   0.949          75.9        58.7           4          947.
-#> 6    24     1810.   3.69           75.4        65.1           5          554.
+#> 1     6      475.   6.08           79.2        27.6           2        20203.
+#> 2     9      701.   4.64           77.9        35.5           2         5820.
+#> 3    12      925.   8.47           77.1        42.7           3         2958.
+#> 4    16     1218.   6.22           76.1        48.9           4         1198.
+#> 5    20     1517.   0.949          75.9        58.7           4          726.
+#> 6    24     1810.   3.69           75.4        65.1           5          488.
 #> # ℹ 2 more variables: cv_mean <dbl>, n_rep <dbl>
 autoplot(f)
 ```

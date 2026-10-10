@@ -89,19 +89,20 @@ pak::pak("castlaboratory/fieldopt")
 
 ```r
 library(fieldopt)
+library(dplyr)
 
 set.seed(1)
-frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
-                    x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
-frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40))
+frame <- tibble(unit = c("depot", paste0("s", 1:40)),
+                x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))) |>
+  mutate(crop = if_else(unit == "depot", NA_real_, 20 + 3 * x + rnorm(n())))
 
 model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
                           interviews_per_unit = 4, currency = "BRL")
 
 # one design: select, route, price, estimate
-s <- frame[frame$unit != "depot", ] |> select_units(n = 12)
+s <- frame |> filter(unit != "depot") |> select_units(n = 12)
 r <- s |>
-  travel_matrix(bases = frame[frame$unit == "depot", ], method = "euclidean") |>
+  travel_matrix(bases = frame |> filter(unit == "depot"), method = "euclidean") |>
   route_fieldwork(units = s, depot = "depot", max_stops = 5, cost_model = model)
 r
 design_variance(s, y = "crop")
