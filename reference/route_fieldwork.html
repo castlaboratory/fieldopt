@@ -7,8 +7,11 @@ population of giant tours, order crossover, the optimal split of Prins
 (2004) under the limits, and a local search with granular neighbourhoods
 (2-opt, Or-opt, relocate, swap, 2-opt*). The gap to a lower bound is
 reported: the Held-Karp bound for a single tour on a symmetric matrix
-(usually within a few percent of the optimum), a loose bound otherwise;
-optimal says when the solution is proven optimal."><meta property="og:description" content="Finds low-cost routes from a depot through the selected units: one route
+(usually within a few percent of the optimum), a loose bound otherwise.
+For a single tour, a branch-and-bound on Held-Karp 1-trees then tries to
+close the gap within certify seconds; optimal says when the solution
+is proven optimal (most tours of up to about 100 units are, within a few
+seconds)."><meta property="og:description" content="Finds low-cost routes from a depot through the selected units: one route
 when the limits allow it, several otherwise (one per team or per day).
 Instances of up to 13 units are solved exactly (dynamic programming over
 subsets). Larger ones go to a hybrid genetic search (Vidal 2022): a
@@ -16,8 +19,11 @@ population of giant tours, order crossover, the optimal split of Prins
 (2004) under the limits, and a local search with granular neighbourhoods
 (2-opt, Or-opt, relocate, swap, 2-opt*). The gap to a lower bound is
 reported: the Held-Karp bound for a single tour on a symmetric matrix
-(usually within a few percent of the optimum), a loose bound otherwise;
-optimal says when the solution is proven optimal."><meta property="og:image" content="https://castlaboratory.github.io/fieldopt/logo.svg"></head><body>
+(usually within a few percent of the optimum), a loose bound otherwise.
+For a single tour, a branch-and-bound on Held-Karp 1-trees then tries to
+close the gap within certify seconds; optimal says when the solution
+is proven optimal (most tours of up to about 100 units are, within a few
+seconds)."><meta property="og:image" content="https://castlaboratory.github.io/fieldopt/logo.svg"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -74,8 +80,11 @@ population of giant tours, order crossover, the optimal split of Prins
 (2004) under the limits, and a local search with granular neighbourhoods
 (2-opt, Or-opt, relocate, swap, 2-opt*). The <code>gap</code> to a lower bound is
 reported: the Held-Karp bound for a single tour on a symmetric matrix
-(usually within a few percent of the optimum), a loose bound otherwise;
-<code>optimal</code> says when the solution is proven optimal.</p>
+(usually within a few percent of the optimum), a loose bound otherwise.
+For a single tour, a branch-and-bound on Held-Karp 1-trees then tries to
+close the gap within <code>certify</code> seconds; <code>optimal</code> says when the solution
+is proven optimal (most tours of up to about 100 units are, within a few
+seconds).</p>
     </div>
 
     <div class="section level2">
@@ -91,6 +100,7 @@ reported: the Held-Karp bound for a single tour on a symmetric matrix
 <span>  capacity <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  iterations <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  time_limit <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  certify <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cost_model <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -147,6 +157,13 @@ instance is solved exactly or when <code>time_limit</code> is given).</p></dd>
 <dt id="arg-time-limit">time_limit<a class="anchor" aria-label="anchor" href="#arg-time-limit"></a></dt>
 <dd><p>Seconds of search instead of <code>iterations</code> (<code>NULL</code> for
 none); the only stopping rule of the <code>"vrpr"</code> engine (default 5 s).</p></dd>
+
+
+<dt id="arg-certify">certify<a class="anchor" aria-label="anchor" href="#arg-certify"></a></dt>
+<dd><p>Seconds allowed to the branch-and-bound on Held-Karp
+1-trees that tries to prove a single tour optimal (symmetric matrix, no
+limits forcing several routes); <code>0</code> switches it off. It also improves the
+tour when it finds a better one.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>

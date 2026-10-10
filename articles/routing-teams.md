@@ -179,14 +179,14 @@ whether the work fits.
 
 frame2 <- rbind(frame, data.frame(unit = "base2", lat = -8.30, lon = -35.30))
 m2 <- travel_matrix(frame2, detour = 1.3, unit = "min")
-sch <- schedule_fieldwork(m2, units = sel, teams = c(depot = 1, base2 = 1), days = 3,
+sch <- schedule_fieldwork(m2, units = sel, teams = c(depot = 1, base2 = 1), days = 6,
                           max_length = 480, service_time = 120, iterations = 50, cost_model = daily)
 sch
 #> 
 #> ── Field schedule ──────────────────────────────────────────────────────────────
-#> 18 units, 2 bases, 2 teams, 3 days available: the work does not fit.
-#> "depot": 15 units, 1 team, 5 routes, 5 of 3 days (short of days).
-#> "base2": 3 units, 1 team, 1 route, 1 of 3 days.
+#> 18 units, 2 bases, 2 teams, 6 days available: the work fits.
+#> "depot": 15 units, 1 team, 5 routes, 5 of 6 days.
+#> "base2": 3 units, 1 team, 1 route, 1 of 6 days.
 #> Cost (BRL): 3878.
 head(sch$calendar[, c("base", "team", "day", "stops", "travel", "duration")])
 #> # A tibble: 6 × 6
@@ -202,6 +202,26 @@ autoplot(sch)
 ```
 
 ![](routing-teams_files/figure-html/schedule-1.png)
+
+The distribution of the routes over teams and days follows a simple rule
+(longest route first). When the field has constraints of its own, a team
+away on some days, a route that must be done by a given team or before
+another, or short routes that could share a day,
+[`schedule_calendar()`](https://castlaboratory.github.io/fieldopt/reference/schedule_calendar.md)
+solves that distribution exactly as a small integer programme with the
+`highs` package, minimising the last working day.
+
+``` r
+
+off <- data.frame(team = "depot-1", day = 1, available = FALSE)
+cal <- schedule_calendar(sch, availability = off)
+cal$summary
+#> # A tibble: 2 × 7
+#>   base  units teams routes days_needed days_available fits 
+#>   <chr> <int> <dbl>  <int>       <int>          <dbl> <lgl>
+#> 1 depot    15     1      5           6              6 TRUE 
+#> 2 base2     3     1      1           1              6 TRUE
+```
 
 ## The solver and how good it is
 
@@ -219,12 +239,15 @@ that seed the population.
 
 The `gap` is measured against a lower bound. For a single tour on a
 symmetric matrix it is the Held-Karp 1-tree bound, usually within one or
-two percent of the optimum, so a small gap means a solution close to
-optimal. With several routes the only cheap bound is loose (half the sum
-of the cheapest incoming and outgoing edge at each node), and gaps of 50
-to 70 percent are normal for solutions that are in fact within one
-percent of the optimum; judge those by the benchmark below rather than
-by the gap.
+two percent of the optimum, and a branch-and-bound on those 1-trees then
+tries to close it within `certify` seconds (one by default): on the
+TSPLIB instances below, four of the seven tours are proven optimal
+within one second and six within ten, so for a plan that will be used as
+is, give the certificate a few seconds and read `optimal`. With several
+routes the only cheap bound is loose (half the sum of the cheapest
+incoming and outgoing edge at each node), and gaps of 50 to 70 percent
+are normal for solutions that are in fact within one percent of the
+optimum; judge those by the benchmark below rather than by the gap.
 
 ``` r
 

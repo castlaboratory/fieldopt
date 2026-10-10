@@ -144,5 +144,5 @@ two_stage_design(frame, "depot", model, m_secondary = 12, s2_between = 9, s2_wit
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
 #> n = 55 primary units with m = 4 secondary units each (optimal m 4.01): cost
-#> 6904, variance of the total 1785000 (SE 1336, CV 4.95%).
+#> 6903, variance of the total 1785000 (SE 1336, CV 4.95%).
 ```

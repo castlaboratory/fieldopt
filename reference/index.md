@@ -17,6 +17,9 @@
   : Route the field work
 - [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
   : Schedule the field work of several teams from several bases
+- [`schedule_calendar()`](https://castlaboratory.github.io/fieldopt/reference/schedule_calendar.md)
+  : Redistribute the routes of a schedule over teams and days with
+  constraints
 - [`autoplot(`*`<fieldopt_routes>`*`)`](https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_routes.md)
   : Plot the routes
 - [`autoplot(`*`<fieldopt_schedule>`*`)`](https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_schedule.md)

@@ -8,8 +8,11 @@ population of giant tours, order crossover, the optimal split of Prins
 (2004) under the limits, and a local search with granular neighbourhoods
 (2-opt, Or-opt, relocate, swap, 2-opt\*). The `gap` to a lower bound is
 reported: the Held-Karp bound for a single tour on a symmetric matrix
-(usually within a few percent of the optimum), a loose bound otherwise;
-`optimal` says when the solution is proven optimal.
+(usually within a few percent of the optimum), a loose bound otherwise.
+For a single tour, a branch-and-bound on Held-Karp 1-trees then tries to
+close the gap within `certify` seconds; `optimal` says when the solution
+is proven optimal (most tours of up to about 100 units are, within a few
+seconds).
 
 ## Usage
 
@@ -25,6 +28,7 @@ route_fieldwork(
   capacity = Inf,
   iterations = 200,
   time_limit = NULL,
+  certify = 1,
   alpha = 0.3,
   seed = 1,
   cost_model = NULL,
@@ -80,6 +84,13 @@ route_fieldwork(
 
   Seconds of search instead of `iterations` (`NULL` for none); the only
   stopping rule of the `"vrpr"` engine (default 5 s).
+
+- certify:
+
+  Seconds allowed to the branch-and-bound on Held-Karp 1-trees that
+  tries to prove a single tour optimal (symmetric matrix, no limits
+  forcing several routes); `0` switches it off. It also improves the
+  tour when it finds a better one.
 
 - alpha:
 

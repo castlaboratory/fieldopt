@@ -243,14 +243,14 @@ who goes where on which day and whether the work fits.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">frame2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">frame</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>unit <span class="op">=</span> <span class="st">"base2"</span>, lat <span class="op">=</span> <span class="op">-</span><span class="fl">8.30</span>, lon <span class="op">=</span> <span class="op">-</span><span class="fl">35.30</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/travel_matrix.html">travel_matrix</a></span><span class="op">(</span><span class="va">frame2</span>, detour <span class="op">=</span> <span class="fl">1.3</span>, unit <span class="op">=</span> <span class="st">"min"</span><span class="op">)</span></span>
-<span><span class="va">sch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schedule_fieldwork.html">schedule_fieldwork</a></span><span class="op">(</span><span class="va">m2</span>, units <span class="op">=</span> <span class="va">sel</span>, teams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>depot <span class="op">=</span> <span class="fl">1</span>, base2 <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, days <span class="op">=</span> <span class="fl">3</span>,</span>
+<span><span class="va">sch</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schedule_fieldwork.html">schedule_fieldwork</a></span><span class="op">(</span><span class="va">m2</span>, units <span class="op">=</span> <span class="va">sel</span>, teams <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>depot <span class="op">=</span> <span class="fl">1</span>, base2 <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, days <span class="op">=</span> <span class="fl">6</span>,</span>
 <span>                          max_length <span class="op">=</span> <span class="fl">480</span>, service_time <span class="op">=</span> <span class="fl">120</span>, iterations <span class="op">=</span> <span class="fl">50</span>, cost_model <span class="op">=</span> <span class="va">daily</span><span class="op">)</span></span>
 <span><span class="va">sch</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Field schedule</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; 18 units, 2 bases, 2 teams, 3 days available: the work does not fit.</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">"depot"</span>: 15 units, 1 team, 5 routes, 5 of 3 days (short of days).</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">"base2"</span>: 3 units, 1 team, 1 route, 1 of 3 days.</span></span>
+<span><span class="co">#&gt; 18 units, 2 bases, 2 teams, 6 days available: the work fits.</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">"depot"</span>: 15 units, 1 team, 5 routes, 5 of 6 days.</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">"base2"</span>: 3 units, 1 team, 1 route, 1 of 6 days.</span></span>
 <span><span class="co">#&gt; Cost (BRL): 3878.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sch</span><span class="op">$</span><span class="va">calendar</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"team"</span>, <span class="st">"day"</span>, <span class="st">"stops"</span>, <span class="st">"travel"</span>, <span class="st">"duration"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
@@ -264,6 +264,22 @@ who goes where on which day and whether the work fits.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> depot depot-1     5     3   71.1     431.</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">sch</span><span class="op">)</span></span></code></pre></div>
 <p><img src="routing-teams_files/figure-html/schedule-1.png" class="r-plt" alt="" width="624"></p>
+<p>The distribution of the routes over teams and days follows a simple
+rule (longest route first). When the field has constraints of its own, a
+team away on some days, a route that must be done by a given team or
+before another, or short routes that could share a day,
+<code><a href="../reference/schedule_calendar.html">schedule_calendar()</a></code> solves that distribution exactly as a
+small integer programme with the <code>highs</code> package, minimising
+the last working day.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">off</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>team <span class="op">=</span> <span class="st">"depot-1"</span>, day <span class="op">=</span> <span class="fl">1</span>, available <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">cal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/schedule_calendar.html">schedule_calendar</a></span><span class="op">(</span><span class="va">sch</span>, availability <span class="op">=</span> <span class="va">off</span><span class="op">)</span></span>
+<span><span class="va">cal</span><span class="op">$</span><span class="va">summary</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 7</span></span></span>
+<span><span class="co">#&gt;   base  units teams routes days_needed days_available fits </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> depot    15     1      5           6              6 TRUE </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> base2     3     1      1           1              6 TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="the-solver-and-how-good-it-is">The solver and how good it is<a class="anchor" aria-label="anchor" href="#the-solver-and-how-good-it-is"></a>
@@ -281,13 +297,17 @@ granular neighbourhoods made of 2-opt, Or-opt, relocate, swap, SWAP* and
 the greediness of the constructions that seed the population.</p>
 <p>The <code>gap</code> is measured against a lower bound. For a single
 tour on a symmetric matrix it is the Held-Karp 1-tree bound, usually
-within one or two percent of the optimum, so a small gap means a
-solution close to optimal. With several routes the only cheap bound is
-loose (half the sum of the cheapest incoming and outgoing edge at each
-node), and gaps of 50 to 70 percent are normal for solutions that are in
-fact within one percent of the optimum; judge those by the benchmark
-below rather than by the gap.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+within one or two percent of the optimum, and a branch-and-bound on
+those 1-trees then tries to close it within <code>certify</code> seconds
+(one by default): on the TSPLIB instances below, four of the seven tours
+are proven optimal within one second and six within ten, so for a plan
+that will be used as is, give the certificate a few seconds and read
+<code>optimal</code>. With several routes the only cheap bound is loose
+(half the sum of the cheapest incoming and outgoing edge at each node),
+and gaps of 50 to 70 percent are normal for solutions that are in fact
+within one percent of the optimum; judge those by the benchmark below
+rather than by the gap.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">quick</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span><span class="va">m</span>, units <span class="op">=</span> <span class="va">sel</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, iterations <span class="op">=</span> <span class="fl">10</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">long</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span><span class="va">m</span>, units <span class="op">=</span> <span class="va">sel</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, iterations <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>quick <span class="op">=</span> <span class="va">quick</span><span class="op">$</span><span class="va">total</span>, long <span class="op">=</span> <span class="va">long</span><span class="op">$</span><span class="va">total</span>, bound <span class="op">=</span> <span class="va">long</span><span class="op">$</span><span class="va">lower_bound</span><span class="op">)</span></span>
@@ -394,7 +414,7 @@ schedule jointly. Prefer vrpr for hundreds of units, for time windows or
 for heterogeneous fleets. For a schedule with several bases, the vrpr
 engine optimises the assignment of units to bases jointly with the
 routes.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span><span class="va">m</span>, units <span class="op">=</span> <span class="va">sel</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, max_length <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>                     cost_model <span class="op">=</span> <span class="va">model</span>, engine <span class="op">=</span> <span class="st">"vrpr"</span>, time_limit <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>fieldopt <span class="op">=</span> <span class="va">days</span><span class="op">$</span><span class="va">total</span>, vrpr <span class="op">=</span> <span class="va">v</span><span class="op">$</span><span class="va">total</span><span class="op">)</span></span>
