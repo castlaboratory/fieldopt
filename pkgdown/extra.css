@@ -1,0 +1,29 @@
+/* Tables in articles: readable benchmark and settings tables */
+main table, .contents table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2em 0 1.4em;
+  font-size: 0.92em;
+  line-height: 1.35;
+}
+main table th, .contents table th {
+  text-align: left;
+  background: #f3f6f4;
+  border-top: 2px solid #2E6B3A;
+  border-bottom: 1px solid #c9d3cc;
+  padding: 0.5em 0.65em;
+  font-weight: 600;
+  vertical-align: bottom;
+}
+main table td, .contents table td {
+  padding: 0.45em 0.65em;
+  border-bottom: 1px solid #e3e8e5;
+  vertical-align: top;
+}
+main table tr:nth-child(even) td, .contents table tr:nth-child(even) td { background: #fafbfa; }
+main table th[style*="text-align: right"], main table td[style*="text-align: right"],
+.contents table th[style*="text-align: right"], .contents table td[style*="text-align: right"] {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+main table th[align="right"], main table td[align="right"] { font-variant-numeric: tabular-nums; white-space: nowrap; }

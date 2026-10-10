@@ -1,6 +1,8 @@
 ---
 title: "Get started with fieldopt"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    css: fieldopt.css
 vignette: >
   %\VignetteIndexEntry{Get started with fieldopt}
   %\VignetteEngine{knitr::rmarkdown}

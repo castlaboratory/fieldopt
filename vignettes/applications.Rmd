@@ -1,6 +1,8 @@
 ---
 title: "Where fieldopt applies: beyond agricultural surveys"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    css: fieldopt.css
 vignette: >
   %\VignetteIndexEntry{Where fieldopt applies: beyond agricultural surveys}
   %\VignetteEngine{knitr::rmarkdown}
@@ -17,7 +19,7 @@ them, and the estimate that comes out. Any survey that sends people to
 locations fits. Four settings, each with the functions it uses.
 
 | Setting | Units | What the sample balances on | Field constraint | Functions |
-|---|---|---|---|---|
+|----------------------|------------------|----------------------|------------------|------------------------|
 | Agricultural area frame | grid cells with points | space and farmland intensity | team-days, service per cell | all of them; see the plan vignette |
 | Environmental monitoring (lakes, forest plots, air stations) | sites | space and covariates (altitude, size, land use) | boats or vehicles with a daily range | `select_units(method = "cube")`, `route_fieldwork(service_time = )` |
 | Household survey with enumeration areas | enumeration areas, then households | population size | interviewer-days, several offices | `select_units()`, `two_stage_allocation()`, `schedule_fieldwork(region = )` |

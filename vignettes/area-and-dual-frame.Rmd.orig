@@ -1,6 +1,8 @@
 ---
 title: "An area frame with points, a list frame, and their joint design"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    css: fieldopt.css
 vignette: >
   %\VignetteIndexEntry{An area frame with points, a list frame, and their joint design}
   %\VignetteEngine{knitr::rmarkdown}

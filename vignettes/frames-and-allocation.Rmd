@@ -1,6 +1,8 @@
 ---
 title: "Frames, strata and cost-aware allocation"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    css: fieldopt.css
 vignette: >
   %\VignetteIndexEntry{Frames, strata and cost-aware allocation}
   %\VignetteEngine{knitr::rmarkdown}

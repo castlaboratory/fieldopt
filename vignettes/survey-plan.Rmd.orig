@@ -1,6 +1,8 @@
 ---
 title: "From the frame to the field: a survey plan end to end"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    css: fieldopt.css
 vignette: >
   %\VignetteIndexEntry{From the frame to the field: a survey plan end to end}
   %\VignetteEngine{knitr::rmarkdown}
