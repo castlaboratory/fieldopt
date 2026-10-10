@@ -135,7 +135,12 @@ among `m` randomly placed primary units (after Mahalanobis, Marks 1948 and Ghosh
 model has `C_1`, and the optimum is found by iteration (convergence proved by
 Tepping and Skalak). Ch. 7 §7b does the same for strata with their own travel
 constants. (5.1) is their optimum written with a general `G`; our fitted
-`G(n) = c_0 + a n + b √n` is their cost with `b = C_0`.
+`G(n) = c_0 + a n + b √n` is their cost with `b = C_0`. In Vol. I (ch. 6 §11–15) they
+derive `C_0` from `m` points on a regular grid (route `≈ √(mA)`), add call-backs
+as further `√` terms and stems as an uplift on daily pay, and call the result "a
+very rough approximation" because units are not uniformly spread, roads vary and
+work is not done in one sequential tour. Routing the actual sample is the direct
+answer to that caveat. Call-backs are not modelled here yet (§9).
 Cochran (1977, §5.5) cites Beardwood et al. for a `t_h √n_h` travel term and
 keeps only the linear cost. The contribution here is to *measure* `G_p(n)` by
 routing the sampled units (depots, daily limits, fleets, per-route costs) rather
@@ -243,7 +248,9 @@ passes: balance is worth its travel for spatially structured variables.
    through the selection probabilities.
 5. The dual-frame cost of the list frame is linear; routed cost applies to the area
    frame only.
-6. Nothing here treats panel rotation, nonresponse or measurement error.
+6. Nothing here treats panel rotation, nonresponse or measurement error. Repeat
+   visits for nonresponse (call-backs), which HHM model as extra `√` travel terms,
+   are not routed; a fraction of units revisited would be a second routing problem.
 
 ## 10. What E1 and E2 must answer
 
