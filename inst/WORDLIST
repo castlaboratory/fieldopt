@@ -1,3 +1,4 @@
+areaframe
 Augerat
 auxiliaries
 berlin
@@ -13,6 +14,8 @@ CVRP
 Deville
 eil
 Fuller
+GeoJSON
+GeoPackage
 ggplot
 Grafström
 HGS
@@ -24,6 +27,7 @@ Lohr
 Lundström
 Nealon
 neighborhood
+nonresponse
 Olsen
 OpenStreetMap
 ORCID
@@ -42,3 +46,4 @@ UFPE
 unsampled
 Voronoi
 vrpr
+WKB

@@ -65,8 +65,11 @@ inside them) and a list frame needs.
   of point sampling, the `deff_a` the dual-frame allocation asks for.
 - `cost_variance_frontier()` simulates designs over a grid of sample sizes and
   returns the trade-off between field cost and variance.
-- `as_frame()` and `as_sf()` move between `sf` layers and the plain frames
-  the package works on.
+- `as_frame()`, `as_sf()` and `read_areaframe()` move between spatial layers
+  (or the cells exported by an area-frame service) and the plain frames the
+  package works on; `frame_overlap()` matches a list frame to the cells and
+  marks the overlap domain; `as_svydesign()` hands a sample to the `survey`
+  package for calibration, domains and nonresponse adjustment.
 
 The numerical engine is the Rust crate
 [`fieldopt-core`](https://github.com/castlaboratory/fieldopt-core), usable on

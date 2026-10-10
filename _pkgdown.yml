@@ -27,13 +27,13 @@ navbar:
 
 reference:
 - title: Travel and cost
-  contents: [travel_matrix, field_cost_model, as_frame, as_sf]
+  contents: [travel_matrix, field_cost_model, as_frame, as_sf, read_areaframe]
 - title: Routing the field work
   contents: [route_fieldwork, schedule_fieldwork, schedule_calendar, autoplot.fieldopt_routes, autoplot.fieldopt_schedule, routes-methods]
 - title: Selecting units and points
   contents: [select_units, select_points, spatial_balance, autoplot.fieldopt_sample]
 - title: Estimating
-  contents: [design_variance, ratio_estimator, dual_frame_estimator, segment_estimator, point_estimator, expected_hits, point_design_effect]
+  contents: [design_variance, ratio_estimator, dual_frame_estimator, as_svydesign, frame_overlap, segment_estimator, point_estimator, expected_hits, point_design_effect]
 - title: Allocation
   contents: [frame_allocation, multivariate_allocation, dual_frame_allocation, two_stage_allocation, allocation-methods]
 - title: Allocation with the routed field cost

@@ -85,8 +85,9 @@
 <text x="218.0" y="501.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">cost and variance per sample size:</text>
 <text x="218.0" y="516.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">select, route, price, estimate</text>
 <rect x="412" y="462" width="348" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
-<text x="586.0" y="488.1" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">as_frame(), as_sf()</text>
-<text x="586.0" y="509.1" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">sf layers in (centroids, areas), samples and results out</text>
+<text x="586.0" y="481.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1A202C">as_frame(), as_sf(), read_areaframe()</text>
+<text x="586.0" y="501.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">sf layers and the area-frame service in, results out;</text>
+<text x="586.0" y="515.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#2D3748">frame_overlap(), as_svydesign() to the survey package</text>
 <rect x="440" y="580" width="320" height="44" rx="8" fill="#FFF8E6" stroke="#B7791F" stroke-width="1.6"/>
 <text x="600.0" y="596.0" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">extendr bindings (src/rust/src/lib.rs)</text>
 <text x="600.0" y="617.0" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">plain vectors in, vectors and lists out</text>

@@ -39,6 +39,7 @@ Imports:
     stats,
     tibble
 Suggests: 
+    arrow,
     dplyr,
     highs,
     knitr,
@@ -46,6 +47,7 @@ Suggests:
     Matrix,
     rmarkdown,
     sf,
+    survey,
     testthat (>= 3.0.0),
     vrpr
 VignetteBuilder: 

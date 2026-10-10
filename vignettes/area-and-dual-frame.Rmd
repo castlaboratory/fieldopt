@@ -182,6 +182,13 @@ dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$de
 
 ## Estimating from both frames
 
+The domains come from the overlap between the frames: `frame_overlap()`
+places each listed establishment in the cell it falls in (by coordinates,
+by polygons, or by a table of pairs from record linkage, for example with
+the `reclin2` package) and marks it `ab` or `b`, and tells each cell which
+listed establishments it holds, which is what the teams use to screen the
+overlap out of the area sample.
+
 Once both samples are in, `dual_frame_estimator()` combines them. Each
 sampled unit carries its domain (`a` or `ab` on the area frame, `b` or `ab`
 on the list); Hartley's estimator mixes the two estimates of the overlap with
@@ -209,6 +216,17 @@ The selection scales to national frames: the local pivotal method and the
 systematic and cube methods run on a million cells in about a second (a grid
 index keeps the nearest-neighbour searches local), and the selection is done
 within strata, so the size of the whole frame is not a constraint.
+
+For everything else the estimation needs, calibration to known totals,
+domain estimates, nonresponse adjustment, `as_svydesign()` hands a sample
+to the `survey` package as a design object with the right weights, strata
+and, for replicated systematic samples, the replicate weights.
+
+```{r survey, eval = requireNamespace("survey", quietly = TRUE)}
+d <- as_svydesign(sa)
+survey::svytotal(~crop_est, d)
+survey::svyby(~crop_est, ~intensity, d, survey::svytotal)
+```
 
 ## Auxiliaries: the ratio estimator and balanced samples
 
