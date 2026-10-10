@@ -115,9 +115,9 @@ sch$calendar
 #> 1 base1 base1-1     1     2     4  14.4     14.4  <chr [4]>
 #> 2 base1 base1-2     1     1     4  10.8     10.8  <chr [4]>
 #> 3 base1 base1-2     2     3     3   6.14     6.14 <chr [3]>
-#> 4 base2 base2-1     1     1     4  13.9     13.9  <chr [4]>
-#> 5 base2 base2-1     2     4     4  13.7     13.7  <chr [4]>
-#> 6 base2 base2-1     3     2     4  12.8     12.8  <chr [4]>
-#> 7 base2 base2-1     4     3     4   8.87     8.87 <chr [4]>
-#> 8 base2 base2-1     5     5     3   8.85     8.85 <chr [3]>
+#> 4 base2 base2-1     1     3     4  13.8     13.8  <chr [4]>
+#> 5 base2 base2-1     2     5     4  13.7     13.7  <chr [4]>
+#> 6 base2 base2-1     3     4     4  10.7     10.7  <chr [4]>
+#> 7 base2 base2-1     4     2     4   8.87     8.87 <chr [4]>
+#> 8 base2 base2-1     5     1     3   8.56     8.56 <chr [3]>
 ```

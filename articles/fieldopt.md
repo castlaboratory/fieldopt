@@ -117,11 +117,11 @@ r <- route_fieldwork(m, units = s$unit[s$sampled], depot = "depot",
 r
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 3 routes from "depot" through 12 units: total travel 38.74 distance (lower
-#> bound 25.87, gap 49.7%).
-#> Route 1 (13.93): s27 > s15 > s24 > s20 > s32
-#> Route 2 (17.02): s37 > s19 > s2 > s14 > s12
-#> Route 3 (7.786): s1 > s35
+#> 3 routes from "depot" through 12 units: total travel 38.74 distance (proven
+#> optimal).
+#> Route 1 (7.786): s1 > s35
+#> Route 2 (17.02): s12 > s14 > s2 > s19 > s37
+#> Route 3 (13.93): s27 > s15 > s24 > s20 > s32
 #> Cost (BRL): travel 77.47 + routes 0 + units 360 + interviews 480 = 917.5.
 autoplot(r)
 ```
@@ -165,12 +165,12 @@ f
 #> # A tibble: 6 × 9
 #>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
 #> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>
-#> 1     6      475.    5.92          79.2        27.6        2           20211.
-#> 2     9      701.    6.89          77.9        35.5        2.25         6185.
-#> 3    12      925.    7.68          77.1        42.7        3.25         3122.
-#> 4    16     1223.    6.12          76.4        51.3        4            1632.
-#> 5    20     1518.    4.33          75.9        59.2        4.38          909.
-#> 6    24     1810.    5.25          75.4        65.1        5.38          558.
+#> 1     6      475.    5.92          79.2        27.6           2        20211.
+#> 2     9      700.    6.77          77.8        35.0           2         6185.
+#> 3    12      925.    7.95          77.1        42.6           3         3122.
+#> 4    16     1222.    6.04          76.4        51.2           4         1632.
+#> 5    20     1517.    3.42          75.9        58.5           4          909.
+#> 6    24     1809.    5.09          75.4        64.7           5          558.
 #> # ℹ 2 more variables: cv_mean <dbl>, n_rep <dbl>
 autoplot(f)
 ```

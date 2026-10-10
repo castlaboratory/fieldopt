@@ -2,6 +2,16 @@
 
 ## fieldopt 0.1.0
 
+- The routing solver was rebuilt (engine `fieldopt-core` 0.5.0):
+  instances of up to 13 units are solved exactly; larger ones by a
+  hybrid genetic search with the optimal split of giant tours and a
+  granular local search with inter-route moves (relocate, swap,
+  2-opt\*); the Held-Karp bound replaces the two-edge bound for single
+  tours and `optimal` reports proven optimality;
+  [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
+  gains `demand` and `capacity`. On TSPLIB and Augerat’s set A the
+  solver is optimal or within 1.2% of the optimum in about a second.
+
 - New tools (engine `fieldopt-core` 0.4.0):
   [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
   takes a `service_time` per unit that counts towards `max_length` and

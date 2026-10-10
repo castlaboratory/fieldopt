@@ -56,14 +56,14 @@ tidy(r); glance(r)
 #>   <int> <int> <chr>  <dbl>
 #> 1     1     1 s5    0.716 
 #> 2     1     2 s1    0.0862
-#> 3     1     3 s7    0.694 
-#> 4     1     4 s8    0.393 
-#> 5     2     1 s3    0.609 
-#> 6     2     2 s6    0.371 
-#> 7     2     3 s4    0.208 
-#> 8     2     4 s2    0.548 
-#> # A tibble: 1 × 7
-#>   n_units n_routes total lower_bound   gap longest_route travel_unit
-#>     <int>    <int> <dbl>       <dbl> <dbl>         <dbl> <chr>      
-#> 1       8        2  4.83        2.11  1.29          2.72 distance   
+#> 3     1     3 s3    0.523 
+#> 4     1     4 s2    0.247 
+#> 5     2     1 s8    0.827 
+#> 6     2     2 s7    0.393 
+#> 7     2     3 s6    0.389 
+#> 8     2     4 s4    0.208 
+#> # A tibble: 1 × 8
+#>   n_units n_routes total lower_bound   gap optimal longest_route travel_unit
+#>     <int>    <int> <dbl>       <dbl> <dbl> <lgl>           <dbl> <chr>      
+#> 1       8        2  4.69        4.69     0 TRUE             2.74 distance   
 ```

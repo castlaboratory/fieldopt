@@ -1,10 +1,15 @@
 # Route the field work
 
-Finds low-cost routes from a depot through the selected units with GRASP
-(randomised greedy construction, 2-opt and Or-opt local search, optimal
-split of the tour into routes under the limits). One route when the
-limits allow it, several otherwise (one per team or per day). The
-solution is a heuristic; the gap to a lower bound is reported.
+Finds low-cost routes from a depot through the selected units: one route
+when the limits allow it, several otherwise (one per team or per day).
+Instances of up to 13 units are solved exactly (dynamic programming over
+subsets). Larger ones go to a hybrid genetic search (Vidal 2022): a
+population of giant tours, order crossover, the optimal split of Prins
+(2004) under the limits, and a local search with granular neighbourhoods
+(2-opt, Or-opt, relocate, swap, 2-opt\*). The `gap` to a lower bound is
+reported: the Held-Karp bound for a single tour on a symmetric matrix
+(usually within a few percent of the optimum), a loose bound otherwise;
+`optimal` says when the solution is proven optimal.
 
 ## Usage
 
@@ -16,6 +21,8 @@ route_fieldwork(
   max_length = Inf,
   max_stops = Inf,
   service_time = 0,
+  demand = 0,
+  capacity = Inf,
   iterations = 200,
   alpha = 0.3,
   seed = 1,
@@ -53,13 +60,24 @@ route_fieldwork(
   travel matrix: a single number, or a vector named by unit. It counts
   towards `max_length` and is reported in `durations`.
 
+- demand:
+
+  Load each unit adds to its route (interviews to make, samples to
+  carry): a single number or a vector named by unit.
+
+- capacity:
+
+  Maximum load of a route; `Inf` for none.
+
 - iterations:
 
-  GRASP iterations.
+  Offspring of the genetic search (ignored when the instance is solved
+  exactly).
 
 - alpha:
 
-  Greediness of the construction in `[0, 1]` (0 greedy, 1 random).
+  Greediness of the constructions that seed the population, in `[0, 1]`
+  (0 greedy, 1 random).
 
 - seed:
 
@@ -75,8 +93,19 @@ route_fieldwork(
 
 An object of class `fieldopt_routes`: `routes` (a tibble with columns
 `route`, `stop`, `unit`), `lengths` (travel per route), `durations`
-(travel plus service), `total`, `lower_bound`, `gap`, `best_iteration`,
-`cost` (when a model is given), the inputs and the travel matrix.
+(travel plus service), `loads`, `total`, `lower_bound`, `gap`,
+`optimal`, `best_iteration`, `cost` (when a model is given), the inputs
+and the travel matrix.
+
+## References
+
+Vidal, T. (2022). Hybrid genetic search for the CVRP: open-source
+implementation and SWAP\* neighborhood. *Computers & Operations
+Research*, 140, 105643. Prins, C. (2004). A simple and effective
+evolutionary algorithm for the vehicle routing problem. *Computers &
+Operations Research*, 31, 1985-2002. Held, M. and Karp, R. M. (1971).
+The traveling-salesman problem and minimum spanning trees: part II.
+*Mathematical Programming*, 1, 6-25.
 
 ## Examples
 
@@ -90,10 +119,9 @@ r <- route_fieldwork(m, units = paste0("s", 1:12), depot = "depot", max_stops = 
 r
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 4 routes from "depot" through 12 units: total travel 61.76 distance (lower
-#> bound 18.79, gap 229%).
-#> Route 1 (4.333): s12
-#> Route 2 (30.53): s2 > s9 > s6 > s4 > s7
-#> Route 3 (22.47): s8 > s3 > s1 > s5 > s11
-#> Route 4 (4.419): s10
+#> 3 routes from "depot" through 12 units: total travel 57.81 distance (proven
+#> optimal).
+#> Route 1 (21.08): s11 > s5 > s1 > s3 > s2
+#> Route 2 (30.92): s8 > s9 > s6 > s4 > s7
+#> Route 3 (5.814): s10 > s12
 ```

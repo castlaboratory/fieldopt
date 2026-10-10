@@ -152,7 +152,7 @@ routed_unit_cost(frame, "depot", model, n = sum(n_h), method = "euclidean",
 #> # A tibble: 1 × 6
 #>       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep
 #>   <dbl>         <dbl>           <dbl>     <dbl>       <dbl> <dbl>
-#> 1   100          167.            2.70    16675.           1     3
+#> 1   100          167.            2.68    16670.           1     3
 ```
 
 ## The design effect of point sampling
@@ -208,7 +208,7 @@ ts$history
 #>   round    c1     n     m   cost variance_total
 #>   <int> <dbl> <int> <int>  <dbl>          <dbl>
 #> 1     1  90.1   170     9 53568.       1218047.
-#> 2     2  65.0   170     9 49304.       1218047.
+#> 2     2  65.0   170     9 49296.       1218047.
 ```
 
 ## Dual-frame allocation: area plus list
@@ -243,13 +243,13 @@ df$history
 #>   round cost_a   n_a   n_b theta   cost variance
 #>   <int>  <dbl> <int> <int> <dbl>  <dbl>    <dbl>
 #> 1     1   190.    80   141 0.155 21553.  871821.
-#> 2     2   168.    81   135 0.16  19645.  877223.
-#> 3     3   168.    81   135 0.16  19659.  877223.
+#> 2     2   167.    81   135 0.153 19642.  876506.
+#> 3     3   168.    81   135 0.16  19656.  877223.
 tidy(df)
 #> # A tibble: 2 × 8
 #>   frame     n cost_per_unit   cost  deff variance overlap_units
 #>   <chr> <int>         <dbl>  <dbl> <dbl>    <dbl>         <dbl>
-#> 1 A        81          168. 13584. 0.839  697399.          11.6
+#> 1 A        81          168. 13581. 0.839  697399.          11.6
 #> 2 B       135           45   6075  1      179823.         112. 
 #> # ℹ 1 more variable: weight_on_overlap <dbl>
 dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$deff,
