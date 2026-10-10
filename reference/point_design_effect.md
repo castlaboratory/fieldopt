@@ -127,6 +127,6 @@ point_design_effect(cells, areas, n = 15, points_per_cell = 6, cell_size = 1, n_
 #> # A tibble: 1 × 10
 #>   n_sim total mean_estimate  bias variance    cv mean_variance_estimate
 #> * <dbl> <dbl>         <dbl> <dbl>    <dbl> <dbl>                  <dbl>
-#> 1    20  711.          694. -16.3    7923. 0.125                 11714.
+#> 1    20  711.          694. -16.3    7923. 0.125                 12187.
 #> # ℹ 3 more variables: interviews <dbl>, variance_srs <dbl>, deff <dbl>
 ```

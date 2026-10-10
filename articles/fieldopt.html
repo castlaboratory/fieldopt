@@ -227,10 +227,10 @@ variance the same sample size would give under simple random sampling is
 shown for comparison.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/design_variance.html">design_variance</a></span><span class="op">(</span><span class="va">s</span>, y <span class="op">=</span> <span class="st">"crop"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
-<span><span class="co">#&gt;   total variance    se     cv variance_srs     n     N variance_method</span></span>
-<span><span class="co">#&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;          </span></span>
-<span><span class="co">#&gt; 1 1254.    3158.  56.2 0.0448        5874.    12    40 local-mean</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 9</span></span>
+<span><span class="co">#&gt;   total variance    se     cv variance_srs     n     N variance_method    df</span></span>
+<span><span class="co">#&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 1254.    3158.  56.2 0.0448        5874.    12    40 local-mean         11</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">frame</span><span class="op">$</span><span class="va">crop</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1241.484</span></span></code></pre></div>
 </div>
@@ -254,12 +254,12 @@ planner faces.</p>
 <span><span class="co">#&gt; # A tibble: 6 × 9</span></span>
 <span><span class="co">#&gt;       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean</span></span>
 <span><span class="co">#&gt; * &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1     6      475.   6.08           79.2        27.6           2        20203.</span></span>
-<span><span class="co">#&gt; 2     9      701.   4.64           77.9        35.5           2         5820.</span></span>
+<span><span class="co">#&gt; 1     6      475.   6.08           79.2        27.6           2        13594.</span></span>
+<span><span class="co">#&gt; 2     9      701.   4.64           77.9        35.5           2         4791.</span></span>
 <span><span class="co">#&gt; 3    12      925.   8.47           77.1        42.7           3         2958.</span></span>
-<span><span class="co">#&gt; 4    16     1218.   6.22           76.1        48.9           4         1198.</span></span>
-<span><span class="co">#&gt; 5    20     1517.   0.949          75.9        58.7           4          726.</span></span>
-<span><span class="co">#&gt; 6    24     1810.   3.69           75.4        65.1           5          488.</span></span>
+<span><span class="co">#&gt; 4    16     1218.   6.22           76.1        48.9           4         1529.</span></span>
+<span><span class="co">#&gt; 5    20     1517.   0.949          75.9        58.7           4         1136.</span></span>
+<span><span class="co">#&gt; 6    24     1810.   3.69           75.4        65.1           5          825.</span></span>
 <span><span class="co">#&gt; # ℹ 2 more variables: cv_mean &lt;dbl&gt;, n_rep &lt;dbl&gt;</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></code></pre></div>
 <div class="float">

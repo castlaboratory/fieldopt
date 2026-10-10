@@ -100,18 +100,18 @@ dual_frame_estimator(sa, sb, y = "y", domain = "domain")
 #> # A tibble: 1 × 13
 #>   total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
 #>   <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
-#> 1 4510.   18873.  137. 0.0305 hartley       0 FALSE       1169.  2300.  2167.
+#> 1 4510.   18687.  137. 0.0303 hartley       0 FALSE       1169.  2300.  2167.
 #> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 dual_frame_estimator(sa, sb, y = "y", domain = "domain", theta = "screening")
 #> # A tibble: 1 × 13
 #>   total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
 #>   <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
-#> 1 4510.   18873.  137. 0.0305 hartley       0 TRUE        1169.  2300.  2167.
+#> 1 4510.   18687.  137. 0.0303 hartley       0 TRUE        1169.  2300.  2167.
 #> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 dual_frame_estimator(sa, sb, y = "y", domain = "domain", estimator = "fuller-burmeister")
 #> # A tibble: 1 × 13
 #>   total variance    se      cv estimator beta_1 beta_2   y_a y_ab_a y_ab_b   y_b
 #>   <dbl>    <dbl> <dbl>   <dbl> <chr>      <dbl>  <dbl> <dbl>  <dbl>  <dbl> <dbl>
-#> 1 4445.    1381.  37.2 0.00836 fuller-b…  0.224  -57.0 1169.  2300.  2167. 1174.
+#> 1 4445.    1167.  34.2 0.00769 fuller-b…  0.309  -63.8 1169.  2300.  2167. 1174.
 #> # ℹ 2 more variables: n_a <int>, n_b <int>
 ```

@@ -63,7 +63,7 @@ deff |> select(bias, variance, mean_variance_estimate, deff)
 #> # A tibble: 1 × 4
 #>     bias variance mean_variance_estimate   deff
 #>    <dbl>    <dbl>                  <dbl>  <dbl>
-#> 1 56.127  158401.                170292. 1.4716
+#> 1 56.127  158401.                167223. 1.4716
 ```
 
 ``` r
@@ -95,13 +95,13 @@ est |>
 #> # A tibble: 1 × 3
 #>    truth hartley     fb
 #>    <dbl>   <dbl>  <dbl>
-#> 1 6182.1  6217.7 6242.3
+#> 1 6182.1  6221.3 6247.1
 # relative bias in percent
 est |> summarise(across(everything(), \(e) round(100 * (mean(e) - truth) / truth, 2)))
 #> # A tibble: 1 × 2
 #>   hartley    fb
 #>     <dbl> <dbl>
-#> 1    0.58  0.97
+#> 1    0.63  1.05
 ```
 
 Further checks live in the test suite: the Hartley allocation against a

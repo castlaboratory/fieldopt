@@ -142,7 +142,7 @@ cost_variance_frontier(frame,
 #> # A tibble: 2 × 9
 #>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
 #> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>
-#> 1     8      619.    2.88          77.4        29.6           1         8311.
-#> 2    16     1196.    2.85          74.7        37.8           1         1255.
+#> 1     8      619.    2.88          77.4        29.6           1         7519.
+#> 2    16     1196.    2.85          74.7        37.8           1         1267.
 #> # ℹ 2 more variables: cv_mean <dbl>, n_rep <dbl>
 ```

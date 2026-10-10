@@ -66,5 +66,5 @@ if (requireNamespace("survey", quietly = TRUE)) {
 #> # A tibble: 1 × 2
 #>   total    se
 #>   <dbl> <dbl>
-#> 1 1506.  34.7
+#> 1 1506.  30.6
 ```

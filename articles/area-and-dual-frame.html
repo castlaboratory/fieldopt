@@ -202,11 +202,11 @@ probabilities and their point densities.</p>
 <code class="sourceCode R"><span><span class="va">eh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/expected_hits.html">expected_hits</a></span><span class="op">(</span><span class="va">areas</span>, <span class="va">cells_s</span>, points_per_cell <span class="op">=</span> <span class="va">ppc</span>, cell_size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">hits</span> <span class="op">&lt;-</span> <span class="va">hits</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">eh</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">establishment</span>, <span class="va">expected_hits</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"establishment"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/point_estimator.html">point_estimator</a></span><span class="op">(</span><span class="va">hits</span>, <span class="va">cells_s</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 10</span></span>
-<span><span class="co">#&gt;    total variance    se     cv variance_srs     n     N variance_method   n_hits</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 11</span></span>
+<span><span class="co">#&gt;    total variance    se     cv variance_srs     n     N variance_method       df</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;              &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1 22034. 1211899. 1101. 0.0500     3243984.   100   900 stratified local…    401</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: n_establishments &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 22034. 1178527. 1086. 0.0493     3243984.   100   900 stratified local-…    97</span></span>
+<span><span class="co">#&gt; # ℹ 2 more variables: n_hits &lt;int&gt;, n_establishments &lt;int&gt;</span></span>
 <span><span class="va">truth</span></span>
 <span><span class="co">#&gt; [1] 22447.9</span></span></code></pre></div>
 <p>The variance uses the cell design (local-mean estimator on the cell
@@ -220,10 +220,10 @@ replicate-based variance instead:</p>
 <span>    n <span class="op">=</span> <span class="va">n_h</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, method <span class="op">=</span> <span class="st">"systematic"</span>, replicates <span class="op">=</span> <span class="fl">4</span>, seed <span class="op">=</span> <span class="fl">7</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/design_variance.html">design_variance</a></span><span class="op">(</span><span class="va">cells_r</span>, <span class="st">"crop"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
-<span><span class="co">#&gt;    total variance    se     cv variance_srs     n     N variance_method</span></span>
-<span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;          </span></span>
-<span><span class="co">#&gt; 1 22562.  517031.  719. 0.0319     2488872.    92   900 replicates</span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 1 × 9</span></span>
+<span><span class="co">#&gt;    total variance    se     cv variance_srs     n     N variance_method    df</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 22562.  517031.  719. 0.0319     2488872.    92   900 replicates          3</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="what-the-field-work-costs">What the field work costs<a class="anchor" aria-label="anchor" href="#what-the-field-work-costs"></a>
@@ -271,7 +271,7 @@ interviews and the design effect.</p>
 <span><span class="co">#&gt; # A tibble: 1 × 10</span></span>
 <span><span class="co">#&gt;   n_sim  total mean_estimate  bias variance     cv mean_variance_estimate</span></span>
 <span><span class="co">#&gt; * &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;                  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1    60 22448.        22355. -93.1 1554792. 0.0555               1359453.</span></span>
+<span><span class="co">#&gt; 1    60 22448.        22355. -93.1 1554792. 0.0555               1349171.</span></span>
 <span><span class="co">#&gt; # ℹ 3 more variables: interviews &lt;dbl&gt;, variance_srs &lt;dbl&gt;, deff &lt;dbl&gt;</span></span></code></pre></div>
 <p>The bias is negligible and the variance estimator of
 <code><a href="../reference/point_estimator.html">point_estimator()</a></code> tracks the empirical variance; the design
@@ -290,8 +290,12 @@ shares its travel among the cells it visits, so the routed cost of
 curve and allocates with the <strong>marginal</strong> cost of a cell,
 which is what Cochran’s rule needs when the cost is not linear (the
 average cost per cell would give too few cells), iterating until the
-number of cells settles. The history shows the marginal cost used in
-each round next to the average.</p>
+number of cells settles. This is the travel-cost model of Hansen,
+Hurwitz and Madow (1953), whose term <code>C0 sqrt(m)</code> they
+derived from points on a regular grid; here <code>b</code> plays the
+role of <code>C0</code> and is measured by routing the frame itself. The
+history shows the marginal cost used in each round next to the average,
+and <code><a href="../reference/routed_cost_curve.html">routed_cost_curve()</a></code> gives the curve on its own.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/two_stage_design.html">two_stage_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">frame</span>, <span class="st">"depot"</span>, <span class="va">model</span>,</span>
@@ -417,13 +421,13 @@ estimator of each design.</p>
 <span><span class="co">#&gt; # A tibble: 1 × 13</span></span>
 <span><span class="co">#&gt;    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;lgl&gt;       &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 20084.  176231.  420. 0.0209 hartley   0.227 FALSE       9797. 10005.  9470.</span></span>
+<span><span class="co">#&gt; 1 20078.  186923.  432. 0.0215 hartley   0.217 FALSE       9797. 10005.  9470.</span></span>
 <span><span class="co">#&gt; # ℹ 3 more variables: y_b &lt;dbl&gt;, n_a &lt;int&gt;, n_b &lt;int&gt;</span></span>
 <span><span class="fu"><a href="../reference/dual_frame_estimator.html">dual_frame_estimator</a></span><span class="op">(</span><span class="va">sa</span>, <span class="va">sb</span>, y <span class="op">=</span> <span class="st">"crop_est"</span>, domain <span class="op">=</span> <span class="st">"domain"</span>, theta <span class="op">=</span> <span class="st">"screening"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 13</span></span>
 <span><span class="co">#&gt;    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;lgl&gt;       &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 19962.  437619.  662. 0.0331 hartley       0 TRUE        9797. 10005.  9470.</span></span>
+<span><span class="co">#&gt; 1 19962.  425106.  652. 0.0327 hartley       0 TRUE        9797. 10005.  9470.</span></span>
 <span><span class="co">#&gt; # ℹ 3 more variables: y_b &lt;dbl&gt;, n_a &lt;int&gt;, n_b &lt;int&gt;</span></span>
 <span><span class="fu"><a href="../reference/dual_frame_estimator.html">dual_frame_estimator</a></span><span class="op">(</span></span>
 <span>  <span class="va">sa</span>, <span class="va">sb</span>,</span>
@@ -432,7 +436,7 @@ estimator of each design.</p>
 <span><span class="co">#&gt; # A tibble: 1 × 13</span></span>
 <span><span class="co">#&gt;    total variance    se     cv estimator beta_1 beta_2   y_a y_ab_a y_ab_b   y_b</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 20091.  174005.  417. 0.0208 fuller-b… 0.0700   9.68 9797. 10005.  9470.  695.</span></span>
+<span><span class="co">#&gt; 1 20077.  186851.  432. 0.0215 fuller-b…  0.253  -2.26 9797. 10005.  9470.  695.</span></span>
 <span><span class="co">#&gt; # ℹ 2 more variables: n_a &lt;int&gt;, n_b &lt;int&gt;</span></span></code></pre></div>
 <p>The selection scales to national frames: the local pivotal method and
 the systematic and cube methods run on a million cells in about a second
@@ -478,7 +482,7 @@ perfect).</p>
 <span><span class="co">#&gt; # A tibble: 1 × 4</span></span>
 <span><span class="co">#&gt;    total    se variance variance_ht</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 23722.  415.  172067.     877010.</span></span>
+<span><span class="co">#&gt; 1 23722.  411.  169014.     956341.</span></span>
 <span><span class="va">s_cube</span> <span class="op">&lt;-</span> <span class="va">cells</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">40</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, method <span class="op">=</span> <span class="st">"cube"</span>, balance <span class="op">=</span> <span class="st">"farmland"</span>, seed <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="va">s_srs</span> <span class="op">&lt;-</span> <span class="va">cells</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">40</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, method <span class="op">=</span> <span class="st">"srs"</span>, seed <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>

@@ -2,6 +2,26 @@
 
 ## fieldopt 0.1.0
 
+- The local-mean variance estimator
+  ([`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
+  for `"lpm"`, `"cube"` and single-replicate systematic samples)
+  averages over each sampled unit and its `neighbours = 3` nearest
+  sampled units, as
+  [`BalancedSampling::vsb()`](https://rdrr.io/pkg/BalancedSampling/man/vsb.html)
+  (engine `fieldopt-core` 0.10.0). The previous neighbourhood grew until
+  the inclusion probabilities summed to one and overestimated the
+  variance by 60 to 160 percent for spatially smooth variables
+  (experiment E3).
+  [`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
+  also reports `df`, the degrees of freedom of the variance (`r - 1`
+  with `r` replicates): use the t quantile for intervals.
+
+- [`routed_cost_curve()`](https://castlaboratory.github.io/fieldopt/reference/routed_cost_curve.md)
+  measures the routed cost `G(n) = c0 + a n + b sqrt(n)` of a design:
+  Hansen, Hurwitz and Madow’s travel constant estimated by routing the
+  frame; [`predict()`](https://rdrr.io/r/stats/predict.html) gives the
+  total, average and marginal cost.
+
 - [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)
   and
   [`dual_frame_design()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_design.md)

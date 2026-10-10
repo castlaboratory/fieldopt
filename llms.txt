@@ -278,6 +278,13 @@ CAST Lab. Licence GPL (\>= 3).
 
 ## Allocation with the routed field cost
 
+- [`routed_cost_curve()`](https://castlaboratory.github.io/fieldopt/reference/routed_cost_curve.md)
+  [`predict(`*`<fieldopt_cost_curve>`*`)`](https://castlaboratory.github.io/fieldopt/reference/routed_cost_curve.md)
+  [`tidy(`*`<fieldopt_cost_curve>`*`)`](https://castlaboratory.github.io/fieldopt/reference/routed_cost_curve.md)
+  [`glance(`*`<fieldopt_cost_curve>`*`)`](https://castlaboratory.github.io/fieldopt/reference/routed_cost_curve.md)
+  [`autoplot(`*`<fieldopt_cost_curve>`*`)`](https://castlaboratory.github.io/fieldopt/reference/routed_cost_curve.md)
+  : Routed cost curve of a design: the travel constant of Hansen,
+  Hurwitz and Madow
 - [`routed_unit_cost()`](https://castlaboratory.github.io/fieldopt/reference/routed_unit_cost.md)
   : Field cost per sampled unit at a given sample size, from the routing
 - [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md)

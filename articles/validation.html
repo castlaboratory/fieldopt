@@ -208,7 +208,7 @@ estimators.</p>
 <span><span class="co">#&gt; # A tibble: 1 × 4</span></span>
 <span><span class="co">#&gt;     bias variance mean_variance_estimate   deff</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt;                  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 56.127  158401.                170292. 1.4716</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 56.127  158401.                167223. 1.4716</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span>
 <span><span class="va">cells</span> <span class="op">&lt;-</span> <span class="va">cells</span> <span class="op">|&gt;</span></span>
@@ -237,13 +237,13 @@ estimators.</p>
 <span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
 <span><span class="co">#&gt;    truth hartley     fb</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 6182.1  6217.7 6242.3</span></span>
+<span><span class="co">#&gt; 1 6182.1  6221.3 6247.1</span></span>
 <span><span class="co"># relative bias in percent</span></span>
 <span><span class="va">est</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span>, \<span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">-</span> <span class="va">truth</span><span class="op">)</span> <span class="op">/</span> <span class="va">truth</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 2</span></span>
 <span><span class="co">#&gt;   hartley    fb</span></span>
 <span><span class="co">#&gt;     &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1    0.58  0.97</span></span></code></pre></div>
+<span><span class="co">#&gt; 1    0.63  1.05</span></span></code></pre></div>
 <p>Further checks live in the test suite: the Hartley allocation against
 a grid search over the mixing weight, Cochran’s two-stage optimum
 against enumeration, the multivariate allocation against an integer
