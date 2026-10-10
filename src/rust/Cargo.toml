@@ -11,7 +11,7 @@ name = 'fieldopt'
 
 [dependencies]
 extendr-api = '0.9'
-fieldopt-core = '0.6.0'
+fieldopt-core = '0.7.0'
 
 [profile.release]
 lto = true
