@@ -89,7 +89,7 @@
 <li>
 <code><a href="reference/route_fieldwork.html">route_fieldwork()</a></code> routes the field work from a depot through the selected units, for one team or several, under daily limits of duration (travel plus the service time at each unit), stops and capacity, on symmetric or road-network matrices: exact up to 13 units, otherwise a hybrid genetic search with the optimal split of the tour and a granular local search (optimal on the classical TSPLIB instances and on 24 of the 27 Augerat CVRP set A instances, largest gap 0.15%), with the Held-Karp bound and a proof of optimality when it closes; <code>engine = "vrpr"</code> hands the same problem to the PyVRP solver.</li>
 <li>
-<code><a href="reference/schedule_fieldwork.html">schedule_fieldwork()</a></code> assigns the units to several bases, routes each base and distributes the routes over the teams and the days available: a calendar that says whether the field work fits.</li>
+<code><a href="reference/schedule_fieldwork.html">schedule_fieldwork()</a></code> solves the multi-depot problem of several bases with their teams and days (assignment, routes and the number of team-days at once) and distributes the routes over the teams and the days available: a calendar that says whether the field work fits.</li>
 <li>
 <code><a href="reference/select_units.html">select_units()</a></code> draws a probability sample of segments or cells, within strata, by the local pivotal method (spatially balanced), by spatially ordered systematic sampling along a Hilbert curve with interpenetrating replicates, by the cube method balanced on auxiliaries, or by simple random sampling; <code><a href="reference/spatial_balance.html">spatial_balance()</a></code> measures how evenly a sample covers the territory.</li>
 <li>

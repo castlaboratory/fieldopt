@@ -99,10 +99,12 @@ route_fieldwork(
 - engine:
 
   `"fieldopt"` (the built-in solver) or `"vrpr"`, the PyVRP solver
-  through the `vrpr` package (in Suggests): stronger on large instances
-  and with long runs, with the same inputs and outputs, except that it
-  takes one of `max_stops` and `capacity`, gives no lower bound and
-  charges a cost model's `per_route` inside its objective.
+  through the `vrpr` package (in Suggests), with the same inputs and
+  outputs, except that it takes one of `max_stops` and `capacity` and
+  gives no lower bound. Both engines charge a cost model's `per_route`
+  inside the objective (as `per_route / per_travel` travel units per
+  route), so the number of routes is itself optimised when a cost model
+  is given.
 
 ## Value
 

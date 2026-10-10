@@ -149,30 +149,31 @@ day <- route_fieldwork(m_min, units = sel, depot = "depot", max_length = 480, se
 day
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 7 routes from "depot" through 18 units: total travel 638.6 min (lower bound
-#> 277.2, gap 130%).
-#> Route 1 (83.88, duration 443.9): s30 > s9 > s16
-#> Route 2 (117.9, duration 477.9): s12 > s4 > s47
-#> Route 3 (84.94, duration 444.9): s6 > s13 > s54
-#> Route 4 (8.027, duration 128): s37
-#> Route 5 (118.1, duration 478.1): s48 > s1 > s31
-#> Route 6 (121.4, duration 361.4): s27 > s32
-#> Route 7 (104.4, duration 464.4): s43 > s19 > s29
-#> Cost (BRL): travel 319.3 + routes 2800 + units 360 + interviews 810 = 4289.
+#> 6 routes from "depot" through 18 units: total travel 650.3 min (lower bound
+#> 277.2, gap 135%).
+#> Route 1 (115.1, duration 475.1): s30 > s9 > s32
+#> Route 2 (117.9, duration 477.9): s47 > s4 > s12
+#> Route 3 (107, duration 467): s6 > s19 > s13
+#> Route 4 (102.8, duration 462.8): s43 > s29 > s1
+#> Route 5 (108.4, duration 468.4): s31 > s48 > s27
+#> Route 6 (99.3, duration 459.3): s16 > s54 > s37
+#> Cost (BRL): travel 325.2 + routes 2400 + units 360 + interviews 810 = 3895.
 glance(day)
 #> # A tibble: 1 × 9
 #>   n_units n_routes total lower_bound   gap optimal longest_route travel_unit
 #>     <int>    <int> <dbl>       <dbl> <dbl> <lgl>           <dbl> <chr>      
-#> 1      18        7  639.        277.  1.30 FALSE            121. min        
+#> 1      18        6  650.        277.  1.35 FALSE            118. min        
 #> # ℹ 1 more variable: cost <dbl>
 ```
 
 With several teams based in several towns,
 [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
-assigns the units to the nearest base (or balances them when a base is
-short of team-days), routes each base and distributes the routes over
-the teams and the days available, longest first. The calendar says who
-goes where on which day and whether the work fits.
+solves one multi-depot problem: which base serves each unit, how the
+routes are drawn, and how many routes to open when the cost model
+charges a team-day. Each base may send at most `teams * days` routes.
+The routes are then distributed over the teams and the days available,
+longest first, and the calendar says who goes where on which day and
+whether the work fits.
 
 ``` r
 
@@ -184,19 +185,19 @@ sch
 #> 
 #> ── Field schedule ──────────────────────────────────────────────────────────────
 #> 18 units, 2 bases, 2 teams, 3 days available: the work does not fit.
-#> "depot": 17 units, 1 team, 6 routes, 6 of 3 days (short of days).
-#> "base2": 1 unit, 1 team, 1 route, 1 of 3 days.
-#> Cost (BRL): 4275.
+#> "depot": 15 units, 1 team, 5 routes, 5 of 3 days (short of days).
+#> "base2": 3 units, 1 team, 1 route, 1 of 3 days.
+#> Cost (BRL): 3878.
 head(sch$calendar[, c("base", "team", "day", "stops", "travel", "duration")])
 #> # A tibble: 6 × 6
 #>   base  team      day stops travel duration
 #>   <chr> <chr>   <int> <int>  <dbl>    <dbl>
-#> 1 base2 base2-1     1     1   40.2     160.
+#> 1 base2 base2-1     1     3  118.      478.
 #> 2 depot depot-1     1     3  118.      478.
-#> 3 depot depot-1     2     3  100.      460.
-#> 4 depot depot-1     3     3   83.9     444.
-#> 5 depot depot-1     4     3   80.4     440.
-#> 6 depot depot-1     5     3   80.0     440.
+#> 3 depot depot-1     2     3  118.      478.
+#> 4 depot depot-1     3     3  104.      464.
+#> 5 depot depot-1     4     3   84.9     445.
+#> 6 depot depot-1     5     3   71.1     431.
 autoplot(sch)
 ```
 
@@ -245,6 +246,15 @@ laptop):
 | Augerat set A (CVRP, 31 to 79 customers, capacity) | 27 | 2000 | 24 of 27 | 0.01% | 0.15% | 0.7 to 4 s |
 | Augerat set A | 27 | 200 (default) | 14 of 27 | 0.20% | 1.14% | under 0.4 s |
 | Augerat set A | 27 | `time_limit = 5` | 24 of 27 | 0.01% | 0.15% | 5 s |
+| Cordeau multi-depot (p01 to p23: 50 to 360 customers, 2 to 6 depots, route limits per depot, duration limits) | 23 | 2000 | 11 of 23 at or below the best known | 0.29% | 1.5% | 1 to 26 s |
+
+Across eight seeds on four of these instances the gap moved by less than
+one percentage point (standard deviation below 0.3 points), so one run
+with the default seed is representative. The multi-depot instances are
+what
+[`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
+solves: the base of every route, the routes and how many to open, with a
+limit on routes per base.
 
 For field work, with tens of segments per base and daily limits, the
 default settings are therefore enough; raise `iterations` to a few
@@ -261,11 +271,11 @@ outputs, except that the limit on a route is either `max_stops` or
 `capacity`, there is no lower bound, and the `per_route` cost of a cost
 model enters its objective. On the Augerat instances the two engines are
 equivalent: both reach 24 of 27 optima within a few seconds (mean gap
-0.01% for the built-in solver, 0.05% for vrpr). Prefer vrpr for hundreds
-of units, for time windows, for heterogeneous fleets, or for the joint
-assignment to several bases. For a schedule with several bases, the vrpr
-engine optimises the assignment of units to bases jointly with the
-routes.
+0.01% for the built-in solver, 0.05% for vrpr), and both solve the
+multi-depot schedule jointly. Prefer vrpr for hundreds of units, for
+time windows or for heterogeneous fleets. For a schedule with several
+bases, the vrpr engine optimises the assignment of units to bases
+jointly with the routes.
 
 ``` r
 

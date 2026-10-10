@@ -2,6 +2,15 @@
 
 ## fieldopt 0.1.0
 
+- [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
+  solves the assignment of units to bases and the routes jointly, as one
+  multi-depot problem with a route limit per base and the `per_route`
+  cost in the objective (engine `fieldopt-core` 0.8.1);
+  [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
+  charges `per_route` in its objective too. On the 23 Cordeau
+  multi-depot instances the solver reaches or beats the best known
+  solution on 11 and stays within 1.6% on the rest, in 1 to 26 seconds.
+
 - The routing solver was rebuilt (engine `fieldopt-core` 0.5.0):
   instances of up to 13 units are solved exactly; larger ones by a
   hybrid genetic search with the optimal split of giant tours and a

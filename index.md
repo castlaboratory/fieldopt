@@ -26,9 +26,10 @@ frame (grid cells, points inside them) and a list frame needs.
   bound and a proof of optimality when it closes; `engine = "vrpr"`
   hands the same problem to the PyVRP solver.
 - [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
-  assigns the units to several bases, routes each base and distributes
-  the routes over the teams and the days available: a calendar that says
-  whether the field work fits.
+  solves the multi-depot problem of several bases with their teams and
+  days (assignment, routes and the number of team-days at once) and
+  distributes the routes over the teams and the days available: a
+  calendar that says whether the field work fits.
 - [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
   draws a probability sample of segments or cells, within strata, by the
   local pivotal method (spatially balanced), by spatially ordered

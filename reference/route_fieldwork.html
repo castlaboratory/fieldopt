@@ -164,10 +164,11 @@ none); the only stopping rule of the <code>"vrpr"</code> engine (default 5 s).</
 
 <dt id="arg-engine">engine<a class="anchor" aria-label="anchor" href="#arg-engine"></a></dt>
 <dd><p><code>"fieldopt"</code> (the built-in solver) or <code>"vrpr"</code>, the PyVRP
-solver through the <code>vrpr</code> package (in Suggests): stronger on large
-instances and with long runs, with the same inputs and outputs, except
-that it takes one of <code>max_stops</code> and <code>capacity</code>, gives no lower bound and
-charges a cost model's <code>per_route</code> inside its objective.</p></dd>
+solver through the <code>vrpr</code> package (in Suggests), with the same inputs and
+outputs, except that it takes one of <code>max_stops</code> and <code>capacity</code> and gives
+no lower bound. Both engines charge a cost model's <code>per_route</code> inside the
+objective (as <code>per_route / per_travel</code> travel units per route), so the
+number of routes is itself optimised when a cost model is given.</p></dd>
 
 </dl></div>
     <div class="section level2">
