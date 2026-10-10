@@ -64,3 +64,6 @@ src/*.dll
 src/Makevars
 src/Makevars.win
 tests/testthat/_problems/
+
+# Manuscript drafts (kept local until submission)
+paper/sm/
