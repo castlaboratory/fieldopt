@@ -8,7 +8,11 @@ here.
 
 ## The routing solver
 
-![](figures/solver.svg)
+![Inside route_fieldwork: exact dynamic programme, hybrid genetic
+search, split, local search, penalties, bounds and
+certificate](figures/solver.svg)
+
+Figure of the chunk unnamed-chunk-2
 
 Instances with rounded Euclidean distances, as the libraries define
 them, one core of a laptop, one seed:

@@ -89,6 +89,7 @@
 
     
     
+<!-- Generated from area-and-dual-frame.Rmd.orig by tools/precompute-vignettes.R; edit the .orig file. -->
 <p>Agricultural surveys often combine an <strong>area frame</strong> (a
 grid of square cells classified by intensity of agricultural use from
 satellite imagery, with sample points inside the selected cells
@@ -143,21 +144,21 @@ over the cell while spreading them.</p>
 <code class="sourceCode R"><span><span class="va">n_h</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>low <span class="op">=</span> <span class="fl">20</span>, mid <span class="op">=</span> <span class="fl">35</span>, high <span class="op">=</span> <span class="fl">45</span><span class="op">)</span></span>
 <span><span class="va">cells_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">cells</span>, n <span class="op">=</span> <span class="va">n_h</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, seed <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
 <span><span class="va">cells_s</span></span>
-<span><span class="co">#&gt; Sample of 100 units from 900 by <span style="color: #0000BB;">"lpm"</span>, 3 strata.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 900 × 7</span></span></span>
+<span><span class="co">#&gt; Sample of 100 units from 900 by "lpm", 3 strata.</span></span>
+<span><span class="co">#&gt; # A tibble: 900 × 7</span></span>
 <span><span class="co">#&gt;        x     y unit  intensity  size     pi sampled</span></span>
-<span><span class="co">#&gt;  <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1     1 c1    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2     1 c2    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3     1 c3    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4     1 c4    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5     1 c5    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6     1 c6    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7     1 c7    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8     1 c8    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9     1 c9    low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10     1 c10   low           1 0.050<span style="text-decoration: underline;">1</span> FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 890 more rows</span></span></span>
+<span><span class="co">#&gt;  * &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;fct&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;lgl&gt;  </span></span>
+<span><span class="co">#&gt;  1     1     1 c1    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt;  2     2     1 c2    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt;  3     3     1 c3    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt;  4     4     1 c4    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt;  5     5     1 c5    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt;  6     6     1 c6    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt;  7     7     1 c7    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt;  8     8     1 c8    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt;  9     9     1 c9    low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt; 10    10     1 c10   low           1 0.0501 FALSE  </span></span>
+<span><span class="co">#&gt; # ℹ 890 more rows</span></span>
 <span><span class="va">ppc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>low <span class="op">=</span> <span class="fl">3</span>, mid <span class="op">=</span> <span class="fl">6</span>, high <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span>
 <span><span class="va">points</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_points.html">select_points</a></span><span class="op">(</span><span class="va">cells_s</span>, points_per_cell <span class="op">=</span> <span class="va">ppc</span>, cell_size <span class="op">=</span> <span class="fl">1</span>, layout <span class="op">=</span> <span class="st">"systematic"</span>, seed <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">points</span><span class="op">)</span></span>
@@ -187,11 +188,11 @@ probabilities and their point densities.</p>
 <code class="sourceCode R"><span><span class="va">eh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/expected_hits.html">expected_hits</a></span><span class="op">(</span><span class="va">areas</span>, <span class="va">cells_s</span>, points_per_cell <span class="op">=</span> <span class="va">ppc</span>, cell_size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">hits</span><span class="op">$</span><span class="va">expected_hits</span> <span class="op">&lt;-</span> <span class="va">eh</span><span class="op">$</span><span class="va">expected_hits</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">hits</span><span class="op">$</span><span class="va">establishment</span>, <span class="va">eh</span><span class="op">$</span><span class="va">establishment</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/point_estimator.html">point_estimator</a></span><span class="op">(</span><span class="va">hits</span>, <span class="va">cells_s</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 10</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 10</span></span>
 <span><span class="co">#&gt;    total variance    se     cv variance_srs     n     N variance_method   n_hits</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">22</span>091. 1<span style="text-decoration: underline;">191</span>097. <span style="text-decoration: underline;">1</span>091. 0.049<span style="text-decoration: underline;">4</span>     3<span style="text-decoration: underline;">381</span>540.   100   900 stratified local…    401</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: n_establishments &lt;int&gt;</span></span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;              &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 22091. 1191097. 1091. 0.0494     3381540.   100   900 stratified local…    401</span></span>
+<span><span class="co">#&gt; # ℹ 1 more variable: n_establishments &lt;int&gt;</span></span>
 <span><span class="va">truth</span></span>
 <span><span class="co">#&gt; [1] 22075.4</span></span></code></pre></div>
 <p>The variance uses the cell design (local-mean estimator on the cell
@@ -202,10 +203,10 @@ replicate-based variance instead:</p>
 <code class="sourceCode R"><span><span class="va">cells_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">cells</span>, n <span class="op">=</span> <span class="va">n_h</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, method <span class="op">=</span> <span class="st">"systematic"</span>, replicates <span class="op">=</span> <span class="fl">4</span>, seed <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
 <span><span class="va">cells_r</span><span class="op">$</span><span class="va">crop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="va">areas</span><span class="op">$</span><span class="va">y</span>, <span class="va">areas</span><span class="op">$</span><span class="va">unit</span>, <span class="va">sum</span><span class="op">)</span><span class="op">[</span><span class="va">cells_r</span><span class="op">$</span><span class="va">unit</span><span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/design_variance.html">design_variance</a></span><span class="op">(</span><span class="va">cells_r</span>, <span class="st">"crop"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 8</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
 <span><span class="co">#&gt;    total variance    se     cv variance_srs     n     N variance_method</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">21</span>651.  <span style="text-decoration: underline;">345</span>846.  588. 0.027<span style="text-decoration: underline;">2</span>     3<span style="text-decoration: underline;">296</span>859.    91   900 replicates</span></span></code></pre></div>
+<span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;          </span></span>
+<span><span class="co">#&gt; 1 21651.  345846.  588. 0.0272     3296859.    91   900 replicates</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="what-the-field-work-costs">What the field work costs<a class="anchor" aria-label="anchor" href="#what-the-field-work-costs"></a>
@@ -221,10 +222,10 @@ assumed.</p>
 <span>                          interviews_per_unit <span class="op">=</span> <span class="fl">4</span>, currency <span class="op">=</span> <span class="st">"BRL"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/routed_unit_cost.html">routed_unit_cost</a></span><span class="op">(</span><span class="va">frame</span>, <span class="st">"depot"</span>, <span class="va">model</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_h</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
 <span>                 n_rep <span class="op">=</span> <span class="fl">3</span>, iterations <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
 <span><span class="co">#&gt;       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   100          167.            2.67    <span style="text-decoration: underline;">16</span>666.           1     3</span></span></code></pre></div>
+<span><span class="co">#&gt;   &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1   100          167.            2.66    16666.           1     3</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="the-design-effect-of-point-sampling">The design effect of point sampling<a class="anchor" aria-label="anchor" href="#the-design-effect-of-point-sampling"></a>
@@ -239,11 +240,11 @@ interviews and the design effect.</p>
 <code class="sourceCode R"><span><span class="va">deff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/point_design_effect.html">point_design_effect</a></span><span class="op">(</span><span class="va">cells</span>, <span class="va">areas</span>, n <span class="op">=</span> <span class="va">n_h</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>,</span>
 <span>                            points_per_cell <span class="op">=</span> <span class="va">ppc</span>, cell_size <span class="op">=</span> <span class="fl">1</span>, n_sim <span class="op">=</span> <span class="fl">60</span>, seed <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span>
 <span><span class="va">deff</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 10</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 10</span></span>
 <span><span class="co">#&gt;   n_sim  total mean_estimate  bias variance     cv mean_variance_estimate</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">*</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    60 <span style="text-decoration: underline;">22</span>075.        <span style="text-decoration: underline;">22</span>189.  114. 1<span style="text-decoration: underline;">120</span>913. 0.048<span style="text-decoration: underline;">0</span>               1<span style="text-decoration: underline;">416</span>757.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: interviews &lt;dbl&gt;, variance_srs &lt;dbl&gt;, deff &lt;dbl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; * &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;                  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1    60 22075.        22189.  114. 1120913. 0.0480               1416757.</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: interviews &lt;dbl&gt;, variance_srs &lt;dbl&gt;, deff &lt;dbl&gt;</span></span></code></pre></div>
 <p>The bias is negligible and the variance estimator of
 <code><a href="../reference/point_estimator.html">point_estimator()</a></code> tracks the empirical variance; the design
 effect is what enters <code>deff_a</code>.</p>
@@ -265,15 +266,15 @@ until the number of cells settles.</p>
 <span>                       method <span class="op">=</span> <span class="st">"euclidean"</span>, n_rep <span class="op">=</span> <span class="fl">3</span>, iterations <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
 <span><span class="va">ts</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Two-stage allocation</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Two-stage allocation ────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; n = 170 primary units with m = 9 secondary units each (optimal m 9): cost</span></span>
 <span><span class="co">#&gt; 49310, variance of the total 1218000 (SE 1104, CV 5%).</span></span>
 <span><span class="va">ts</span><span class="op">$</span><span class="va">history</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
 <span><span class="co">#&gt;   round    c1     n     m   cost variance_total</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1  90.1   170     9 <span style="text-decoration: underline;">53</span>568.       1<span style="text-decoration: underline;">218</span>047.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2  65.0   170     9 <span style="text-decoration: underline;">49</span>308.       1<span style="text-decoration: underline;">218</span>047.</span></span></code></pre></div>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1     1  90.1   170     9 53568.       1218047.</span></span>
+<span><span class="co">#&gt; 2     2  65.0   170     9 49308.       1218047.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="dual-frame-allocation-area-plus-list">Dual-frame allocation: area plus list<a class="anchor" aria-label="anchor" href="#dual-frame-allocation-area-plus-list"></a>
@@ -295,29 +296,29 @@ gives the design in which the area sample does not use the overlap.</p>
 <span>                        target_cv <span class="op">=</span> <span class="fl">0.05</span>, method <span class="op">=</span> <span class="st">"euclidean"</span>, n_rep <span class="op">=</span> <span class="fl">3</span>, iterations <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
 <span><span class="va">df</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Dual-frame allocation</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Dual-frame allocation ───────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Minimum cost for target variance 878900: n_A = 56 (frame A, cost 169.4/unit),</span></span>
 <span><span class="co">#&gt; n_B = 117 (frame B, cost 45/unit), theta = 0.168 (optimised).</span></span>
 <span><span class="co">#&gt; Cost 14750; variance 875300 (frame A 647000, frame B 229000); CV 4.99% of the</span></span>
 <span><span class="co">#&gt; total 18750.</span></span>
 <span><span class="co">#&gt; Expected overlap units: 8 in the A sample, 97.5 in the B sample.</span></span>
 <span><span class="va">df</span><span class="op">$</span><span class="va">history</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 7</span></span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 7</span></span>
 <span><span class="co">#&gt;   round cost_a   n_a   n_b theta   cost variance</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1   190.    55   122 0.153 <span style="text-decoration: underline;">15</span>946.  <span style="text-decoration: underline;">870</span>584.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2   169.    56   117 0.168 <span style="text-decoration: underline;">14</span>750.  <span style="text-decoration: underline;">875</span>297.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3   169.    56   117 0.168 <span style="text-decoration: underline;">14</span>750.  <span style="text-decoration: underline;">875</span>304.</span></span>
+<span><span class="co">#&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1     1   190.    55   122 0.153 15946.  870584.</span></span>
+<span><span class="co">#&gt; 2     2   169.    56   117 0.168 14750.  875297.</span></span>
+<span><span class="co">#&gt; 3     3   169.    56   117 0.168 14750.  875304.</span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 8</span></span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 8</span></span>
 <span><span class="co">#&gt;   frame     n cost_per_unit  cost  deff variance overlap_units weight_on_overlap</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> A        56          169. <span style="text-decoration: underline;">9</span>485. 0.528  <span style="text-decoration: underline;">646</span>660.           8               0.168</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> B       117           45  <span style="text-decoration: underline;">5</span>265  1      <span style="text-decoration: underline;">228</span>645.          97.5             0.832</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;int&gt;         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 A        56          169. 9485. 0.528  646660.           8               0.168</span></span>
+<span><span class="co">#&gt; 2 B       117           45  5265  1      228645.          97.5             0.832</span></span>
 <span><span class="fu"><a href="../reference/dual_frame_allocation.html">dual_frame_allocation</a></span><span class="op">(</span><span class="va">domains</span>, cost_a <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">cost_a</span>, cost_b <span class="op">=</span> <span class="fl">45</span>, deff_a <span class="op">=</span> <span class="va">deff</span><span class="op">$</span><span class="va">deff</span>,</span>
 <span>                      theta <span class="op">=</span> <span class="st">"screening"</span>, target_cv <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Dual-frame allocation</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Dual-frame allocation ───────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Minimum cost for target variance 878900: n_A = 62 (frame A, cost 169.4/unit),</span></span>
 <span><span class="co">#&gt; n_B = 131 (frame B, cost 45/unit), theta = 0 (fixed).</span></span>
 <span><span class="co">#&gt; Cost 16400; variance 868400 (frame A 650000, frame B 219000); CV 4.97% of the</span></span>
@@ -354,23 +355,23 @@ estimator of each design.</p>
 <span><span class="va">sa</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">cells</span>, n <span class="op">=</span> <span class="fl">40</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, seed <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">sb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">list_frame</span>, n <span class="op">=</span> <span class="fl">20</span>, method <span class="op">=</span> <span class="st">"srs"</span>, seed <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/dual_frame_estimator.html">dual_frame_estimator</a></span><span class="op">(</span><span class="va">sa</span>, <span class="va">sb</span>, y <span class="op">=</span> <span class="st">"crop_est"</span>, domain <span class="op">=</span> <span class="st">"domain"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 13</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 13</span></span>
 <span><span class="co">#&gt;    total variance    se     cv estimator theta theta_fixed    y_a y_ab_a y_ab_b</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">18</span>802.  <span style="text-decoration: underline;">217</span>013.  466. 0.024<span style="text-decoration: underline;">8</span> hartley   0.157 FALSE       <span style="text-decoration: underline;">10</span>021.  <span style="text-decoration: underline;">5</span>475.  <span style="text-decoration: underline;">8</span>584.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: y_b &lt;dbl&gt;, n_a &lt;int&gt;, n_b &lt;int&gt;</span></span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;lgl&gt;        &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 18802.  217013.  466. 0.0248 hartley   0.157 FALSE       10021.  5475.  8584.</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: y_b &lt;dbl&gt;, n_a &lt;int&gt;, n_b &lt;int&gt;</span></span>
 <span><span class="fu"><a href="../reference/dual_frame_estimator.html">dual_frame_estimator</a></span><span class="op">(</span><span class="va">sa</span>, <span class="va">sb</span>, y <span class="op">=</span> <span class="st">"crop_est"</span>, domain <span class="op">=</span> <span class="st">"domain"</span>, theta <span class="op">=</span> <span class="st">"screening"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 13</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 13</span></span>
 <span><span class="co">#&gt;    total variance    se     cv estimator theta theta_fixed    y_a y_ab_a y_ab_b</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">19</span>292.  <span style="text-decoration: underline;">345</span>814.  588. 0.030<span style="text-decoration: underline;">5</span> hartley       0 TRUE        <span style="text-decoration: underline;">10</span>021.  <span style="text-decoration: underline;">5</span>475.  <span style="text-decoration: underline;">8</span>584.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: y_b &lt;dbl&gt;, n_a &lt;int&gt;, n_b &lt;int&gt;</span></span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;lgl&gt;        &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 19292.  345814.  588. 0.0305 hartley       0 TRUE        10021.  5475.  8584.</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: y_b &lt;dbl&gt;, n_a &lt;int&gt;, n_b &lt;int&gt;</span></span>
 <span><span class="fu"><a href="../reference/dual_frame_estimator.html">dual_frame_estimator</a></span><span class="op">(</span><span class="va">sa</span>, <span class="va">sb</span>, y <span class="op">=</span> <span class="st">"crop_est"</span>, domain <span class="op">=</span> <span class="st">"domain"</span>, estimator <span class="op">=</span> <span class="st">"fuller-burmeister"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 13</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 13</span></span>
 <span><span class="co">#&gt;    total variance    se     cv estimator      beta_1 beta_2    y_a y_ab_a y_ab_b</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">18</span>802.  <span style="text-decoration: underline;">215</span>797.  465. 0.024<span style="text-decoration: underline;">7</span> fuller-burmei…  0.386  -<span style="color: #BB0000;">13.9</span> <span style="text-decoration: underline;">10</span>021.  <span style="text-decoration: underline;">5</span>475.  <span style="text-decoration: underline;">8</span>584.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: y_b &lt;dbl&gt;, n_a &lt;int&gt;, n_b &lt;int&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 18802.  215797.  465. 0.0247 fuller-burmei…  0.386  -13.9 10021.  5475.  8584.</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: y_b &lt;dbl&gt;, n_a &lt;int&gt;, n_b &lt;int&gt;</span></span></code></pre></div>
 <p>The selection scales to national frames: the local pivotal method and
 the systematic and cube methods run on a million cells in about a second
 (a grid index keeps the nearest-neighbour searches local), and the
@@ -408,10 +409,10 @@ perfect).</p>
 <span><span class="va">cells</span><span class="op">$</span><span class="va">crop_r</span> <span class="op">&lt;-</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">cells</span><span class="op">$</span><span class="va">farmland</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cells</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">s_lpm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">cells</span>, n <span class="op">=</span> <span class="fl">40</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, seed <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ratio_estimator.html">ratio_estimator</a></span><span class="op">(</span><span class="va">s_lpm</span>, y <span class="op">=</span> <span class="st">"crop_r"</span>, x <span class="op">=</span> <span class="st">"farmland"</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"total"</span>, <span class="st">"se"</span>, <span class="st">"variance"</span>, <span class="st">"variance_ht"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 4</span></span>
 <span><span class="co">#&gt;    total    se variance variance_ht</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">22</span>495.  391.  <span style="text-decoration: underline;">152</span>859.    1<span style="text-decoration: underline;">266</span>972.</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 22495.  391.  152859.    1266972.</span></span>
 <span><span class="va">s_cube</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">cells</span>, n <span class="op">=</span> <span class="fl">40</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, method <span class="op">=</span> <span class="st">"cube"</span>, balance <span class="op">=</span> <span class="st">"farmland"</span>, seed <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>lpm <span class="op">=</span> <span class="fu"><a href="../reference/spatial_balance.html">spatial_balance</a></span><span class="op">(</span><span class="va">s_lpm</span><span class="op">)</span>, cube <span class="op">=</span> <span class="fu"><a href="../reference/spatial_balance.html">spatial_balance</a></span><span class="op">(</span><span class="va">s_cube</span><span class="op">)</span>,</span>
 <span>  srs <span class="op">=</span> <span class="fu"><a href="../reference/spatial_balance.html">spatial_balance</a></span><span class="op">(</span><span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">cells</span>, n <span class="op">=</span> <span class="fl">40</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, method <span class="op">=</span> <span class="st">"srs"</span>, seed <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>

@@ -89,6 +89,7 @@
 
     
     
+<!-- Generated from validation.Rmd.orig by tools/precompute-vignettes.R; edit the .orig file. -->
 <p>This vignette records how the package was checked: the routing solver
 against public benchmark instances and other solvers, and the estimators
 by simulation. The large runs were done once, outside the package build,
@@ -97,7 +98,11 @@ ones run here.</p>
 <div class="section level2">
 <h2 id="the-routing-solver">The routing solver<a class="anchor" aria-label="anchor" href="#the-routing-solver"></a>
 </h2>
-<p><img src="figures/solver.svg" class="r-plt" alt="" width="100%"></p>
+<div class="figure">
+<img src="figures/solver.svg" alt="Inside route_fieldwork: exact dynamic programme, hybrid genetic search, split, local search, penalties, bounds and certificate" width="100%"><p class="caption">
+Figure of the chunk unnamed-chunk-2
+</p>
+</div>
 <p>Instances with rounded Euclidean distances, as the libraries define
 them, one core of a laptop, one seed:</p>
 <table class="table">
@@ -176,10 +181,10 @@ estimators.</p>
 <span>                                                                 area <span class="op">=</span> <span class="fl">0.3</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Lognormal.html" class="external-link">rlnorm</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">deff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/point_design_effect.html">point_design_effect</a></span><span class="op">(</span><span class="va">cells</span>, <span class="va">areas</span>, n <span class="op">=</span> <span class="fl">25</span>, points_per_cell <span class="op">=</span> <span class="fl">6</span>, cell_size <span class="op">=</span> <span class="fl">1</span>, n_sim <span class="op">=</span> <span class="fl">60</span>, seed <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">deff</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bias"</span>, <span class="st">"variance"</span>, <span class="st">"mean_variance_estimate"</span>, <span class="st">"deff"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 4</span></span>
 <span><span class="co">#&gt;    bias variance mean_variance_estimate  deff</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  56.1  <span style="text-decoration: underline;">158</span>401.                <span style="text-decoration: underline;">170</span>292.  1.47</span></span></code></pre></div>
+<span><span class="co">#&gt;   &lt;dbl&gt;    &lt;dbl&gt;                  &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1  56.1  158401.                170292.  1.47</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span>
 <span><span class="va">cells</span><span class="op">$</span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">225</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.2</span>, <span class="st">"ab"</span>, <span class="st">"a"</span><span class="op">)</span>; <span class="va">cells</span><span class="op">$</span><span class="va">yv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">cells</span><span class="op">$</span><span class="va">domain</span> <span class="op">==</span> <span class="st">"ab"</span>, <span class="fl">80</span>, <span class="fl">10</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">225</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="520" viewBox="0 0 860 520" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4A5568"/></marker></defs>
+<rect width="860" height="520" fill="#FFFFFF"/>
+<text x="430" y="26" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#1A202C">Inside route_fieldwork(): how a routing problem is solved and proven</text>
+<rect x="20" y="50" width="200" height="64" rx="8" fill="#EDF2F7" stroke="#4A5568" stroke-width="1.6"/>
+<text x="120.0" y="68.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">Problem</text>
+<text x="120.0" y="89.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">matrix, depots, units,</text>
+<text x="120.0" y="104.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">limits, service, demand</text>
+<rect x="300" y="50" width="200" height="64" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="400.0" y="68.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">Up to 13 units</text>
+<text x="400.0" y="89.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">exact dynamic programme</text>
+<text x="400.0" y="104.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">over subsets: optimal</text>
+<rect x="580" y="50" width="260" height="64" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="710.0" y="68.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1A202C">More units: hybrid genetic search</text>
+<text x="710.0" y="89.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">population of giant tours,</text>
+<text x="710.0" y="104.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">order crossover, restarts, time limit</text>
+<rect x="580" y="160" width="260" height="64" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="710.0" y="178.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">Split (Prins)</text>
+<text x="710.0" y="199.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">optimal cut of a tour into routes,</text>
+<text x="710.0" y="214.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">depot per route, fleet cap, penalties</text>
+<rect x="580" y="270" width="260" height="64" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="710.0" y="288.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">Local search</text>
+<text x="710.0" y="309.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">2-opt, Or-opt, relocate, swap,</text>
+<text x="710.0" y="324.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">SWAP*, 2-opt*, depot change; O(1) pricing</text>
+<rect x="300" y="160" width="200" height="64" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="400.0" y="178.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">Adaptive penalties</text>
+<text x="400.0" y="199.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">feasible and infeasible</text>
+<text x="400.0" y="214.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">subpopulations (Vidal 2022)</text>
+<rect x="300" y="270" width="200" height="64" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="400.0" y="288.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">Bounds</text>
+<text x="400.0" y="309.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">Held-Karp 1-tree (single tour),</text>
+<text x="400.0" y="324.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">in/out edges otherwise</text>
+<rect x="20" y="160" width="200" height="64" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
+<text x="120.0" y="178.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">Certificate</text>
+<text x="120.0" y="199.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">branch-and-bound on 1-trees:</text>
+<text x="120.0" y="214.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">optimal, or the gap</text>
+<rect x="20" y="270" width="200" height="64" rx="8" fill="#FFF8E6" stroke="#B7791F" stroke-width="1.6"/>
+<text x="120.0" y="288.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">Solution</text>
+<text x="120.0" y="309.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">routes, durations, loads,</text>
+<text x="120.0" y="324.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">lower bound, optimal</text>
+<polyline points="220,82 300,82" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="500,82 580,82" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="710,114 710,160" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="710,224 710,270" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="580,302 500,302" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="580,192 500,192" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="300,302 220,302" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="120,270 120,224" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<polyline points="300,114 300,137 120,137 120,160" fill="none" stroke="#4A5568" stroke-width="1.8" marker-end="url(#ah)"/>
+<text x="430" y="380" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#718096" font-style="italic">Validation: optimal on TSPLIB (7 of 7), 24 of 27 Augerat CVRP optima, at or below the best known on 11 to 13 of the 23 Cordeau MDVRP instances;</text>
+<text x="430" y="400" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#718096" font-style="italic">every move priced in constant time and checked against full recomputation; exact DP and split checked against brute force.</text>
+<text x="430" y="440" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#718096" font-style="italic">engine = "vrpr" sends the same problem to PyVRP; schedule_calendar() distributes the routes over teams and days with highs.</text>
+</svg>

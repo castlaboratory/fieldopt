@@ -126,7 +126,9 @@ r
 autoplot(r)
 ```
 
-![](fieldopt_files/figure-html/route-1.png)
+![Figure of the chunk route](figures/fieldopt-route-1.png)
+
+Figure of the chunk route
 
 [`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
 gives the Horvitz-Thompson estimate of the total of `crop` and its
@@ -175,7 +177,9 @@ f
 autoplot(f)
 ```
 
-![](fieldopt_files/figure-html/frontier-1.png)
+![Figure of the chunk frontier](figures/fieldopt-frontier-1.png)
+
+Figure of the chunk frontier
 
 The frontier makes two questions answerable with numbers: how much the
 next unit of precision costs in the field, and how much a different

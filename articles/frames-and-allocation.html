@@ -89,6 +89,7 @@
 
     
     
+<!-- Generated from frames-and-allocation.Rmd.orig by tools/precompute-vignettes.R; edit the .orig file. -->
 <p>Agricultural and establishment surveys often combine a list frame
 (known farms, cheap to reach by phone or on a planned visit) and an area
 frame (segments of territory, expensive to reach, complete in coverage).
@@ -117,14 +118,14 @@ between 2 and <code>N_h</code>.</p>
 <code class="sourceCode R"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/frame_allocation.html">frame_allocation</a></span><span class="op">(</span><span class="va">strata</span>, target_variance <span class="op">=</span> <span class="fl">2.5e7</span><span class="op">)</span></span>
 <span><span class="va">a</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Allocation</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Allocation ──────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Minimum cost for target variance 2.5e+07: cost 22640, variance 24720000.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 5</span></span>
 <span><span class="co">#&gt;   stratum      size    sd  cost     n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> list: large   300    80    60    88</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> list: small  <span style="text-decoration: underline;">2</span>500    12    35   143</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> area          900    35   190    65</span></span></code></pre></div>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 list: large   300    80    60    88</span></span>
+<span><span class="co">#&gt; 2 list: small  2500    12    35   143</span></span>
+<span><span class="co">#&gt; 3 area          900    35   190    65</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="minimum-variance-for-a-budget">Minimum variance for a budget<a class="anchor" aria-label="anchor" href="#minimum-variance-for-a-budget"></a>
@@ -136,14 +137,14 @@ the budget.</p>
 <code class="sourceCode R"><span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/frame_allocation.html">frame_allocation</a></span><span class="op">(</span><span class="va">strata</span>, budget <span class="op">=</span> <span class="fl">30000</span><span class="op">)</span></span>
 <span><span class="va">b</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Allocation</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Allocation ──────────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Minimum variance for budget 30000: cost 29980, variance 17830000.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 5</span></span>
 <span><span class="co">#&gt;   stratum      size    sd  cost     n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> list: large   300    80    60   116</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> list: small  <span style="text-decoration: underline;">2</span>500    12    35   191</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> area          900    35   190    86</span></span></code></pre></div>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 list: large   300    80    60   116</span></span>
+<span><span class="co">#&gt; 2 list: small  2500    12    35   191</span></span>
+<span><span class="co">#&gt; 3 area          900    35   190    86</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="where-the-field-cost-comes-in">Where the field cost comes in<a class="anchor" aria-label="anchor" href="#where-the-field-cost-comes-in"></a>
@@ -183,22 +184,22 @@ each.</p>
 <span>                              target_cv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.04</span>, <span class="fl">0.06</span><span class="op">)</span>, totals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">120000</span>, <span class="fl">90000</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">ma</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Multivariate allocation</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Multivariate allocation ─────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Minimum cost 11200 for 2 targets.</span></span>
 <span><span class="co">#&gt; sd_crop: target 23040000, attained 22600000 (binding).</span></span>
 <span><span class="co">#&gt; sd_cattle: target 29160000, attained 28670000 (binding).</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 4</span></span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 4</span></span>
 <span><span class="co">#&gt;   stratum    size  cost     n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> list       <span style="text-decoration: underline;">2</span>000    40   169</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> area-high   300   200     7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> area-low    500   160    19</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 list       2000    40   169</span></span>
+<span><span class="co">#&gt; 2 area-high   300   200     7</span></span>
+<span><span class="co">#&gt; 3 area-low    500   160    19</span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">ma</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 7</span></span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 7</span></span>
 <span><span class="co">#&gt;   variable    target  attained multiplier     n  cost bounded</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> sd_crop   23<span style="text-decoration: underline;">040</span>000 22<span style="text-decoration: underline;">603</span>942.  0.000<span style="text-decoration: underline;">061</span>6   195 <span style="text-decoration: underline;">11</span>200 FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> sd_cattle 29<span style="text-decoration: underline;">160</span>000 28<span style="text-decoration: underline;">668</span>674.  0.000<span style="text-decoration: underline;">305</span>    195 <span style="text-decoration: underline;">11</span>200 FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;lgl&gt;  </span></span>
+<span><span class="co">#&gt; 1 sd_crop   23040000 22603942.  0.0000616   195 11200 FALSE  </span></span>
+<span><span class="co">#&gt; 2 sd_cattle 29160000 28668674.  0.000305    195 11200 FALSE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

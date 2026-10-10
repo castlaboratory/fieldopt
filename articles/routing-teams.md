@@ -56,7 +56,9 @@ days
 autoplot(days)
 ```
 
-![](routing-teams_files/figure-html/days-1.png)
+![Figure of the chunk days](figures/routing-teams-days-1.png)
+
+Figure of the chunk days
 
 ## Routes limited by stops
 
@@ -201,7 +203,9 @@ head(sch$calendar[, c("base", "team", "day", "stops", "travel", "duration")])
 autoplot(sch)
 ```
 
-![](routing-teams_files/figure-html/schedule-1.png)
+![Figure of the chunk schedule](figures/routing-teams-schedule-1.png)
+
+Figure of the chunk schedule
 
 For a survey over a whole country the schedule is solved region by
 region: `schedule_fieldwork(region = )` takes a table of units and bases

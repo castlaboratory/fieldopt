@@ -89,13 +89,18 @@
 
     
     
+<!-- Generated from survey-plan.Rmd.orig by tools/precompute-vignettes.R; edit the .orig file. -->
 <p>This vignette walks through one agricultural survey from the frame to
 the estimate, the way a planning team would: an area frame of cells with
 intensity strata and a list frame of large holdings, targets for two
 variables, a sample, the field work of several teams from two bases, and
 the estimates. Every number is synthetic; the point is the sequence and
 what each step hands to the next.</p>
-<p><img src="figures/lifecycle.svg" class="r-plt" alt="" width="100%"></p>
+<div class="figure">
+<img src="figures/lifecycle.svg" alt="Life cycle of a field survey with fieldopt and the packages it talks to" width="100%"><p class="caption">
+Figure of the chunk unnamed-chunk-2
+</p>
+</div>
 <div class="section level2">
 <h2 id="the-frame">1. The frame<a class="anchor" aria-label="anchor" href="#the-frame"></a>
 </h2>
@@ -135,22 +140,22 @@ allocation that meets both targets at once.</p>
 <span>                                 totals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">cells</span><span class="op">$</span><span class="va">corn</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">cells</span><span class="op">$</span><span class="va">cattle</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">alloc</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Multivariate allocation</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Multivariate allocation ─────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Minimum cost 5480 for 2 targets.</span></span>
 <span><span class="co">#&gt; sd_corn: target 3980000, attained 3797000 (binding).</span></span>
 <span><span class="co">#&gt; sd_cattle: target 2579000, attained 933100.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 4</span></span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 4</span></span>
 <span><span class="co">#&gt;   stratum  size  cost     n</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> low       240   150     6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> mid       412   180    12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> high      248   220    11</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 low       240   150     6</span></span>
+<span><span class="co">#&gt; 2 mid       412   180    12</span></span>
+<span><span class="co">#&gt; 3 high      248   220    11</span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">alloc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 7</span></span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 7</span></span>
 <span><span class="co">#&gt;   variable    target attained multiplier     n  cost bounded</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> sd_corn   3<span style="text-decoration: underline;">979</span>529. 3<span style="text-decoration: underline;">797</span>176.    0.001<span style="text-decoration: underline;">27</span>    29  <span style="text-decoration: underline;">5</span>480 FALSE  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> sd_cattle 2<span style="text-decoration: underline;">579</span>007.  <span style="text-decoration: underline;">933</span>101.    0          29  <span style="text-decoration: underline;">5</span>480 FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;lgl&gt;  </span></span>
+<span><span class="co">#&gt; 1 sd_corn   3979529. 3797176.    0.00127    29  5480 FALSE  </span></span>
+<span><span class="co">#&gt; 2 sd_cattle 2579007.  933101.    0          29  5480 FALSE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="selection">3. Selection<a class="anchor" aria-label="anchor" href="#selection"></a>
@@ -165,7 +170,9 @@ nine points inside each cell, and the spatial balance as a check.</p>
 <span><span class="co">#&gt;   cells  points balance </span></span>
 <span><span class="co">#&gt;  29.000 261.000   0.203</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></code></pre></div>
-<p><img src="survey-plan_files/figure-html/selection-1.png" class="r-plt" alt="" width="624"></p>
+<div class="float">
+<img src="figures/survey-plan-selection-1.png" alt="Figure of the chunk selection"><div class="figcaption">Figure of the chunk selection</div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="field-work-routes-teams-and-days">4. Field work: routes, teams and days<a class="anchor" aria-label="anchor" href="#field-work-routes-teams-and-days"></a>
@@ -184,20 +191,22 @@ and the calendar says whether the work fits in the campaign.</p>
 <span>                          max_length <span class="op">=</span> <span class="fl">480</span>, service_time <span class="op">=</span> <span class="fl">180</span>, cost_model <span class="op">=</span> <span class="va">money</span>, iterations <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="va">sch</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Field schedule</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Field schedule ──────────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; 29 units, 2 bases, 4 teams, 12 days available: the work fits.</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">"north"</span>: 15 units, 2 teams, 9 routes, 5 of 12 days.</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">"south"</span>: 14 units, 2 teams, 8 routes, 4 of 12 days.</span></span>
+<span><span class="co">#&gt; "north": 15 units, 2 teams, 9 routes, 5 of 12 days.</span></span>
+<span><span class="co">#&gt; "south": 14 units, 2 teams, 8 routes, 4 of 12 days.</span></span>
 <span><span class="co">#&gt; Cost (BRL): 15680.</span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">sch</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 11</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 11</span></span>
 <span><span class="co">#&gt;   units bases teams routes days_available days_needed fits  travel duration</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    29     2     4     17             12           5 TRUE   <span style="text-decoration: underline;">1</span>789.    <span style="text-decoration: underline;">7</span>009.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: utilisation &lt;dbl&gt;, cost &lt;dbl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;dbl&gt;  &lt;int&gt;          &lt;dbl&gt;       &lt;int&gt; &lt;lgl&gt;  &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1    29     2     4     17             12           5 TRUE   1789.    7009.</span></span>
+<span><span class="co">#&gt; # ℹ 2 more variables: utilisation &lt;dbl&gt;, cost &lt;dbl&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">sch</span><span class="op">)</span></span></code></pre></div>
-<p><img src="survey-plan_files/figure-html/fieldwork-plot-1.png" class="r-plt" alt="" width="624"></p>
+<div class="float">
+<img src="figures/survey-plan-fieldwork-plot-1.png" alt="Figure of the chunk fieldwork-plot"><div class="figcaption">Figure of the chunk fieldwork-plot</div>
+</div>
 <p>With the <code>highs</code> package the same routes can be
 redistributed under the constraints of the campaign, a team away on some
 days for example (<code><a href="../reference/schedule_calendar.html">schedule_calendar()</a></code>); with the
@@ -224,7 +233,7 @@ sizes both samples.</p>
 <span>                      mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">cells</span><span class="op">$</span><span class="va">corn</span><span class="op">)</span>, <span class="fl">1.5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">big</span><span class="op">$</span><span class="va">corn</span><span class="op">)</span>, <span class="fl">100</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">cells</span><span class="op">$</span><span class="va">corn</span><span class="op">)</span>, <span class="fl">1.5</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">big</span><span class="op">$</span><span class="va">corn</span><span class="op">)</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/dual_frame_allocation.html">dual_frame_allocation</a></span><span class="op">(</span><span class="va">domains</span>, cost_a <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">sch</span><span class="op">)</span><span class="op">$</span><span class="va">cost</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">sampled</span><span class="op">)</span>, cost_b <span class="op">=</span> <span class="fl">60</span>, target_cv <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Dual-frame allocation</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Dual-frame allocation ───────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Minimum cost for target variance 5567000: n_A = 101 (frame A, cost 540.8/unit),</span></span>
 <span><span class="co">#&gt; n_B = 16 (frame B, cost 60/unit), theta = 0.34 (optimised).</span></span>
 <span><span class="co">#&gt; Cost 55580; variance 5548000 (frame A 5460000, frame B 84000); CV 4.99% of the</span></span>
@@ -233,7 +242,7 @@ sizes both samples.</p>
 <span><span class="fu"><a href="../reference/dual_frame_allocation.html">dual_frame_allocation</a></span><span class="op">(</span><span class="va">domains</span>, cost_a <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">sch</span><span class="op">)</span><span class="op">$</span><span class="va">cost</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">s</span><span class="op">$</span><span class="va">sampled</span><span class="op">)</span>, cost_b <span class="op">=</span> <span class="fl">60</span>, target_cv <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>                      theta <span class="op">=</span> <span class="st">"screening"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Dual-frame allocation</span> <span style="color: #00BBBB;">───────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; ── Dual-frame allocation ───────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; Minimum cost for target variance 5567000: n_A = 115 (frame A, cost 540.8/unit),</span></span>
 <span><span class="co">#&gt; n_B = 27 (frame B, cost 60/unit), theta = 0 (fixed).</span></span>
 <span><span class="co">#&gt; Cost 63810; variance 5527000 (frame A 5430000, frame B 94300); CV 4.98% of the</span></span>
@@ -251,10 +260,10 @@ estimates.</p>
 <code class="sourceCode R"><span><span class="va">field</span> <span class="op">&lt;-</span> <span class="va">s</span></span>
 <span><span class="va">field</span><span class="op">$</span><span class="va">corn_obs</span> <span class="op">&lt;-</span> <span class="va">field</span><span class="op">$</span><span class="va">corn</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">field</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span>   <span class="co"># what the points measured</span></span>
 <span><span class="fu"><a href="../reference/design_variance.html">design_variance</a></span><span class="op">(</span><span class="va">field</span>, <span class="st">"corn_obs"</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"total"</span>, <span class="st">"se"</span>, <span class="st">"cv"</span>, <span class="st">"variance_method"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 4</span></span>
 <span><span class="co">#&gt;    total    se     cv variance_method      </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">41</span>200. <span style="text-decoration: underline;">1</span>838. 0.044<span style="text-decoration: underline;">6</span> stratified local-mean</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;                </span></span>
+<span><span class="co">#&gt; 1 41200. 1838. 0.0446 stratified local-mean</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>true_total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">cells</span><span class="op">$</span><span class="va">corn</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; true_total </span></span>
 <span><span class="co">#&gt;   39897.51</span></span>

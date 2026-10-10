@@ -7,7 +7,10 @@ variables, a sample, the field work of several teams from two bases, and
 the estimates. Every number is synthetic; the point is the sequence and
 what each step hands to the next.
 
-![](figures/lifecycle.svg)
+![Life cycle of a field survey with fieldopt and the packages it talks
+to](figures/lifecycle.svg)
+
+Figure of the chunk unnamed-chunk-2
 
 ## 1. The frame
 
@@ -88,7 +91,9 @@ c(cells = sum(s$sampled), points = nrow(pts), balance = round(spatial_balance(s)
 autoplot(s)
 ```
 
-![](survey-plan_files/figure-html/selection-1.png)
+![Figure of the chunk selection](figures/survey-plan-selection-1.png)
+
+Figure of the chunk selection
 
 ## 4. Field work: routes, teams and days
 
@@ -126,7 +131,10 @@ glance(sch)
 autoplot(sch)
 ```
 
-![](survey-plan_files/figure-html/fieldwork-plot-1.png)
+![Figure of the chunk
+fieldwork-plot](figures/survey-plan-fieldwork-plot-1.png)
+
+Figure of the chunk fieldwork-plot
 
 With the `highs` package the same routes can be redistributed under the
 constraints of the campaign, a team away on some days for example
