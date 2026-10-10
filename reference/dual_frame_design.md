@@ -158,8 +158,8 @@ dual_frame_design(frame, "depot", model, domains, cost_b = 45, deff_a = 1.5,
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
 #> Minimum cost for target variance 119000: n_A = 114 (frame A, cost 103.7/unit),
-#> n_B = 99 (frame B, cost 45/unit), theta = 0.135 (optimised).
-#> Cost 16270; variance 118500 (frame A 118000, frame B 538); CV 4.99% of the
+#> n_B = 99 (frame B, cost 45/unit), theta = 0.14 (optimised).
+#> Cost 16270; variance 118500 (frame A 118000, frame B 536); CV 4.99% of the
 #> total 6900.
 #> Expected overlap units: 13.4 in the A sample, 79.2 in the B sample.
 ```

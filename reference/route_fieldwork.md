@@ -24,9 +24,11 @@ route_fieldwork(
   demand = 0,
   capacity = Inf,
   iterations = 200,
+  time_limit = NULL,
   alpha = 0.3,
   seed = 1,
-  cost_model = NULL
+  cost_model = NULL,
+  engine = c("fieldopt", "vrpr")
 )
 ```
 
@@ -72,7 +74,12 @@ route_fieldwork(
 - iterations:
 
   Offspring of the genetic search (ignored when the instance is solved
-  exactly).
+  exactly or when `time_limit` is given).
+
+- time_limit:
+
+  Seconds of search instead of `iterations` (`NULL` for none); the only
+  stopping rule of the `"vrpr"` engine (default 5 s).
 
 - alpha:
 
@@ -88,6 +95,14 @@ route_fieldwork(
   Optional
   [`field_cost_model()`](https://castlaboratory.github.io/fieldopt/reference/field_cost_model.md)
   to price the solution.
+
+- engine:
+
+  `"fieldopt"` (the built-in solver) or `"vrpr"`, the PyVRP solver
+  through the `vrpr` package (in Suggests): stronger on large instances
+  and with long runs, with the same inputs and outputs, except that it
+  takes one of `max_stops` and `capacity`, gives no lower bound and
+  charges a cost model's `per_route` inside its objective.
 
 ## Value
 

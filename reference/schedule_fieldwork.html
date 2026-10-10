@@ -80,8 +80,10 @@ which day, and whether the work fits in the days available.</p>
 <span>  assign <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nearest"</span>, <span class="st">"balanced"</span><span class="op">)</span>,</span>
 <span>  cost_model <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  iterations <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  time_limit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">1</span></span>
+<span>  seed <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fieldopt"</span>, <span class="st">"vrpr"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -125,8 +127,12 @@ accepted when <code>bases</code> is given.</p></dd>
 charged once per team-day.</p></dd>
 
 
-<dt id="arg-iterations-alpha-seed">iterations, alpha, seed<a class="anchor" aria-label="anchor" href="#arg-iterations-alpha-seed"></a></dt>
-<dd><p>Solver settings of <code><a href="route_fieldwork.html">route_fieldwork()</a></code>.</p></dd>
+<dt id="arg-iterations-time-limit-alpha-seed-engine">iterations, time_limit, alpha, seed, engine<a class="anchor" aria-label="anchor" href="#arg-iterations-time-limit-alpha-seed-engine"></a></dt>
+<dd><p>Solver settings of
+<code><a href="route_fieldwork.html">route_fieldwork()</a></code>. With <code>engine = "vrpr"</code> the assignment of units to
+bases and the routes are optimised jointly (a multi-depot problem with
+<code>teams * days</code> routes available per base and the <code>per_route</code> cost of the
+cost model in the objective), and <code>assign</code> is ignored.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -168,9 +174,9 @@ so the calendar still reports when a base is short of days.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> base1 base1-1     1     2     4  14.4     14.4  <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> base1 base1-2     1     1     4  10.8     10.8  <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> base1 base1-2     2     3     3   6.14     6.14 <span style="color: #949494;">&lt;chr [3]&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> base2 base2-1     1     3     4  13.8     13.8  <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> base2 base2-1     2     5     4  13.7     13.7  <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> base2 base2-1     3     4     4  10.7     10.7  <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> base2 base2-1     1     5     4  13.8     13.8  <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> base2 base2-1     2     4     4  13.7     13.7  <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> base2 base2-1     3     3     4  10.7     10.7  <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span> base2 base2-1     4     2     4   8.87     8.87 <span style="color: #949494;">&lt;chr [4]&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">8</span> base2 base2-1     5     1     3   8.56     8.56 <span style="color: #949494;">&lt;chr [3]&gt;</span></span>
 </code></pre></div>

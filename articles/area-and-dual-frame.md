@@ -208,7 +208,7 @@ ts$history
 #>   round    c1     n     m   cost variance_total
 #>   <int> <dbl> <int> <int>  <dbl>          <dbl>
 #> 1     1  90.1   170     9 53568.       1218047.
-#> 2     2  65.0   170     9 49296.       1218047.
+#> 2     2  65.0   170     9 49297.       1218047.
 ```
 
 ## Dual-frame allocation: area plus list
@@ -234,8 +234,8 @@ df
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
 #> Minimum cost for target variance 878900: n_A = 81 (frame A, cost 167.7/unit),
-#> n_B = 135 (frame B, cost 45/unit), theta = 0.16 (optimised).
-#> Cost 19660; variance 877200 (frame A 697000, frame B 180000); CV 5% of the
+#> n_B = 135 (frame B, cost 45/unit), theta = 0.154 (optimised).
+#> Cost 19660; variance 876600 (frame A 696000, frame B 181000); CV 4.99% of the
 #> total 18750.
 #> Expected overlap units: 11.6 in the A sample, 112.5 in the B sample.
 df$history
@@ -244,13 +244,13 @@ df$history
 #>   <int>  <dbl> <int> <int> <dbl>  <dbl>    <dbl>
 #> 1     1   190.    80   141 0.155 21553.  871821.
 #> 2     2   167.    81   135 0.153 19642.  876506.
-#> 3     3   168.    81   135 0.16  19656.  877223.
+#> 3     3   168.    81   135 0.154 19656.  876588.
 tidy(df)
 #> # A tibble: 2 × 8
 #>   frame     n cost_per_unit   cost  deff variance overlap_units
 #>   <chr> <int>         <dbl>  <dbl> <dbl>    <dbl>         <dbl>
-#> 1 A        81          168. 13581. 0.839  697399.          11.6
-#> 2 B       135           45   6075  1      179823.         112. 
+#> 1 A        81          168. 13581. 0.839  695923.          11.6
+#> 2 B       135           45   6075  1      180665.         112. 
 #> # ℹ 1 more variable: weight_on_overlap <dbl>
 dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$deff,
                       theta = "screening", target_cv = 0.05)

@@ -126,10 +126,10 @@ limit (Prins 2004) and improves each route locally.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Field routes</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; 4 routes from <span style="color: #0000BB;">"depot"</span> through 18 units: total travel 382 km (lower bound 213.2,</span></span>
 <span><span class="co">#&gt; gap 79.2%).</span></span>
-<span><span class="co">#&gt; Route 1 (99.02): s27 &gt; s48 &gt; s1 &gt; s29</span></span>
-<span><span class="co">#&gt; Route 2 (86.76): s43 &gt; s19 &gt; s6 &gt; s13 &gt; s54 &gt; s37</span></span>
-<span><span class="co">#&gt; Route 3 (97.48): s47 &gt; s4 &gt; s16 &gt; s12</span></span>
-<span><span class="co">#&gt; Route 4 (98.76): s30 &gt; s9 &gt; s32 &gt; s31</span></span>
+<span><span class="co">#&gt; Route 1 (98.76): s31 &gt; s32 &gt; s9 &gt; s30</span></span>
+<span><span class="co">#&gt; Route 2 (97.48): s47 &gt; s4 &gt; s16 &gt; s12</span></span>
+<span><span class="co">#&gt; Route 3 (86.76): s37 &gt; s54 &gt; s13 &gt; s6 &gt; s19 &gt; s43</span></span>
+<span><span class="co">#&gt; Route 4 (99.02): s27 &gt; s48 &gt; s1 &gt; s29</span></span>
 <span><span class="co">#&gt; Cost (BRL): travel 687.6 + routes 0 + units 720 + interviews 1296 = 2704.</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">days</span><span class="op">)</span></span></code></pre></div>
 <p><img src="routing-teams_files/figure-html/days-1.png" class="r-plt" alt="" width="624"></p>
@@ -147,11 +147,11 @@ instead.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Field routes</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; 5 routes from <span style="color: #0000BB;">"depot"</span> through 18 units: total travel 405.2 km (lower bound</span></span>
 <span><span class="co">#&gt; 213.2, gap 90.1%).</span></span>
-<span><span class="co">#&gt; Route 1 (97.48): s12 &gt; s16 &gt; s4 &gt; s47</span></span>
-<span><span class="co">#&gt; Route 2 (120.2): s48 &gt; s27 &gt; s32 &gt; s9</span></span>
-<span><span class="co">#&gt; Route 3 (82.91): s6 &gt; s19 &gt; s13 &gt; s54</span></span>
-<span><span class="co">#&gt; Route 4 (79.38): s43 &gt; s29 &gt; s1 &gt; s31</span></span>
-<span><span class="co">#&gt; Route 5 (25.21): s37 &gt; s30</span></span>
+<span><span class="co">#&gt; Route 1 (25.21): s37 &gt; s30</span></span>
+<span><span class="co">#&gt; Route 2 (82.91): s54 &gt; s13 &gt; s19 &gt; s6</span></span>
+<span><span class="co">#&gt; Route 3 (120.2): s9 &gt; s32 &gt; s27 &gt; s48</span></span>
+<span><span class="co">#&gt; Route 4 (97.48): s47 &gt; s4 &gt; s16 &gt; s12</span></span>
+<span><span class="co">#&gt; Route 5 (79.38): s31 &gt; s1 &gt; s29 &gt; s43</span></span>
 <span><span class="co">#&gt; Cost (BRL): travel 729.4 + routes 0 + units 720 + interviews 1296 = 2745.</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -329,26 +329,60 @@ Euclidean distances, as the libraries define them (script in the
 <td>Augerat set A (CVRP, 31 to 79 customers, capacity)</td>
 <td>27</td>
 <td>2000</td>
-<td>17 of 27</td>
-<td>0.30%</td>
-<td>1.14%</td>
-<td>0.3 to 1.6 s</td>
+<td>18 of 27</td>
+<td>0.12%</td>
+<td>0.69%</td>
+<td>0.6 to 3.3 s</td>
 </tr>
 <tr class="odd">
 <td>Augerat set A</td>
 <td>27</td>
 <td>200 (default)</td>
-<td>9 of 27</td>
-<td>0.57%</td>
-<td>1.86%</td>
-<td>under 0.2 s</td>
+<td>14 of 27</td>
+<td>0.31%</td>
+<td>1.55%</td>
+<td>under 0.3 s</td>
+</tr>
+<tr class="even">
+<td>Augerat set A</td>
+<td>27</td>
+<td><code>time_limit = 5</code></td>
+<td>22 of 27</td>
+<td>0.07%</td>
+<td>0.68%</td>
+<td>5 s</td>
 </tr>
 </tbody>
 </table>
 <p>For field work, with tens of segments per base and daily limits, the
 default settings are therefore enough; raise <code>iterations</code> to
-a few thousand when the instance has hundreds of units or when a route
-plan will be used as is.</p>
+a few thousand, or give a <code>time_limit</code> in seconds, when the
+instance has hundreds of units or when a route plan will be used as
+is.</p>
+</div>
+<div class="section level2">
+<h2 id="the-vrpr-engine">The vrpr engine<a class="anchor" aria-label="anchor" href="#the-vrpr-engine"></a>
+</h2>
+<p>The <code>vrpr</code> package brings the PyVRP solver to R, a
+production solver with a much richer local search (SWAP*, adaptive
+penalties) and support for time windows, heterogeneous fleets and
+multiple depots. <code>engine = "vrpr"</code> sends the same problem to
+it, with the same inputs and outputs, except that the limit on a route
+is either <code>max_stops</code> or <code>capacity</code>, there is no
+lower bound, and the <code>per_route</code> cost of a cost model enters
+its objective. On the Augerat instances both engines are within 0.2
+percent of the optimum after one second; with five seconds vrpr reaches
+24 of 27 optima (mean gap 0.05%) against 22 (0.07%) for the built-in
+solver, so prefer it for hundreds of units, for time windows, or for a
+plan that will be used as is. For a schedule with several bases, the
+vrpr engine optimises the assignment of units to bases jointly with the
+routes.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span><span class="va">m</span>, units <span class="op">=</span> <span class="va">sel</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, max_length <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>                     cost_model <span class="op">=</span> <span class="va">model</span>, engine <span class="op">=</span> <span class="st">"vrpr"</span>, time_limit <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>fieldopt <span class="op">=</span> <span class="va">days</span><span class="op">$</span><span class="va">total</span>, vrpr <span class="op">=</span> <span class="va">v</span><span class="op">$</span><span class="va">total</span><span class="op">)</span></span>
+<span><span class="co">#&gt; fieldopt     vrpr </span></span>
+<span><span class="co">#&gt; 382.0247 382.0247</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

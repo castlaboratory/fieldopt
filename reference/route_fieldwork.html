@@ -90,9 +90,11 @@ reported: the Held-Karp bound for a single tour on a symmetric matrix
 <span>  demand <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  capacity <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  iterations <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  time_limit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  cost_model <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  cost_model <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fieldopt"</span>, <span class="st">"vrpr"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -139,7 +141,12 @@ samples to carry): a single number or a vector named by unit.</p></dd>
 
 <dt id="arg-iterations">iterations<a class="anchor" aria-label="anchor" href="#arg-iterations"></a></dt>
 <dd><p>Offspring of the genetic search (ignored when the
-instance is solved exactly).</p></dd>
+instance is solved exactly or when <code>time_limit</code> is given).</p></dd>
+
+
+<dt id="arg-time-limit">time_limit<a class="anchor" aria-label="anchor" href="#arg-time-limit"></a></dt>
+<dd><p>Seconds of search instead of <code>iterations</code> (<code>NULL</code> for
+none); the only stopping rule of the <code>"vrpr"</code> engine (default 5 s).</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
@@ -153,6 +160,14 @@ instance is solved exactly).</p></dd>
 
 <dt id="arg-cost-model">cost_model<a class="anchor" aria-label="anchor" href="#arg-cost-model"></a></dt>
 <dd><p>Optional <code><a href="field_cost_model.html">field_cost_model()</a></code> to price the solution.</p></dd>
+
+
+<dt id="arg-engine">engine<a class="anchor" aria-label="anchor" href="#arg-engine"></a></dt>
+<dd><p><code>"fieldopt"</code> (the built-in solver) or <code>"vrpr"</code>, the PyVRP
+solver through the <code>vrpr</code> package (in Suggests): stronger on large
+instances and with long runs, with the same inputs and outputs, except
+that it takes one of <code>max_stops</code> and <code>capacity</code>, gives no lower bound and
+charges a cost model's <code>per_route</code> inside its objective.</p></dd>
 
 </dl></div>
     <div class="section level2">
