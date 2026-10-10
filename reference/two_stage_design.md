@@ -7,12 +7,13 @@ a tour shares its travel among the units it visits, so the routed cost
 (Beardwood, Halton and Hammersley). This function measures `G(n)` by
 routing samples at a few sizes around the current allocation, fits that
 curve, and re-allocates with the **marginal** cost `G'(n)` in place of
-`c1`; with a nonlinear cost the optimal number of secondary units is
+`c1`; with a non-linear cost the optimal number of secondary units is
 Cochran's formula with the marginal, not the average, cost per primary
-unit. Under a budget the number of primary units then comes from the
-fitted curve, so the design spends the budget at its real routed cost.
-It stops when `n` no longer changes (or after `max_iter` rounds; a
-two-cycle stops with the better of the two designs).
+unit, as in Hansen, Hurwitz and Madow's travel-cost model. Under a
+budget the number of primary units then comes from the fitted curve, so
+the design spends the budget at its real routed cost. It stops when `n`
+no longer changes (or after `max_iter` rounds; a two-cycle stops with
+the better of the two designs).
 
 ## Usage
 
@@ -150,9 +151,12 @@ distances 7 to 19 percent above.
 
 ## References
 
-Cochran, W. G. (1977). *Sampling Techniques*, 3rd ed., Section 10.6.
-Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The shortest
-path through many points. *Proc. Cambridge Phil. Soc.*, 55, 299-327.
+Hansen, M. H., Hurwitz, W. N. and Madow, W. G. (1953). *Sample Survey
+Methods and Theory*, Vol. II, Section 6.11 (two-stage optimum with a
+travel cost proportional to `sqrt(n)`). Cochran, W. G. (1977). *Sampling
+Techniques*, 3rd ed., Section 10.6. Beardwood, J., Halton, J. H. and
+Hammersley, J. M. (1959). The shortest path through many points. *Proc.
+Cambridge Phil. Soc.*, 55, 299-327.
 
 ## Examples
 

@@ -5,9 +5,10 @@ visits, so the routed cost G(n) of visiting n units grows like
 c0 + a n + b sqrt(n) (Beardwood, Halton and Hammersley). This function
 measures G(n) by routing samples at a few sizes around the current
 allocation, fits that curve, and re-allocates with the marginal cost
-G'(n) in place of c1; with a nonlinear cost the optimal number of
+G'(n) in place of c1; with a non-linear cost the optimal number of
 secondary units is Cochran's formula with the marginal, not the average,
-cost per primary unit. Under a budget the number of primary units then
+cost per primary unit, as in Hansen, Hurwitz and Madow's travel-cost model.
+Under a budget the number of primary units then
 comes from the fitted curve, so the design spends the budget at its real
 routed cost. It stops when n no longer changes (or after max_iter
 rounds; a two-cycle stops with the better of the two designs)."><meta property="og:description" content="two_stage_allocation() needs the cost c1 of visiting a primary unit,
@@ -16,9 +17,10 @@ visits, so the routed cost G(n) of visiting n units grows like
 c0 + a n + b sqrt(n) (Beardwood, Halton and Hammersley). This function
 measures G(n) by routing samples at a few sizes around the current
 allocation, fits that curve, and re-allocates with the marginal cost
-G'(n) in place of c1; with a nonlinear cost the optimal number of
+G'(n) in place of c1; with a non-linear cost the optimal number of
 secondary units is Cochran's formula with the marginal, not the average,
-cost per primary unit. Under a budget the number of primary units then
+cost per primary unit, as in Hansen, Hurwitz and Madow's travel-cost model.
+Under a budget the number of primary units then
 comes from the fitted curve, so the design spends the budget at its real
 routed cost. It stops when n no longer changes (or after max_iter
 rounds; a two-cycle stops with the better of the two designs)."><meta property="og:image" content="https://castlaboratory.github.io/fieldopt/logo.svg"></head><body>
@@ -81,9 +83,10 @@ visits, so the routed cost <code>G(n)</code> of visiting <code>n</code> units gr
 <code>c0 + a n + b sqrt(n)</code> (Beardwood, Halton and Hammersley). This function
 measures <code>G(n)</code> by routing samples at a few sizes around the current
 allocation, fits that curve, and re-allocates with the <strong>marginal</strong> cost
-<code>G'(n)</code> in place of <code>c1</code>; with a nonlinear cost the optimal number of
+<code>G'(n)</code> in place of <code>c1</code>; with a non-linear cost the optimal number of
 secondary units is Cochran's formula with the marginal, not the average,
-cost per primary unit. Under a budget the number of primary units then
+cost per primary unit, as in Hansen, Hurwitz and Madow's travel-cost model.
+Under a budget the number of primary units then
 comes from the fitted curve, so the design spends the budget at its real
 routed cost. It stops when <code>n</code> no longer changes (or after <code>max_iter</code>
 rounds; a two-cycle stops with the better of the two designs).</p>
@@ -221,8 +224,10 @@ cost of the best design found by exhaustive search, the average rule up to
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Cochran, W. G. (1977). <em>Sampling Techniques</em>, 3rd ed., Section
-10.6. Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The
+    <p>Hansen, M. H., Hurwitz, W. N. and Madow, W. G. (1953). <em>Sample
+Survey Methods and Theory</em>, Vol. II, Section 6.11 (two-stage optimum with a
+travel cost proportional to <code>sqrt(n)</code>). Cochran, W. G. (1977). <em>Sampling
+Techniques</em>, 3rd ed., Section 10.6. Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The
 shortest path through many points. <em>Proc. Cambridge Phil. Soc.</em>, 55,
 299-327.</p>
     </div>
