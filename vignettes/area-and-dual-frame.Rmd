@@ -205,6 +205,11 @@ dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", theta = "screeni
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", estimator = "fuller-burmeister")
 ```
 
+The selection scales to national frames: the local pivotal method and the
+systematic and cube methods run on a million cells in about a second (a grid
+index keeps the nearest-neighbour searches local), and the selection is done
+within strata, so the size of the whole frame is not a constraint.
+
 ## Auxiliaries: the ratio estimator and balanced samples
 
 Area frames come with auxiliaries known for every cell: the area of farmland

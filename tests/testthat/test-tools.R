@@ -63,6 +63,15 @@ test_that("schedules assign units to bases, teams and days", {
   expect_error(schedule_fieldwork(m, c("base2", "s1"), teams = c(base1 = 1, base2 = 1), days = 3), "base cannot")
   one <- schedule_fieldwork(m, paste0("s", 1:30), teams = 2, bases = "base1", days = 10, max_stops = 5, iterations = 10)
   expect_equal(unique(one$assignment$base), "base1")
+  # regions: solved separately and combined
+  pts <- tools_points(); reg <- data.frame(unit = pts$unit, region = ifelse(pts$x < 5, "west", "east"))
+  reg$region[reg$unit == "base1"] <- "west"; reg$region[reg$unit == "base2"] <- "east"
+  by_reg <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 2), days = 6, max_stops = 4, iterations = 20, region = reg)
+  expect_setequal(unlist(by_reg$calendar$units), paste0("s", 1:30))
+  expect_setequal(by_reg$regions, c("west", "east"))
+  expect_true(all(by_reg$assignment$base[by_reg$assignment$region == "west"] == "base1"))
+  expect_equal(nrow(by_reg$summary), 2)
+  expect_error(schedule_fieldwork(m, paste0("s", 1:30), teams = c(base1 = 2, base2 = 2), days = 6, region = reg[-1, ]), "does not cover")
 })
 
 test_that("cube samples are balanced and spatial balance ranks designs", {

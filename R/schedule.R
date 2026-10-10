@@ -20,6 +20,12 @@
 #' @param teams Named vector: number of teams per base (names are units of
 #'   the matrix that act as bases). A single unnamed number with one base is
 #'   accepted when `bases` is given.
+#' @param region Optional data frame with columns `unit` and `region`
+#'   covering every unit and base: the schedule is then solved one region at
+#'   a time (its units with its bases) and the calendars are combined. This
+#'   is how a national survey is scheduled state by state without a single
+#'   matrix over everything; `matrix` may then hold only the pairs within
+#'   each region (other entries are ignored).
 #' @param days Number of working days available.
 #' @param bases Optional names of the bases when `teams` is unnamed.
 #' @param max_length,max_stops,service_time Daily limits of a route, as in
@@ -46,8 +52,12 @@
 #' sch$calendar
 schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_length = Inf, max_stops = Inf,
                                service_time = 0, cost_model = NULL, iterations = 200, time_limit = NULL, alpha = 0.3,
-                               seed = 1, engine = c("fieldopt", "vrpr")) {
+                               seed = 1, engine = c("fieldopt", "vrpr"), region = NULL) {
   engine <- rlang::arg_match(engine)
+  if (!is.null(region)) {
+    return(schedule_by_region(matrix, units, teams, days, bases, max_length, max_stops, service_time, cost_model,
+                              iterations, time_limit, alpha, seed, engine, region))
+  }
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix); m <- unclass(matrix)
   if (is.null(names(teams))) {
@@ -191,4 +201,40 @@ autoplot.fieldopt_schedule <- function(object, ...) {
     ggplot2::labs(x = if (geo) "longitude" else "x", y = if (geo) "latitude" else "y", colour = "team") +
     (if (geo) ggplot2::coord_quickmap() else ggplot2::coord_equal()) +
     ggplot2::theme_minimal() + ggplot2::theme(legend.position = "bottom")
+}
+
+# One schedule per region, combined.
+schedule_by_region <- function(matrix, units, teams, days, bases, max_length, max_stops, service_time, cost_model,
+                               iterations, time_limit, alpha, seed, engine, region) {
+  if (!all(c("unit", "region") %in% names(region))) cli::cli_abort("{.arg region} needs columns {.field unit} and {.field region}.")
+  nm <- rownames(matrix)
+  if (is.null(names(teams))) {
+    if (is.null(bases) || length(bases) != length(teams)) cli::cli_abort("{.arg teams} must be named by base, or {.arg bases} must name one base per entry.")
+    names(teams) <- bases
+  }
+  bases <- names(teams)
+  reg <- stats::setNames(as.character(region$region), as.character(region$unit))
+  missing <- setdiff(c(units, bases), names(reg)); if (length(missing)) cli::cli_abort("{.arg region} does not cover {.val {missing}}.")
+  parts <- lapply(unique(reg[c(bases, units)]), function(r) {
+    us <- units[reg[units] == r]; bs <- bases[reg[bases] == r]
+    if (!length(bs)) cli::cli_abort("Region {.val {r}} has units but no base.")
+    if (!length(us)) return(NULL)
+    keep <- nm %in% c(bs, us)
+    sub <- structure(unclass(matrix)[keep, keep, drop = FALSE], class = class(matrix), coords = attr(matrix, "coords")[match(nm[keep], attr(matrix, "coords")$unit), ],
+                     method = attr(matrix, "method"), unit = attr(matrix, "unit"), detour = attr(matrix, "detour"))
+    sch <- schedule_fieldwork(sub, us, teams[bs], days, max_length = max_length, max_stops = max_stops, service_time = service_time,
+                              cost_model = cost_model, iterations = iterations, time_limit = time_limit, alpha = alpha, seed = seed, engine = engine)
+    sch$calendar$region <- r; sch$summary$region <- r; sch$assignment$region <- r
+    sch
+  })
+  parts <- parts[!vapply(parts, is.null, logical(1))]
+  out <- parts[[1]]
+  out$calendar <- do.call(rbind, lapply(parts, `[[`, "calendar"))
+  out$summary <- do.call(rbind, lapply(parts, `[[`, "summary"))
+  out$assignment <- do.call(rbind, lapply(parts, `[[`, "assignment"))
+  out$routes <- do.call(c, lapply(parts, `[[`, "routes"))
+  out$fits <- all(out$summary$fits); out$teams <- teams
+  out$cost <- if (is.null(cost_model)) NULL else sum(vapply(parts, function(p) p$cost, numeric(1)))
+  out$coords <- attr(matrix, "coords"); out$regions <- unique(out$summary$region)
+  out
 }

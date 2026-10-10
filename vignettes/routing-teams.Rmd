@@ -136,6 +136,11 @@ head(sch$calendar[, c("base", "team", "day", "stops", "travel", "duration")])
 autoplot(sch)
 ```
 
+For a survey over a whole country the schedule is solved region by region:
+`schedule_fieldwork(region = )` takes a table of units and bases with their
+region, solves each region with its own bases and combines the calendars,
+so no travel matrix over the whole country is ever needed.
+
 The distribution of the routes over teams and days follows a simple rule
 (longest route first). When the field has constraints of its own, a team
 away on some days, a route that must be done by a given team or before

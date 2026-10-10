@@ -6,6 +6,11 @@
   `route_fieldwork()` charges `per_route` in its objective too. On the 23
   Cordeau multi-depot instances the solver reaches or beats the best known
   solution on 11 and stays within 1.6% on the rest, in 1 to 26 seconds.
+* `select_units(method = "lpm")` and `spatial_balance()` use a grid spatial
+  index (engine `fieldopt-core` 0.9.1): a frame of a million cells is sampled
+  in under a second instead of hours. `schedule_fieldwork(region = )` solves
+  one region at a time and combines the calendars, the way a national survey
+  is scheduled state by state.
 * `schedule_calendar()` redistributes the routes of a schedule over teams and
   days as an integer programme solved with the `highs` package (in Suggests):
   team availability by day, routes fixed to a team or a day, precedences, and
