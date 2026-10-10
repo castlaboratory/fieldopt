@@ -124,3 +124,27 @@ test_that("the routed designs use the marginal cost and reach the optimum on the
   expect_gte(tb$cost, 0.97 * ts$cost)
   expect_equal(tb$mode, "budget")
 })
+
+test_that("routed_cost_curve() fits G(n) and predicts total, average and marginal cost", {
+  set.seed(2)
+  cells <- expand.grid(x = 1:15, y = 1:15)
+  cells$unit <- paste0("c", seq_len(nrow(cells)))
+  frame <- rbind(data.frame(unit = "depot", x = 8, y = 8), cells)
+  model <- field_cost_model(per_travel = 3, per_unit = 40)
+  cc <- routed_cost_curve(frame, "depot", model,
+    n_grid = c(10, 20, 40, 80), method = "euclidean", n_rep = 2, iterations = 10
+  )
+  expect_s3_class(cc, "fieldopt_cost_curve")
+  expect_equal(nrow(cc$points), 4)
+  expect_gte(cc$coef[["a"]], 0)
+  expect_gte(cc$coef[["b"]], 0)
+  expect_gt(cc$r_squared, 0.95)
+  expect_equal(predict(cc, 40), curve_G(cc$coef, 40))
+  expect_equal(predict(cc, 40, "average"), curve_G(cc$coef, 40) / 40)
+  expect_lt(predict(cc, 40, "marginal"), predict(cc, 40, "average"))
+  expect_named(glance(cc), c("c0", "a", "b", "r_squared", "n_min", "n_max", "n_sizes", "n_rep"))
+  expect_equal(nrow(tidy(cc)), 4)
+  expect_s3_class(autoplot(cc), "ggplot")
+  expect_message(print(cc), "C0")
+  expect_error(routed_cost_curve(frame, "depot", model, n_grid = c(10, 20)), "three")
+})

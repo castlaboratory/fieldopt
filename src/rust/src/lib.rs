@@ -96,9 +96,9 @@ fn ht_total_rs(y: &[f64], pi: &[f64], sampled: Logicals) -> extendr_api::Result<
 /// Local-mean variance estimator of the Horvitz-Thompson total.
 /// @noRd
 #[extendr]
-fn local_mean_variance_rs(coords: &[f64], d: i32, y: &[f64], pi: &[f64], sampled: Logicals) -> extendr_api::Result<f64> {
+fn local_mean_variance_rs(coords: &[f64], d: i32, y: &[f64], pi: &[f64], sampled: Logicals, k: i32) -> extendr_api::Result<f64> {
     let s = to_bools(&sampled);
-    err(local_mean_variance(coords, d as usize, y, pi, &s))
+    err(local_mean_variance(coords, d as usize, y, pi, &s, k.max(1) as usize))
 }
 
 /// Simple-random-sampling variance of the total.

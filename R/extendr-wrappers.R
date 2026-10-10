@@ -31,7 +31,7 @@ ht_total_rs <- function(y, pi, sampled) .Call(wrap__ht_total_rs, y, pi, sampled)
 
 #' Local-mean variance estimator of the Horvitz-Thompson total.
 #' @noRd
-local_mean_variance_rs <- function(coords, d, y, pi, sampled) .Call(wrap__local_mean_variance_rs, coords, d, y, pi, sampled)
+local_mean_variance_rs <- function(coords, d, y, pi, sampled, k) .Call(wrap__local_mean_variance_rs, coords, d, y, pi, sampled, k)
 
 #' Simple-random-sampling variance of the total.
 #' @noRd

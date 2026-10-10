@@ -226,7 +226,7 @@ design_variance(field, "corn_obs") |> select(total, se, cv, variance_method)
 #> # A tibble: 1 × 4
 #>    total     se       cv variance_method      
 #>    <dbl>  <dbl>    <dbl> <chr>                
-#> 1 41200. 1838.3 0.044618 stratified local-mean
+#> 1 41200. 1661.9 0.040339 stratified local-mean
 tibble(true_total = sum(cells$corn))
 #> # A tibble: 1 × 1
 #>   true_total

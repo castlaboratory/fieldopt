@@ -461,7 +461,7 @@ segment_estimator <- function(tracts, sample, type = c("closed", "open", "weight
 # replicates, the total is the mean of the replicate estimates and the
 # variance their spread, unless `total` is supplied (then only the variance
 # comes from the replicates).
-ht_variance <- function(sample, z, total = NULL) {
+ht_variance <- function(sample, z, total = NULL, neighbours = 3L) {
   s <- sample$sampled
   z[!s] <- 0
   X <- as.matrix(sample[, attr(sample, "coords")])
@@ -475,12 +475,14 @@ ht_variance <- function(sample, z, total = NULL) {
     est_k <- vapply(seq_len(r), function(k) sum(z[rep_mat[, k]] / pr[rep_mat[, k]]), numeric(1))
     if (is.null(total)) total <- mean(est_k)
     v <- stats::var(est_k) / r
+    df <- r - 1L
     method <- "replicates"
   } else {
     if (is.null(total)) total <- ht_total_rs(z, sample$pi, s)
     design <- attr(sample, "method")
     v <- 0
     method <- NULL
+    df <- sum(s) - nlevels(h)
     for (lev in levels(h)) {
       idx <- which(h == lev)
       if (sum(s[idx]) < 2L) cli::cli_abort("At least two sampled units are needed in every stratum to estimate the variance (stratum {.val {lev}}).")
@@ -489,7 +491,7 @@ ht_variance <- function(sample, z, total = NULL) {
         v <- v + srs_variance_rs(z[idx], s[idx], length(idx))
         method <- c(method, "srs")
       } else {
-        v <- v + local_mean_variance_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), z[idx], sample$pi[idx], s[idx])
+        v <- v + local_mean_variance_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), z[idx], sample$pi[idx], s[idx], as.integer(neighbours))
         method <- c(method, "local-mean")
       }
     }
@@ -499,7 +501,7 @@ ht_variance <- function(sample, z, total = NULL) {
   v_srs <- srs_variance_rs(z, s, nrow(sample))
   tibble::tibble(
     total = total, variance = v, se = sqrt(v), cv = if (total != 0) sqrt(v) / abs(total) else NA_real_,
-    variance_srs = v_srs, n = sum(s), N = nrow(sample), variance_method = method
+    variance_srs = v_srs, n = sum(s), N = nrow(sample), variance_method = method, df = as.integer(df)
   )
 }
 
@@ -516,11 +518,24 @@ ht_variance <- function(sample, z, total = NULL) {
 #' customary approximation. The simple-random-sampling variance of the same
 #' sample is always reported as a reference.
 #'
+#' The local-mean estimator averages over each sampled unit and its
+#' `neighbours` nearest sampled units (ties included), as
+#' `BalancedSampling::vsb()` does with its default `k = 3`. In the package's
+#' experiments (three frames, Gaussian fields at four spatial ranges) it is
+#' close to unbiased when the variable has no spatial structure and
+#' conservative when it is smooth; the replicate estimator is unbiased but has
+#' only `r - 1` degrees of freedom, so intervals should use the t quantile with
+#' `df` (reported) rather than the normal one.
+#'
 #' @param sample A `fieldopt_sample`.
 #' @param y Column of the study variable (observed on the sampled units; other
 #'   rows may be `NA`).
+#' @param neighbours Number of nearest sampled units in the neighbourhood of
+#'   the local-mean estimator.
 #' @return A one-row tibble: `total`, `variance`, `se`, `cv`, `variance_srs`,
-#'   `n`, `N`, `variance_method`.
+#'   `n`, `N`, `variance_method` and `df` (degrees of freedom of the variance
+#'   estimate: `r - 1` with `r` replicates, the number of sampled units minus
+#'   the number of strata otherwise).
 #' @references Grafström, A. and Schelin, L. (2014). How to select
 #'   representative samples. *Scandinavian Journal of Statistics*, 41(2),
 #'   277--290.
@@ -533,13 +548,14 @@ ht_variance <- function(sample, z, total = NULL) {
 #' design_variance(s, y = "crop")
 #' r <- select_units(frame, n = 20, method = "systematic", replicates = 4)
 #' design_variance(r, y = "crop")
-design_variance <- function(sample, y) {
+design_variance <- function(sample, y, neighbours = 3L) {
+  if (!is.numeric(neighbours) || length(neighbours) != 1L || is.na(neighbours) || neighbours < 1) cli::cli_abort("{.arg neighbours} must be a whole number of at least 1.")
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
   if (!y %in% names(sample)) cli::cli_abort("Column {.field {y}} not found.")
   yy <- as.numeric(sample[[y]])
   s <- sample$sampled
   if (anyNA(yy[s])) cli::cli_abort("{.field {y}} is missing for some sampled units.")
-  ht_variance(sample, yy)
+  ht_variance(sample, yy, neighbours = neighbours)
 }
 
 #' Cost-aware allocation across strata

@@ -160,10 +160,10 @@ random sampling is shown for comparison.
 
 ``` r
 design_variance(s, y = "crop")
-#> # A tibble: 1 × 8
-#>   total variance    se     cv variance_srs     n     N variance_method
-#>   <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>          
-#> 1 1254.    3158.  56.2 0.0448        5874.    12    40 local-mean
+#> # A tibble: 1 × 9
+#>   total variance    se     cv variance_srs     n     N variance_method    df
+#>   <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>           <int>
+#> 1 1254.    3158.  56.2 0.0448        5874.    12    40 local-mean         11
 sum(frame$crop, na.rm = TRUE)
 #> [1] 1241.484
 ```
@@ -188,12 +188,12 @@ f
 #> # A tibble: 6 × 9
 #>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
 #> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>
-#> 1     6      475.   6.08           79.2        27.6           2        20203.
-#> 2     9      701.   4.64           77.9        35.5           2         5820.
+#> 1     6      475.   6.08           79.2        27.6           2        13594.
+#> 2     9      701.   4.64           77.9        35.5           2         4791.
 #> 3    12      925.   8.47           77.1        42.7           3         2958.
-#> 4    16     1218.   6.22           76.1        48.9           4         1198.
-#> 5    20     1517.   0.949          75.9        58.7           4          726.
-#> 6    24     1810.   3.69           75.4        65.1           5          488.
+#> 4    16     1218.   6.22           76.1        48.9           4         1529.
+#> 5    20     1517.   0.949          75.9        58.7           4         1136.
+#> 6    24     1810.   3.69           75.4        65.1           5          825.
 #> # ℹ 2 more variables: cv_mean <dbl>, n_rep <dbl>
 autoplot(f)
 ```

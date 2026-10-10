@@ -40,6 +40,7 @@ Imports:
     tibble
 Suggests: 
     arrow,
+    BalancedSampling,
     dplyr,
     highs,
     knitr,

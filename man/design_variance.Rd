@@ -4,17 +4,22 @@
 \alias{design_variance}
 \title{Design-based estimate of a total with its variance}
 \usage{
-design_variance(sample, y)
+design_variance(sample, y, neighbours = 3L)
 }
 \arguments{
 \item{sample}{A \code{fieldopt_sample}.}
 
 \item{y}{Column of the study variable (observed on the sampled units; other
 rows may be \code{NA}).}
+
+\item{neighbours}{Number of nearest sampled units in the neighbourhood of
+the local-mean estimator.}
 }
 \value{
 A one-row tibble: \code{total}, \code{variance}, \code{se}, \code{cv}, \code{variance_srs},
-\code{n}, \code{N}, \code{variance_method}.
+\code{n}, \code{N}, \code{variance_method} and \code{df} (degrees of freedom of the variance
+estimate: -1 with \code{r} replicates, the number of sampled units minus
+the number of strata otherwise).
 }
 \description{
 Horvitz-Thompson estimate of the population total of \code{y} from a
@@ -27,6 +32,16 @@ samples. A systematic sample drawn as a single replicate has no unbiased
 design-based variance estimator; the local-mean estimator is used as the
 customary approximation. The simple-random-sampling variance of the same
 sample is always reported as a reference.
+}
+\details{
+The local-mean estimator averages over each sampled unit and its
+\code{neighbours} nearest sampled units (ties included), as
+\code{BalancedSampling::vsb()} does with its default \code{k = 3}. In the package's
+experiments (three frames, Gaussian fields at four spatial ranges) it is
+close to unbiased when the variable has no spatial structure and
+conservative when it is smooth; the replicate estimator is unbiased but has
+only -1 degrees of freedom, so intervals should use the t quantile with
+\code{df} (reported) rather than the normal one.
 }
 \examples{
 set.seed(2)

@@ -1,5 +1,16 @@
 # fieldopt 0.1.0
 
+* The local-mean variance estimator (`design_variance()` for `"lpm"`, `"cube"` and
+  single-replicate systematic samples) averages over each sampled unit and
+  its `neighbours = 3` nearest sampled units, as `BalancedSampling::vsb()`
+  (engine `fieldopt-core` 0.10.0). The previous neighbourhood grew until the
+  inclusion probabilities summed to one and overestimated the variance by 60
+  to 160 percent for spatially smooth variables (experiment E3).
+  `design_variance()` also reports `df`, the degrees of freedom of the
+  variance (`r - 1` with `r` replicates): use the t quantile for intervals.
+* `routed_cost_curve()` measures the routed cost `G(n) = c0 + a n + b sqrt(n)`
+  of a design: Hansen, Hurwitz and Madow's travel constant estimated by
+  routing the frame; `predict()` gives the total, average and marginal cost.
 * `two_stage_design()` and `dual_frame_design()` fit the routed cost curve
   `G(n) = c0 + a n + b sqrt(n)` from samples routed at a few sizes and
   allocate with the marginal cost `G'(n)`, which is what Cochran's and

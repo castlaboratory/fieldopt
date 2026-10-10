@@ -175,7 +175,11 @@ among the cells it visits, so the routed cost of `n` cells grows like
 fits that curve and allocates with the **marginal** cost of a cell, which is
 what Cochran's rule needs when the cost is not linear (the average cost per
 cell would give too few cells), iterating until the number of cells settles.
-The history shows the marginal cost used in each round next to the average.
+This is the travel-cost model of Hansen, Hurwitz and Madow (1953), whose term
+`C0 sqrt(m)` they derived from points on a regular grid; here `b` plays the
+role of `C0` and is measured by routing the frame itself. The history shows
+the marginal cost used in each round next to the average, and
+`routed_cost_curve()` gives the curve on its own.
 
 ```{r twostage}
 ts <- two_stage_design(

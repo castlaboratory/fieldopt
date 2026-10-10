@@ -75,11 +75,31 @@ test_that("design_variance estimates the total and its variance", {
   # and spatial balance beats simple random sampling on a trending variable
   expect_lt(mean(est[2, ]), mean(est[3, ]))
   d <- design_variance(select_units(fr, n = 20), y = "crop")
-  expect_named(d, c("total", "variance", "se", "cv", "variance_srs", "n", "N", "variance_method"))
+  expect_named(d, c("total", "variance", "se", "cv", "variance_srs", "n", "N", "variance_method", "df"))
   expect_equal(d$se, sqrt(d$variance))
   fr$crop[1] <- NA
   s <- select_units(fr, n = 20, seed = 1)
   if (s$sampled[1]) expect_error(design_variance(s, "crop"), "missing") else expect_s3_class(design_variance(s, "crop"), "tbl_df")
   expect_error(design_variance(fr, "crop"), "select_units")
   expect_error(design_variance(s, "zz"), "not found")
+})
+
+test_that("the local-mean variance matches BalancedSampling::vsb() and df is reported", {
+  skip_if_not_installed("BalancedSampling")
+  set.seed(8)
+  frame <- data.frame(unit = paste0("u", 1:200), x = runif(200), y = runif(200))
+  frame$v <- 5 + 3 * frame$x + rnorm(200)
+  s <- select_units(frame, n = 30, seed = 2)
+  i <- which(s$sampled)
+  X <- as.matrix(as.data.frame(s)[i, c("x", "y")])
+  for (k in c(1L, 3L, 5L)) {
+    expect_equal(design_variance(s, "v", neighbours = k)$variance,
+      BalancedSampling::vsb(s$pi[i], frame$v[i], X, k = k),
+      tolerance = 1e-10
+    )
+  }
+  expect_equal(design_variance(s, "v")$df, 29L)
+  r <- select_units(frame, n = 32, method = "systematic", replicates = 4, seed = 2)
+  expect_equal(design_variance(r, "v")$df, 3L)
+  expect_error(design_variance(s, "v", neighbours = 0), "at least 1")
 })

@@ -134,11 +134,11 @@ and their point densities.
 eh <- expected_hits(areas, cells_s, points_per_cell = ppc, cell_size = 1)
 hits <- hits |> left_join(eh |> select(establishment, expected_hits), by = "establishment")
 point_estimator(hits, cells_s)
-#> # A tibble: 1 × 10
-#>    total variance    se     cv variance_srs     n     N variance_method   n_hits
+#> # A tibble: 1 × 11
+#>    total variance    se     cv variance_srs     n     N variance_method       df
 #>    <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>              <int>
-#> 1 22034. 1211899. 1101. 0.0500     3243984.   100   900 stratified local…    401
-#> # ℹ 1 more variable: n_establishments <int>
+#> 1 22034. 1178527. 1086. 0.0493     3243984.   100   900 stratified local-…    97
+#> # ℹ 2 more variables: n_hits <int>, n_establishments <int>
 truth
 #> [1] 22447.9
 ```
@@ -156,10 +156,10 @@ cells_r <- cells |>
     n = n_h, strata = "intensity", method = "systematic", replicates = 4, seed = 7
   )
 design_variance(cells_r, "crop")
-#> # A tibble: 1 × 8
-#>    total variance    se     cv variance_srs     n     N variance_method
-#>    <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>          
-#> 1 22562.  517031.  719. 0.0319     2488872.    92   900 replicates
+#> # A tibble: 1 × 9
+#>    total variance    se     cv variance_srs     n     N variance_method    df
+#>    <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>           <int>
+#> 1 22562.  517031.  719. 0.0319     2488872.    92   900 replicates          3
 ```
 
 ## What the field work costs
@@ -209,7 +209,7 @@ deff
 #> # A tibble: 1 × 10
 #>   n_sim  total mean_estimate  bias variance     cv mean_variance_estimate
 #> * <dbl>  <dbl>         <dbl> <dbl>    <dbl>  <dbl>                  <dbl>
-#> 1    60 22448.        22355. -93.1 1554792. 0.0555               1359453.
+#> 1    60 22448.        22355. -93.1 1554792. 0.0555               1349171.
 #> # ℹ 3 more variables: interviews <dbl>, variance_srs <dbl>, deff <dbl>
 ```
 
@@ -227,7 +227,11 @@ among the cells it visits, so the routed cost of `n` cells grows like
 fits that curve and allocates with the **marginal** cost of a cell, which is
 what Cochran's rule needs when the cost is not linear (the average cost per
 cell would give too few cells), iterating until the number of cells settles.
-The history shows the marginal cost used in each round next to the average.
+This is the travel-cost model of Hansen, Hurwitz and Madow (1953), whose term
+`C0 sqrt(m)` they derived from points on a regular grid; here `b` plays the
+role of `C0` and is measured by routing the frame itself. The history shows
+the marginal cost used in each round next to the average, and
+`routed_cost_curve()` gives the curve on its own.
 
 
 ``` r
@@ -355,13 +359,13 @@ dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain")
 #> # A tibble: 1 × 13
 #>    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
 #>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
-#> 1 20084.  176231.  420. 0.0209 hartley   0.227 FALSE       9797. 10005.  9470.
+#> 1 20078.  186923.  432. 0.0215 hartley   0.217 FALSE       9797. 10005.  9470.
 #> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", theta = "screening")
 #> # A tibble: 1 × 13
 #>    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
 #>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
-#> 1 19962.  437619.  662. 0.0331 hartley       0 TRUE        9797. 10005.  9470.
+#> 1 19962.  425106.  652. 0.0327 hartley       0 TRUE        9797. 10005.  9470.
 #> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 dual_frame_estimator(
   sa, sb,
@@ -370,7 +374,7 @@ dual_frame_estimator(
 #> # A tibble: 1 × 13
 #>    total variance    se     cv estimator beta_1 beta_2   y_a y_ab_a y_ab_b   y_b
 #>    <dbl>    <dbl> <dbl>  <dbl> <chr>      <dbl>  <dbl> <dbl>  <dbl>  <dbl> <dbl>
-#> 1 20091.  174005.  417. 0.0208 fuller-b… 0.0700   9.68 9797. 10005.  9470.  695.
+#> 1 20077.  186851.  432. 0.0215 fuller-b…  0.253  -2.26 9797. 10005.  9470.  695.
 #> # ℹ 2 more variables: n_a <int>, n_b <int>
 ```
 
@@ -420,7 +424,7 @@ ratio_estimator(s_lpm, y = "crop_r", x = "farmland") |>
 #> # A tibble: 1 × 4
 #>    total    se variance variance_ht
 #>    <dbl> <dbl>    <dbl>       <dbl>
-#> 1 23722.  415.  172067.     877010.
+#> 1 23722.  411.  169014.     956341.
 s_cube <- cells |>
   select_units(n = 40, strata = "intensity", method = "cube", balance = "farmland", seed = 5)
 s_srs <- cells |> select_units(n = 40, strata = "intensity", method = "srs", seed = 5)
