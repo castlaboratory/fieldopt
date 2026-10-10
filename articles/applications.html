@@ -99,48 +99,48 @@ uses.</p>
 <table class="table">
 <colgroup>
 <col width="21%">
-<col width="17%">
-<col width="21%">
-<col width="17%">
-<col width="23%">
+<col width="16%">
+<col width="18%">
+<col width="18%">
+<col width="24%">
 </colgroup>
 <thead><tr class="header">
 <th>Setting</th>
 <th>Units</th>
-<th>What the sample balances on</th>
+<th>Balanced on</th>
 <th>Field constraint</th>
-<th>Functions</th>
+<th>Main functions</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td>Agricultural area frame</td>
-<td>grid cells with points</td>
-<td>space and farmland intensity</td>
+<td>grid cells, points</td>
+<td>space, intensity</td>
 <td>team-days, service per cell</td>
-<td>all of them; see the plan vignette</td>
+<td>all (plan vignette)</td>
 </tr>
 <tr class="even">
-<td>Environmental monitoring (lakes, forest plots, air stations)</td>
-<td>sites</td>
-<td>space and covariates (altitude, size, land use)</td>
-<td>boats or vehicles with a daily range</td>
+<td>Environmental monitoring</td>
+<td>sites (lakes, plots, stations)</td>
+<td>space, covariates</td>
+<td>daily range of boats or vehicles</td>
 <td>
 <code>select_units(method = "cube")</code>,
-<code>route_fieldwork(service_time = )</code>
+<code><a href="../reference/route_fieldwork.html">route_fieldwork()</a></code>
 </td>
 </tr>
 <tr class="odd">
-<td>Household survey with enumeration areas</td>
+<td>Household survey</td>
 <td>enumeration areas, then households</td>
 <td>population size</td>
 <td>interviewer-days, several offices</td>
 <td>
-<code><a href="../reference/select_units.html">select_units()</a></code>, <code><a href="../reference/two_stage_allocation.html">two_stage_allocation()</a></code>,
+<code><a href="../reference/two_stage_allocation.html">two_stage_allocation()</a></code>,
 <code>schedule_fieldwork(region = )</code>
 </td>
 </tr>
 <tr class="even">
-<td>Establishment survey with a list and an area frame</td>
+<td>Establishment survey</td>
 <td>listed firms plus area segments</td>
 <td>coverage of the unlisted</td>
 <td>screening in the field</td>

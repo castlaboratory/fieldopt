@@ -335,66 +335,65 @@ Euclidean distances, as the libraries define them (script in the
 <code>examples/benchmark.rs</code>; one core of a laptop):</p>
 <table class="table">
 <colgroup>
-<col width="32%">
-<col width="8%">
-<col width="12%">
-<col width="14%">
-<col width="8%">
+<col width="27%">
+<col width="4%">
+<col width="17%">
+<col width="16%">
+<col width="9%">
 <col width="9%">
 <col width="14%">
 </colgroup>
 <thead><tr class="header">
 <th>Set</th>
 <th align="right">Instances</th>
-<th align="right">Offspring</th>
+<th>Setting</th>
 <th align="right">Optimal</th>
 <th align="right">Mean gap</th>
 <th align="right">Largest gap</th>
-<th align="right">Time per instance</th>
+<th align="right">Time</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>TSPLIB (eil51, berlin52, st70, eil76, rat99, kroA100, eil101)</td>
+<td>TSPLIB (51 to 101 nodes)</td>
 <td align="right">7</td>
-<td align="right">2000</td>
+<td>2000 offspring</td>
 <td align="right">7 of 7</td>
 <td align="right">0.00%</td>
 <td align="right">0.00%</td>
 <td align="right">0.6 to 1.8 s</td>
 </tr>
 <tr class="even">
-<td>Augerat set A (CVRP, 31 to 79 customers, capacity)</td>
+<td>Augerat A (CVRP, 31 to 79 customers)</td>
 <td align="right">27</td>
-<td align="right">2000</td>
+<td>2000 offspring</td>
 <td align="right">24 of 27</td>
 <td align="right">0.01%</td>
 <td align="right">0.15%</td>
 <td align="right">0.7 to 4 s</td>
 </tr>
 <tr class="odd">
-<td>Augerat set A</td>
+<td>Augerat A</td>
 <td align="right">27</td>
-<td align="right">200 (default)</td>
+<td>200 offspring (default)</td>
 <td align="right">14 of 27</td>
 <td align="right">0.20%</td>
 <td align="right">1.14%</td>
 <td align="right">under 0.4 s</td>
 </tr>
 <tr class="even">
-<td>Augerat set A</td>
+<td>Augerat A</td>
 <td align="right">27</td>
-<td align="right"><code>time_limit = 5</code></td>
+<td>5 s each</td>
 <td align="right">24 of 27</td>
 <td align="right">0.01%</td>
 <td align="right">0.15%</td>
 <td align="right">5 s</td>
 </tr>
 <tr class="odd">
-<td>Cordeau multi-depot (p01 to p23: 50 to 360 customers, 2 to 6 depots,
-route limits per depot, duration limits)</td>
+<td>Cordeau MDVRP (50 to 360 customers, 2 to 6 depots)</td>
 <td align="right">23</td>
-<td align="right">2000</td>
-<td align="right">11 of 23 at or below the best known</td>
+<td>2000 offspring</td>
+<td align="right">11 of 23 at or below best known</td>
 <td align="right">0.29%</td>
 <td align="right">1.5%</td>
 <td align="right">1 to 26 s</td>

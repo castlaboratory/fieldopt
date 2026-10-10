@@ -273,13 +273,13 @@ Euclidean distances, as the libraries define them (script in the
 `fieldopt-core` repository, `examples/benchmark.rs`; one core of a
 laptop):
 
-| Set | Instances | Offspring | Optimal | Mean gap | Largest gap | Time per instance |
-|----|---:|---:|---:|---:|---:|---:|
-| TSPLIB (eil51, berlin52, st70, eil76, rat99, kroA100, eil101) | 7 | 2000 | 7 of 7 | 0.00% | 0.00% | 0.6 to 1.8 s |
-| Augerat set A (CVRP, 31 to 79 customers, capacity) | 27 | 2000 | 24 of 27 | 0.01% | 0.15% | 0.7 to 4 s |
-| Augerat set A | 27 | 200 (default) | 14 of 27 | 0.20% | 1.14% | under 0.4 s |
-| Augerat set A | 27 | `time_limit = 5` | 24 of 27 | 0.01% | 0.15% | 5 s |
-| Cordeau multi-depot (p01 to p23: 50 to 360 customers, 2 to 6 depots, route limits per depot, duration limits) | 23 | 2000 | 11 of 23 at or below the best known | 0.29% | 1.5% | 1 to 26 s |
+| Set | Instances | Setting | Optimal | Mean gap | Largest gap | Time |
+|----|---:|----|---:|---:|---:|---:|
+| TSPLIB (51 to 101 nodes) | 7 | 2000 offspring | 7 of 7 | 0.00% | 0.00% | 0.6 to 1.8 s |
+| Augerat A (CVRP, 31 to 79 customers) | 27 | 2000 offspring | 24 of 27 | 0.01% | 0.15% | 0.7 to 4 s |
+| Augerat A | 27 | 200 offspring (default) | 14 of 27 | 0.20% | 1.14% | under 0.4 s |
+| Augerat A | 27 | 5 s each | 24 of 27 | 0.01% | 0.15% | 5 s |
+| Cordeau MDVRP (50 to 360 customers, 2 to 6 depots) | 23 | 2000 offspring | 11 of 23 at or below best known | 0.29% | 1.5% | 1 to 26 s |
 
 Across eight seeds on four of these instances the gap moved by less than
 one percentage point (standard deviation below 0.3 points), so one run

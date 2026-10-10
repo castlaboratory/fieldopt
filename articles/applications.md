@@ -6,12 +6,12 @@ visiting them, and the estimate that comes out. Any survey that sends
 people to locations fits. Four settings, each with the functions it
 uses.
 
-| Setting | Units | What the sample balances on | Field constraint | Functions |
+| Setting | Units | Balanced on | Field constraint | Main functions |
 |----|----|----|----|----|
-| Agricultural area frame | grid cells with points | space and farmland intensity | team-days, service per cell | all of them; see the plan vignette |
-| Environmental monitoring (lakes, forest plots, air stations) | sites | space and covariates (altitude, size, land use) | boats or vehicles with a daily range | `select_units(method = "cube")`, `route_fieldwork(service_time = )` |
-| Household survey with enumeration areas | enumeration areas, then households | population size | interviewer-days, several offices | [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md), [`two_stage_allocation()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_allocation.md), `schedule_fieldwork(region = )` |
-| Establishment survey with a list and an area frame | listed firms plus area segments | coverage of the unlisted | screening in the field | [`frame_overlap()`](https://castlaboratory.github.io/fieldopt/reference/frame_overlap.md), [`dual_frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_allocation.md), [`dual_frame_estimator()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_estimator.md) |
+| Agricultural area frame | grid cells, points | space, intensity | team-days, service per cell | all (plan vignette) |
+| Environmental monitoring | sites (lakes, plots, stations) | space, covariates | daily range of boats or vehicles | `select_units(method = "cube")`, [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md) |
+| Household survey | enumeration areas, then households | population size | interviewer-days, several offices | [`two_stage_allocation()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_allocation.md), `schedule_fieldwork(region = )` |
+| Establishment survey | listed firms plus area segments | coverage of the unlisted | screening in the field | [`frame_overlap()`](https://castlaboratory.github.io/fieldopt/reference/frame_overlap.md), [`dual_frame_allocation()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_allocation.md), [`dual_frame_estimator()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_estimator.md) |
 
 ## Environmental monitoring: sites balanced on covariates
 
