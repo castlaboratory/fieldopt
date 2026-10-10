@@ -13,10 +13,12 @@
   PyVRP solver through the `vrpr` package, also in
   [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md),
   where it optimises the assignment to bases jointly with the routes).
-  The built-in solver has SWAP* and intra-route swaps, population
-  restarts and a time limit (engine 0.6.0): on TSPLIB it is optimal and
-  on Augerat set A within 0.7% of the optimum (0.12% on average) in
-  about a second.
+  The built-in solver has feasible and infeasible subpopulations with
+  adaptive penalties, SWAP* and intra-route swaps, moves priced from
+  route totals in constant time, population restarts and a time limit
+  (engine 0.7.0): on TSPLIB it is optimal and on Augerat set A it
+  reaches 24 of 27 optima (mean gap 0.01%, largest 0.15%) in about two
+  seconds.
 
 - New tools (engine `fieldopt-core` 0.4.0):
   [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)

@@ -207,11 +207,13 @@ autoplot(sch)
 Instances of up to 13 units are solved exactly, by dynamic programming
 over subsets (the optimal tour of every subset, then the optimal
 partition into feasible routes), and `optimal` is `TRUE`. Larger
-instances go to a hybrid genetic search in the spirit of Vidal (2022): a
-population of giant tours, order crossover, the optimal split of Prins
-(2004) under the limits, and a local search with granular neighbourhoods
-made of 2-opt, Or-opt, relocate, swap and 2-opt\* moves. `iterations` is
-the number of offspring; `alpha` the greediness of the constructions
+instances go to a hybrid genetic search in the spirit of Vidal (2022):
+feasible and infeasible subpopulations of giant tours under adaptive
+penalties on excess load, duration and stops, order crossover, the
+optimal split of Prins (2004), and a local search with granular
+neighbourhoods made of 2-opt, Or-opt, relocate, swap, SWAP\* and 2-opt\*
+moves, each priced from the route totals in constant time. `iterations`
+is the number of offspring; `alpha` the greediness of the constructions
 that seed the population.
 
 The `gap` is measured against a lower bound. For a single tour on a
@@ -240,9 +242,9 @@ laptop):
 | Set | Instances | Offspring | Optimal | Mean gap | Largest gap | Time per instance |
 |----|----|----|----|----|----|----|
 | TSPLIB (eil51, berlin52, st70, eil76, rat99, kroA100, eil101) | 7 | 2000 | 7 of 7 | 0.00% | 0.00% | 0.6 to 1.8 s |
-| Augerat set A (CVRP, 31 to 79 customers, capacity) | 27 | 2000 | 18 of 27 | 0.12% | 0.69% | 0.6 to 3.3 s |
-| Augerat set A | 27 | 200 (default) | 14 of 27 | 0.31% | 1.55% | under 0.3 s |
-| Augerat set A | 27 | `time_limit = 5` | 22 of 27 | 0.07% | 0.68% | 5 s |
+| Augerat set A (CVRP, 31 to 79 customers, capacity) | 27 | 2000 | 24 of 27 | 0.01% | 0.15% | 0.7 to 4 s |
+| Augerat set A | 27 | 200 (default) | 14 of 27 | 0.20% | 1.14% | under 0.4 s |
+| Augerat set A | 27 | `time_limit = 5` | 24 of 27 | 0.01% | 0.15% | 5 s |
 
 For field work, with tens of segments per base and daily limits, the
 default settings are therefore enough; raise `iterations` to a few
@@ -257,13 +259,13 @@ for time windows, heterogeneous fleets and multiple depots.
 `engine = "vrpr"` sends the same problem to it, with the same inputs and
 outputs, except that the limit on a route is either `max_stops` or
 `capacity`, there is no lower bound, and the `per_route` cost of a cost
-model enters its objective. On the Augerat instances both engines are
-within 0.2 percent of the optimum after one second; with five seconds
-vrpr reaches 24 of 27 optima (mean gap 0.05%) against 22 (0.07%) for the
-built-in solver, so prefer it for hundreds of units, for time windows,
-or for a plan that will be used as is. For a schedule with several
-bases, the vrpr engine optimises the assignment of units to bases
-jointly with the routes.
+model enters its objective. On the Augerat instances the two engines are
+equivalent: both reach 24 of 27 optima within a few seconds (mean gap
+0.01% for the built-in solver, 0.05% for vrpr). Prefer vrpr for hundreds
+of units, for time windows, for heterogeneous fleets, or for the joint
+assignment to several bases. For a schedule with several bases, the vrpr
+engine optimises the assignment of units to bases jointly with the
+routes.
 
 ``` r
 

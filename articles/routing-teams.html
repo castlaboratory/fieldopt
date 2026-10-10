@@ -272,12 +272,13 @@ the work fits.</p>
 programming over subsets (the optimal tour of every subset, then the
 optimal partition into feasible routes), and <code>optimal</code> is
 <code>TRUE</code>. Larger instances go to a hybrid genetic search in the
-spirit of Vidal (2022): a population of giant tours, order crossover,
-the optimal split of Prins (2004) under the limits, and a local search
-with granular neighbourhoods made of 2-opt, Or-opt, relocate, swap and
-2-opt* moves. <code>iterations</code> is the number of offspring;
-<code>alpha</code> the greediness of the constructions that seed the
-population.</p>
+spirit of Vidal (2022): feasible and infeasible subpopulations of giant
+tours under adaptive penalties on excess load, duration and stops, order
+crossover, the optimal split of Prins (2004), and a local search with
+granular neighbourhoods made of 2-opt, Or-opt, relocate, swap, SWAP* and
+2-opt* moves, each priced from the route totals in constant time.
+<code>iterations</code> is the number of offspring; <code>alpha</code>
+the greediness of the constructions that seed the population.</p>
 <p>The <code>gap</code> is measured against a lower bound. For a single
 tour on a symmetric matrix it is the Held-Karp 1-tree bound, usually
 within one or two percent of the optimum, so a small gap means a
@@ -329,27 +330,27 @@ Euclidean distances, as the libraries define them (script in the
 <td>Augerat set A (CVRP, 31 to 79 customers, capacity)</td>
 <td>27</td>
 <td>2000</td>
-<td>18 of 27</td>
-<td>0.12%</td>
-<td>0.69%</td>
-<td>0.6 to 3.3 s</td>
+<td>24 of 27</td>
+<td>0.01%</td>
+<td>0.15%</td>
+<td>0.7 to 4 s</td>
 </tr>
 <tr class="odd">
 <td>Augerat set A</td>
 <td>27</td>
 <td>200 (default)</td>
 <td>14 of 27</td>
-<td>0.31%</td>
-<td>1.55%</td>
-<td>under 0.3 s</td>
+<td>0.20%</td>
+<td>1.14%</td>
+<td>under 0.4 s</td>
 </tr>
 <tr class="even">
 <td>Augerat set A</td>
 <td>27</td>
 <td><code>time_limit = 5</code></td>
-<td>22 of 27</td>
-<td>0.07%</td>
-<td>0.68%</td>
+<td>24 of 27</td>
+<td>0.01%</td>
+<td>0.15%</td>
 <td>5 s</td>
 </tr>
 </tbody>
@@ -370,13 +371,12 @@ multiple depots. <code>engine = "vrpr"</code> sends the same problem to
 it, with the same inputs and outputs, except that the limit on a route
 is either <code>max_stops</code> or <code>capacity</code>, there is no
 lower bound, and the <code>per_route</code> cost of a cost model enters
-its objective. On the Augerat instances both engines are within 0.2
-percent of the optimum after one second; with five seconds vrpr reaches
-24 of 27 optima (mean gap 0.05%) against 22 (0.07%) for the built-in
-solver, so prefer it for hundreds of units, for time windows, or for a
-plan that will be used as is. For a schedule with several bases, the
-vrpr engine optimises the assignment of units to bases jointly with the
-routes.</p>
+its objective. On the Augerat instances the two engines are equivalent:
+both reach 24 of 27 optima within a few seconds (mean gap 0.01% for the
+built-in solver, 0.05% for vrpr). Prefer vrpr for hundreds of units, for
+time windows, for heterogeneous fleets, or for the joint assignment to
+several bases. For a schedule with several bases, the vrpr engine
+optimises the assignment of units to bases jointly with the routes.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span><span class="va">m</span>, units <span class="op">=</span> <span class="va">sel</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, max_length <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>                     cost_model <span class="op">=</span> <span class="va">model</span>, engine <span class="op">=</span> <span class="st">"vrpr"</span>, time_limit <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
