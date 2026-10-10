@@ -49,8 +49,9 @@ A tibble.
 set.seed(1)
 pts <- data.frame(unit = c("depot", paste0("s", 1:8)), x = c(0, runif(8)), y = c(0, runif(8)))
 r <- route_fieldwork(travel_matrix(pts, method = "euclidean"), paste0("s", 1:8), "depot",
-                     max_stops = 4, iterations = 20)
-tidy(r); glance(r)
+  max_stops = 4, iterations = 20
+)
+tidy(r)
 #> # A tibble: 8 × 4
 #>   route  stop unit     leg
 #>   <int> <int> <chr>  <dbl>
@@ -62,6 +63,7 @@ tidy(r); glance(r)
 #> 6     2     2 s7    0.393 
 #> 7     2     3 s6    0.389 
 #> 8     2     4 s4    0.208 
+glance(r)
 #> # A tibble: 1 × 8
 #>   n_units n_routes total lower_bound   gap optimal longest_route travel_unit
 #>     <int>    <int> <dbl>       <dbl> <dbl> <lgl>           <dbl> <chr>      

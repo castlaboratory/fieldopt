@@ -142,8 +142,10 @@ is given), <code>bounded</code>.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">two_stage_allocation</span><span class="op">(</span>n_primary <span class="op">=</span> <span class="fl">5000</span>, m_secondary <span class="op">=</span> <span class="fl">20</span>, s2_between <span class="op">=</span> <span class="fl">4</span>, s2_within <span class="op">=</span> <span class="fl">25</span>,</span></span>
-<span class="r-in"><span>                     c1 <span class="op">=</span> <span class="fl">300</span>, c2 <span class="op">=</span> <span class="fl">20</span>, budget <span class="op">=</span> <span class="fl">1e5</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">two_stage_allocation</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  n_primary <span class="op">=</span> <span class="fl">5000</span>, m_secondary <span class="op">=</span> <span class="fl">20</span>, s2_between <span class="op">=</span> <span class="fl">4</span>, s2_within <span class="op">=</span> <span class="fl">25</span>,</span></span>
+<span class="r-in"><span>  c1 <span class="op">=</span> <span class="fl">300</span>, c2 <span class="op">=</span> <span class="fl">20</span>, budget <span class="op">=</span> <span class="fl">1e5</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Two-stage allocation</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> n = 185 primary units with m = 12 secondary units each (optimal m 11.68): cost</span>

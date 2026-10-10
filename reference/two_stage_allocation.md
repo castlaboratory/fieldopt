@@ -67,8 +67,10 @@ given), `bounded`.
 ## Examples
 
 ``` r
-two_stage_allocation(n_primary = 5000, m_secondary = 20, s2_between = 4, s2_within = 25,
-                     c1 = 300, c2 = 20, budget = 1e5)
+two_stage_allocation(
+  n_primary = 5000, m_secondary = 20, s2_between = 4, s2_within = 25,
+  c1 = 300, c2 = 20, budget = 1e5
+)
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
 #> n = 185 primary units with m = 12 secondary units each (optimal m 11.68): cost

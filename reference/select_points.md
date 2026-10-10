@@ -61,11 +61,13 @@ cell), `point`, the two coordinates, `pi_cell`, `points_in_cell` and
 ## Examples
 
 ``` r
-cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
+cells <- expand.grid(x = 1:10, y = 1:10)
+cells$unit <- paste0("c", 1:100)
 s <- select_units(cells, n = 12, seed = 2)
 p <- select_points(s, points_per_cell = 9, cell_size = 1, layout = "systematic")
-nrow(p); head(p)
+nrow(p)
 #> [1] 108
+head(p)
 #> 6 systematic points in 1 sampled cell of size 1 x 1.
 #> # A tibble: 6 × 7
 #>   unit  point     x     y pi_cell points_in_cell density

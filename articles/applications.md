@@ -24,9 +24,13 @@ days feasible.
 ``` r
 
 set.seed(31)
-lakes <- tibble(unit = paste0("lake", 1:300), x = runif(300, 0, 200), y = runif(300, 0, 120)) |>
+lakes <- tibble(
+  unit = paste0("lake", 1:300),
+  x = runif(300, 0, 200), y = runif(300, 0, 120)
+) |>
   mutate(altitude = 200 + 8 * y + rnorm(n(), sd = 40), surface = exp(rnorm(n(), 2, 0.8)))
-s <- lakes |> select_units(n = 40, method = "cube", balance = c("altitude", "surface"), seed = 2)
+s <- lakes |>
+  select_units(n = 40, method = "cube", balance = c("altitude", "surface"), seed = 2)
 bind_rows(frame = lakes, sample = sampled(s), .id = "set") |>
   group_by(set) |>
   summarise(across(c(altitude, surface), mean))
@@ -37,8 +41,11 @@ bind_rows(frame = lakes, sample = sampled(s), .id = "set") |>
 #> 2 sample     674.    10.3
 harbour <- tibble(unit = "harbour", x = 100, y = 0)
 r <- s |>
-  travel_matrix(bases = harbour, method = "euclidean", speed = 60) |>      # 60 km/h: minutes
-  route_fieldwork(units = s, depot = "harbour", max_length = 600, service_time = 240, iterations = 100)
+  travel_matrix(bases = harbour, method = "euclidean", speed = 60) |> # 60 km/h: minutes
+  route_fieldwork(
+    units = s, depot = "harbour",
+    max_length = 600, service_time = 240, iterations = 100
+  )
 tibble(days = r$n_routes, longest_day = round(max(r$durations)))
 #> # A tibble: 1 × 2
 #>    days longest_day
@@ -58,8 +65,10 @@ the regional offices and their interviewers.
 set.seed(5)
 ea <- tibble(unit = paste0("ea", 1:400), x = runif(400, 0, 60), y = runif(400, 0, 40)) |>
   mutate(households = round(exp(rnorm(n(), 5, 0.4))))
-two_stage_allocation(n_primary = 400, m_secondary = mean(ea$households), s2_between = 0.04, s2_within = 0.22,
-                     c1 = 350, c2 = 18, target_cv = 0.03, mean = 0.4)
+two_stage_allocation(
+  n_primary = 400, m_secondary = mean(ea$households), s2_between = 0.04, s2_within = 0.22,
+  c1 = 350, c2 = 18, target_cv = 0.03, mean = 0.4
+)
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
 #> n = 249 primary units with m = 10 secondary units each (optimal m 10.52): cost
@@ -67,9 +76,11 @@ two_stage_allocation(n_primary = 400, m_secondary = mean(ea$households), s2_betw
 offices <- tibble(unit = c("office_w", "office_e"), x = c(12, 48), y = c(20, 20))
 s <- ea |> select_units(n = 36, size = "households", seed = 9)
 sch <- s |>
-  travel_matrix(bases = offices, method = "euclidean", speed = 20) |>      # 20 km/h in town: minutes
-  schedule_fieldwork(units = s, teams = c(office_w = 3, office_e = 2), days = 10,
-                     max_length = 480, service_time = 300, iterations = 60)
+  travel_matrix(bases = offices, method = "euclidean", speed = 20) |> # 20 km/h: minutes
+  schedule_fieldwork(
+    units = s, teams = c(office_w = 3, office_e = 2), days = 10,
+    max_length = 480, service_time = 300, iterations = 60
+  )
 sch$summary
 #> # A tibble: 2 × 7
 #>   base     units teams routes days_needed days_available fits 
@@ -88,8 +99,10 @@ the estimation; the allocation below spends a budget between the frames.
 
 ``` r
 
-domains <- tibble(domain = c("a", "ab", "b"), size = c(5000, 800, 150),
-                  mean = c(12, 90, 110), sd = c(10, 60, 70))
+domains <- tibble(
+  domain = c("a", "ab", "b"), size = c(5000, 800, 150),
+  mean = c(12, 90, 110), sd = c(10, 60, 70)
+)
 dual_frame_allocation(domains, cost_a = 220, cost_b = 35, deff_a = 1.6, budget = 150000)
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────

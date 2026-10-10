@@ -134,13 +134,18 @@ The final `fieldopt_two_stage` allocation with an extra element
 
 ``` r
 set.seed(2)
-cells <- expand.grid(x = 1:15, y = 1:15); cells$unit <- paste0("c", seq_len(nrow(cells)))
+cells <- expand.grid(x = 1:15, y = 1:15)
+cells$unit <- paste0("c", seq_len(nrow(cells)))
 frame <- rbind(data.frame(unit = "depot", x = 8, y = 8), cells)
-model <- field_cost_model(per_travel = 3, per_unit = 40, per_interview = 20,
-                          interviews_per_unit = 1)
-two_stage_design(frame, "depot", model, m_secondary = 12, s2_between = 9, s2_within = 40,
-                 target_cv = 0.05, mean = 10, method = "euclidean", n_rep = 2,
-                 iterations = 20)
+model <- field_cost_model(
+  per_travel = 3, per_unit = 40, per_interview = 20,
+  interviews_per_unit = 1
+)
+two_stage_design(frame, "depot", model,
+  m_secondary = 12, s2_between = 9, s2_within = 40,
+  target_cv = 0.05, mean = 10, method = "euclidean", n_rep = 2,
+  iterations = 20
+)
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
 #> n = 55 primary units with m = 4 secondary units each (optimal m 4): cost 6892,

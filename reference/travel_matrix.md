@@ -112,9 +112,11 @@ direction travelled.
 ## Examples
 
 ``` r
-segments <- data.frame(unit = c("depot", "s1", "s2", "s3"),
-                       lat = c(-8.05, -8.10, -8.00, -8.12),
-                       lon = c(-34.90, -34.95, -34.85, -34.80))
+segments <- data.frame(
+  unit = c("depot", "s1", "s2", "s3"),
+  lat = c(-8.05, -8.10, -8.00, -8.12),
+  lon = c(-34.90, -34.95, -34.85, -34.80)
+)
 travel_matrix(segments)
 #> Travel matrix: 4 units, haversine (km); mean off-diagonal 12.65.
 travel_matrix(segments, detour = 1.3)

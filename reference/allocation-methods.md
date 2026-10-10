@@ -51,15 +51,18 @@ A tibble.
 ## Examples
 
 ``` r
-strata <- data.frame(stratum = c("list", "area"), size = c(2000, 800),
-                     sd = c(12, 30), cost = c(40, 180))
+strata <- data.frame(
+  stratum = c("list", "area"), size = c(2000, 800),
+  sd = c(12, 30), cost = c(40, 180)
+)
 a <- frame_allocation(strata, budget = 20000)
-tidy(a); glance(a)
+tidy(a)
 #> # A tibble: 2 × 7
 #>   stratum  size    sd  cost     n cost_total variance
 #>   <chr>   <dbl> <dbl> <dbl> <int>      <dbl>    <dbl>
 #> 1 list     2000    12    40   162       6480 3267556.
 #> 2 area      800    30   180    75      13500 6960000 
+glance(a)
 #> # A tibble: 1 × 6
 #>   mode   target     n  cost  variance bounded
 #>   <chr>   <dbl> <int> <dbl>     <dbl> <lgl>  

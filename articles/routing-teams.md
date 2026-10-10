@@ -10,13 +10,19 @@ on one sample.
 library(fieldopt)
 library(dplyr, warn.conflicts = FALSE)
 set.seed(7)
-frame <- tibble(unit = c("depot", paste0("s", 1:60)),
-                lat = c(-8.05, -8.05 + runif(60, -0.25, 0.25)),
-                lon = c(-35.00, -35.00 + runif(60, -0.35, 0.35)))
+frame <- tibble(
+  unit = c("depot", paste0("s", 1:60)),
+  lat = c(-8.05, -8.05 + runif(60, -0.25, 0.25)),
+  lon = c(-35.00, -35.00 + runif(60, -0.35, 0.35))
+)
 m <- travel_matrix(frame)
-model <- field_cost_model(per_travel = 1.8, per_unit = 40, per_interview = 12,
-                          interviews_per_unit = 6, currency = "BRL")
-s <- frame |> filter(unit != "depot") |> select_units(n = 18, seed = 3)
+model <- field_cost_model(
+  per_travel = 1.8, per_unit = 40, per_interview = 12,
+  interviews_per_unit = 6, currency = "BRL"
+)
+s <- frame |>
+  filter(unit != "depot") |>
+  select_units(n = 18, seed = 3)
 ```
 
 ## One tour
@@ -41,8 +47,11 @@ limit (Prins 2004) and improves each route locally.
 
 ``` r
 
-days <- route_fieldwork(m, units = s, depot = "depot", max_length = 100,
-                        cost_model = model)
+days <- route_fieldwork(
+  m,
+  units = s, depot = "depot", max_length = 100,
+  cost_model = model
+)
 days
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
@@ -67,8 +76,11 @@ instead.
 
 ``` r
 
-stops <- route_fieldwork(m, units = s, depot = "depot", max_stops = 4,
-                         cost_model = model)
+stops <- route_fieldwork(
+  m,
+  units = s, depot = "depot", max_stops = 4,
+  cost_model = model
+)
 stops
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
@@ -86,8 +98,12 @@ stops
 
 ``` r
 
-bind_rows(`one tour` = glance(one), `100 km per route` = glance(days), `4 stops per route` = glance(stops),
-          .id = "organisation") |>
+bind_rows(
+  `one tour` = glance(one),
+  `100 km per route` = glance(days),
+  `4 stops per route` = glance(stops),
+  .id = "organisation"
+) |>
   select(organisation, n_routes, travel_km = total, cost) |>
   mutate(across(c(travel_km, cost), round))
 #> # A tibble: 3 × 4
@@ -128,7 +144,7 @@ m_detour
 ``` r
 
 m_road <- travel_matrix(frame, method = "osrm", measure = "duration")
-route_fieldwork(m_road, units = s, depot = "depot", max_length = 480)   # 8 hours per route
+route_fieldwork(m_road, units = s, depot = "depot", max_length = 480) # 8 hours per route
 ```
 
 The `snap` attribute of an OSRM matrix gives the distance from each unit
@@ -145,12 +161,16 @@ a team-day (allowances, vehicle, lodging). Routes are then days of work.
 
 ``` r
 
-daily <- field_cost_model(per_travel = 0.5, per_route = 400, per_unit = 20, per_interview = 15,
-                          interviews_per_unit = 3, currency = "BRL")
+daily <- field_cost_model(
+  per_travel = 0.5, per_route = 400, per_unit = 20, per_interview = 15,
+  interviews_per_unit = 3, currency = "BRL"
+)
 day <- frame |>
-  travel_matrix(detour = 1.3, speed = 60) |>                    # kilometres at 60 km/h: minutes
-  route_fieldwork(units = s, depot = "depot", max_length = 480, service_time = 120,
-                  iterations = 50, cost_model = daily)
+  travel_matrix(detour = 1.3, speed = 60) |> # kilometres at 60 km/h: minutes
+  route_fieldwork(
+    units = s, depot = "depot", max_length = 480, service_time = 120,
+    iterations = 50, cost_model = daily
+  )
 day
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
@@ -185,8 +205,10 @@ whether the work fits.
 bases <- tibble(unit = c("depot", "base2"), lat = c(-8.05, -8.30), lon = c(-35.00, -35.30))
 sch <- s |>
   travel_matrix(bases = bases, detour = 1.3, speed = 60) |>
-  schedule_fieldwork(units = s, teams = c(depot = 1, base2 = 1), days = 6,
-                     max_length = 480, service_time = 120, iterations = 50, cost_model = daily)
+  schedule_fieldwork(
+    units = s, teams = c(depot = 1, base2 = 1), days = 6,
+    max_length = 480, service_time = 120, iterations = 50, cost_model = daily
+  )
 sch
 #> 
 #> ── Field schedule ──────────────────────────────────────────────────────────────
@@ -194,7 +216,9 @@ sch
 #> "depot": 15 units, 1 team, 5 routes, 5 of 6 days.
 #> "base2": 3 units, 1 team, 1 route, 1 of 6 days.
 #> Cost (BRL): 3852.
-sch$calendar |> select(base, team, day, stops, travel, duration) |> head()
+sch$calendar |>
+  select(base, team, day, stops, travel, duration) |>
+  head()
 #> # A tibble: 6 × 6
 #>   base  team      day stops  travel duration
 #>   <chr> <chr>   <int> <int>   <dbl>    <dbl>
@@ -318,8 +342,11 @@ jointly with the routes.
 
 ``` r
 
-v <- route_fieldwork(m, units = s, depot = "depot", max_length = 100,
-                     cost_model = model, engine = "vrpr", time_limit = 1)
+v <- route_fieldwork(
+  m,
+  units = s, depot = "depot", max_length = 100,
+  cost_model = model, engine = "vrpr", time_limit = 1
+)
 tibble(fieldopt = days$total, vrpr = v$total)
 #> # A tibble: 1 × 2
 #>   fieldopt   vrpr

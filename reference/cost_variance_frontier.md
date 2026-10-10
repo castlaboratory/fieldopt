@@ -126,13 +126,19 @@ when strata are used.
 
 ``` r
 set.seed(3)
-frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
-                    x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
+frame <- data.frame(
+  unit = c("depot", paste0("s", 1:40)),
+  x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))
+)
 frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40))
-model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
-                          interviews_per_unit = 4)
-cost_variance_frontier(frame, depot = "depot", cost_model = model, n_grid = c(8, 16),
-                       y = "crop", method = "euclidean", n_rep = 3, iterations = 20)
+model <- field_cost_model(
+  per_travel = 2, per_unit = 30, per_interview = 10,
+  interviews_per_unit = 4
+)
+cost_variance_frontier(frame,
+  depot = "depot", cost_model = model, n_grid = c(8, 16),
+  y = "crop", method = "euclidean", n_rep = 3, iterations = 20
+)
 #> # A tibble: 2 × 9
 #>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
 #> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>

@@ -82,8 +82,10 @@ multiple-frame surveys. *JASA*, 101(475), 1019–1030.
 ## Examples
 
 ``` r
-domains <- data.frame(domain = c("a", "ab", "b"), size = c(8000, 1500, 500),
-                      mean = c(5, 40, 60), sd = c(6, 30, 50))
+domains <- data.frame(
+  domain = c("a", "ab", "b"), size = c(8000, 1500, 500),
+  mean = c(5, 40, 60), sd = c(6, 30, 50)
+)
 dual_frame_allocation(domains, cost_a = 200, cost_b = 40, budget = 1e5)
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────

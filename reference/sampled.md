@@ -28,7 +28,9 @@ columns).
 
 ``` r
 cells <- expand.grid(x = 1:6, y = 1:6)
-cells |> select_units(n = 5, seed = 1) |> sampled()
+cells |>
+  select_units(n = 5, seed = 1) |>
+  sampled()
 #> # A tibble: 5 × 5
 #>       x     y unit     pi sampled
 #>   <int> <int> <chr> <dbl> <lgl>  

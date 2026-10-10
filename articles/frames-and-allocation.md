@@ -12,10 +12,12 @@ stratum, in its two forms.
 
 library(fieldopt)
 library(dplyr, warn.conflicts = FALSE)
-strata <- tibble(stratum = c("list: large", "list: small", "area"),
-                 size = c(300, 2500, 900),
-                 sd = c(80, 12, 35),
-                 cost = c(60, 35, 190))
+strata <- tibble(
+  stratum = c("list: large", "list: small", "area"),
+  size = c(300, 2500, 900),
+  sd = c(80, 12, 35),
+  cost = c(60, 35, 190)
+)
 strata
 #> # A tibble: 3 × 4
 #>   stratum      size    sd  cost
@@ -81,9 +83,14 @@ sample sizes agree.
 
 ``` r
 
-f <- cost_variance_frontier(area_frame, depot = "depot", cost_model = model,
-                            n_grid = c(40, 60, 80, 100), y = "crop")
-area_cost <- f |> slice_min(abs(n - a$n[3]), n = 1) |> pull(cost_per_unit)
+f <- cost_variance_frontier(
+  area_frame,
+  depot = "depot", cost_model = model,
+  n_grid = c(40, 60, 80, 100), y = "crop"
+)
+area_cost <- f |>
+  slice_min(abs(n - a$n[3]), n = 1) |>
+  pull(cost_per_unit)
 strata |>
   mutate(cost = if_else(stratum == "area", area_cost, cost)) |>
   frame_allocation(target_variance = 2.5e7)
@@ -104,11 +111,16 @@ variance attained for each.
 
 ``` r
 
-multi <- tibble(stratum = c("list", "area-high", "area-low"),
-                size = c(2000, 300, 500), cost = c(40, 200, 160),
-                sd_crop = c(12, 35, 18), sd_cattle = c(30, 10, 25))
-ma <- multivariate_allocation(multi, sd = c("sd_crop", "sd_cattle"),
-                              target_cv = c(0.04, 0.06), totals = c(120000, 90000))
+multi <- tibble(
+  stratum = c("list", "area-high", "area-low"),
+  size = c(2000, 300, 500), cost = c(40, 200, 160),
+  sd_crop = c(12, 35, 18), sd_cattle = c(30, 10, 25)
+)
+ma <- multivariate_allocation(
+  multi,
+  sd = c("sd_crop", "sd_cattle"),
+  target_cv = c(0.04, 0.06), totals = c(120000, 90000)
+)
 ma
 #> 
 #> ── Multivariate allocation ─────────────────────────────────────────────────────

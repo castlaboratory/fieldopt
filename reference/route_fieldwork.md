@@ -141,11 +141,15 @@ The traveling-salesman problem and minimum spanning trees: part II.
 
 ``` r
 set.seed(1)
-pts <- data.frame(unit = c("depot", paste0("s", 1:12)),
-                  x = c(0, runif(12, 0, 10)), y = c(0, runif(12, 0, 10)))
+pts <- data.frame(
+  unit = c("depot", paste0("s", 1:12)),
+  x = c(0, runif(12, 0, 10)), y = c(0, runif(12, 0, 10))
+)
 m <- travel_matrix(pts, method = "euclidean")
-r <- route_fieldwork(m, units = paste0("s", 1:12), depot = "depot", max_stops = 5,
-                     iterations = 50)
+r <- route_fieldwork(m,
+  units = paste0("s", 1:12), depot = "depot", max_stops = 5,
+  iterations = 50
+)
 r
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────

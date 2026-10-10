@@ -81,15 +81,19 @@ Lohr, S. L. (2009). Multiple-frame surveys. In *Handbook of Statistics
 
 ``` r
 set.seed(7)
-cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144)
+cells <- expand.grid(x = 1:12, y = 1:12)
+cells$unit <- paste0("c", 1:144)
 cells$domain <- ifelse(runif(144) < 0.2, "ab", "a")
 cells$y <- ifelse(cells$domain == "ab", 80, 10) + rnorm(144, sd = 3)
 # the list holds the overlap units (same values) plus units of its own
 ab <- cells[cells$domain == "ab", ]
-list <- data.frame(unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:11)),
-                   x = runif(nrow(ab) + 11), y = c(ab$y, 120 + rnorm(11, sd = 5)),
-                   domain = rep(c("ab", "b"), c(nrow(ab), 11)))
-list$lon <- runif(nrow(list)); list$lat <- runif(nrow(list))
+list <- data.frame(
+  unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:11)),
+  x = runif(nrow(ab) + 11), y = c(ab$y, 120 + rnorm(11, sd = 5)),
+  domain = rep(c("ab", "b"), c(nrow(ab), 11))
+)
+list$lon <- runif(nrow(list))
+list$lat <- runif(nrow(list))
 sa <- select_units(cells, n = 30, seed = 1)
 sb <- select_units(list, n = 15, coords = c("lat", "lon"), method = "srs", seed = 2)
 dual_frame_estimator(sa, sb, y = "y", domain = "domain")

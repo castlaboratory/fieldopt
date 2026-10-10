@@ -59,7 +59,8 @@ cell it belongs to.
 ## Examples
 
 ``` r
-cells <- expand.grid(x = 1:5, y = 1:5); cells$unit <- paste0("c", 1:25)
+cells <- expand.grid(x = 1:5, y = 1:5)
+cells$unit <- paste0("c", 1:25)
 farms <- data.frame(unit = c("f1", "f2", "f3"), x = c(1.2, 3.4, 9), y = c(1.1, 2.6, 9))
 ov <- frame_overlap(farms, cells, cell_size = 1)
 ov$list

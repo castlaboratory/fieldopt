@@ -20,7 +20,10 @@ west to east.
 library(fieldopt)
 library(dplyr, warn.conflicts = FALSE)
 set.seed(2026)
-frame <- tibble(unit = c("depot", paste0("s", 1:40)), x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))) |>
+frame <- tibble(
+  unit = c("depot", paste0("s", 1:40)),
+  x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))
+) |>
   mutate(crop = if_else(unit == "depot", NA_real_, 20 + 3 * x + rnorm(n(), sd = 2)))
 frame
 #> # A tibble: 41 × 4
@@ -70,8 +73,10 @@ cost per visited unit (access, setting up) and a cost per interview.
 
 ``` r
 
-model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
-                          interviews_per_unit = 4, currency = "BRL")
+model <- field_cost_model(
+  per_travel = 2, per_unit = 30, per_interview = 10,
+  interviews_per_unit = 4, currency = "BRL"
+)
 model
 #> Field cost model (BRL): 2 per travel unit, 0 per route, 30 per visited unit, 10
 #> per interview.
@@ -89,8 +94,12 @@ longer. Making that tension explicit is the point of the package.
 
 ``` r
 
-s <- frame |> filter(unit != "depot") |> select_units(n = 12)
-s |> sampled() |> select(unit, x, y, pi)
+s <- frame |>
+  filter(unit != "depot") |>
+  select_units(n = 12)
+s |>
+  sampled() |>
+  select(unit, x, y, pi)
 #> # A tibble: 12 × 4
 #>    unit       x     y    pi
 #>    <chr>  <dbl> <dbl> <dbl>
@@ -168,10 +177,13 @@ frontier a survey planner faces.
 
 ``` r
 
-f <- cost_variance_frontier(frame, depot = "depot", cost_model = model,
-                            n_grid = c(6, 9, 12, 16, 20, 24), y = "crop",
-                            method = "euclidean", max_stops = 5,
-                            n_rep = 8, iterations = 60)
+f <- cost_variance_frontier(
+  frame,
+  depot = "depot", cost_model = model,
+  n_grid = c(6, 9, 12, 16, 20, 24), y = "crop",
+  method = "euclidean", max_stops = 5,
+  n_rep = 8, iterations = 60
+)
 f
 #> # A tibble: 6 × 9
 #>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean

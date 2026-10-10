@@ -69,11 +69,15 @@ calendar satisfies the constraints within `days`.
 
 ``` r
 set.seed(5)
-pts <- data.frame(unit = c("base1", "base2", paste0("s", 1:30)),
-                  x = c(2, 8, runif(30, 0, 10)), y = c(2, 8, runif(30, 0, 10)))
+pts <- data.frame(
+  unit = c("base1", "base2", paste0("s", 1:30)),
+  x = c(2, 8, runif(30, 0, 10)), y = c(2, 8, runif(30, 0, 10))
+)
 m <- travel_matrix(pts, method = "euclidean")
-sch <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 1),
-                          days = 5, max_stops = 4, iterations = 30)
+sch <- schedule_fieldwork(m,
+  units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 1),
+  days = 5, max_stops = 4, iterations = 30
+)
 if (requireNamespace("highs", quietly = TRUE)) {
   off <- data.frame(team = "base1-1", day = 1, available = FALSE)
   schedule_calendar(sch, availability = off)

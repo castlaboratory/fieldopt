@@ -60,10 +60,14 @@ Section, ASA*, 194-199.
 ## Examples
 
 ``` r
-strata <- data.frame(stratum = c("high", "mid", "low"), size = c(300, 800, 2000),
-                     cost = c(250, 180, 150), sd_corn = c(40, 25, 8), sd_cattle = c(15, 30, 12))
-multivariate_allocation(strata, sd = c("sd_corn", "sd_cattle"),
-                        target_cv = c(0.05, 0.08), totals = c(90000, 60000))
+strata <- data.frame(
+  stratum = c("high", "mid", "low"), size = c(300, 800, 2000),
+  cost = c(250, 180, 150), sd_corn = c(40, 25, 8), sd_cattle = c(15, 30, 12)
+)
+multivariate_allocation(strata,
+  sd = c("sd_corn", "sd_cattle"),
+  target_cv = c(0.05, 0.08), totals = c(90000, 60000)
+)
 #> 
 #> ── Multivariate allocation ─────────────────────────────────────────────────────
 #> Minimum cost 21150 for 2 targets.

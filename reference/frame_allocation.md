@@ -38,8 +38,10 @@ The strata with a column `n`, plus attributes `cost`, `variance` and
 ## Examples
 
 ``` r
-strata <- data.frame(stratum = c("list", "area"), size = c(2000, 800),
-                     sd = c(12, 30), cost = c(40, 180))
+strata <- data.frame(
+  stratum = c("list", "area"), size = c(2000, 800),
+  sd = c(12, 30), cost = c(40, 180)
+)
 frame_allocation(strata, target_variance = 4e6)
 #> 
 #> ── Allocation ──────────────────────────────────────────────────────────────────

@@ -43,7 +43,8 @@ Horvitz-Thompson estimate).
 ## Examples
 
 ``` r
-cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144)
+cells <- expand.grid(x = 1:12, y = 1:12)
+cells$unit <- paste0("c", 1:144)
 cells$farmland <- runif(144, 20, 100)
 cells$crop <- 0.4 * cells$farmland + rnorm(144, sd = 3)
 s <- select_units(cells, n = 24, seed = 2)

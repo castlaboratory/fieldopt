@@ -55,7 +55,10 @@ set.seed(4)
 cells <- expand_grid(x = 1:15, y = 1:15) |> mutate(unit = paste0("c", row_number()))
 areas <- expand_grid(unit = cells$unit, k = 1:3) |>
   transmute(unit, establishment = paste0(unit, "-", k), area = 0.3, y = rlnorm(n(), 2, 0.5))
-deff <- point_design_effect(cells, areas, n = 25, points_per_cell = 6, cell_size = 1, n_sim = 60, seed = 2)
+deff <- point_design_effect(
+  cells, areas,
+  n = 25, points_per_cell = 6, cell_size = 1, n_sim = 60, seed = 2
+)
 deff |> select(bias, variance, mean_variance_estimate, deff)
 #> # A tibble: 1 × 4
 #>     bias variance mean_variance_estimate   deff
@@ -67,24 +70,34 @@ deff |> select(bias, variance, mean_variance_estimate, deff)
 
 set.seed(7)
 cells <- cells |>
-  mutate(domain = if_else(runif(n()) < 0.2, "ab", "a"), yv = if_else(domain == "ab", 80, 10) + rnorm(n(), sd = 3))
+  mutate(
+    domain = if_else(runif(n()) < 0.2, "ab", "a"),
+    yv = if_else(domain == "ab", 80, 10) + rnorm(n(), sd = 3)
+  )
 overlap <- cells |> filter(domain == "ab")
-lst <- bind_rows(overlap |> transmute(unit = paste0("l", row_number()), domain, yv),
-                 tibble(unit = paste0("b", 1:12), domain = "b", yv = 120 + rnorm(12, sd = 5))) |>
+lst <- bind_rows(
+  overlap |> transmute(unit = paste0("l", row_number()), domain, yv),
+  tibble(unit = paste0("b", 1:12), domain = "b", yv = 120 + rnorm(12, sd = 5))
+) |>
   mutate(x = runif(n()), y = runif(n()))
 truth <- sum(cells$yv) + sum(lst$yv[lst$domain == "b"])
 est <- map(1:40, \(k) {
   sa <- cells |> select_units(n = 30, seed = k)
   sb <- lst |> select_units(n = 15, method = "srs", seed = k)
-  tibble(hartley = dual_frame_estimator(sa, sb, "yv", "domain")$total,
-         fb = dual_frame_estimator(sa, sb, "yv", "domain", estimator = "fuller-burmeister")$total)
+  tibble(
+    hartley = dual_frame_estimator(sa, sb, "yv", "domain")$total,
+    fb = dual_frame_estimator(sa, sb, "yv", "domain", estimator = "fuller-burmeister")$total
+  )
 }) |> list_rbind()
-est |> summarise(across(everything(), mean)) |> mutate(truth = truth, .before = 1)
+est |>
+  summarise(across(everything(), mean)) |>
+  mutate(truth = truth, .before = 1)
 #> # A tibble: 1 × 3
 #>    truth hartley     fb
 #>    <dbl>   <dbl>  <dbl>
 #> 1 6182.1  6217.7 6242.3
-est |> summarise(across(everything(), \(e) round(100 * (mean(e) - truth) / truth, 2)))   # relative bias in percent
+# relative bias in percent
+est |> summarise(across(everything(), \(e) round(100 * (mean(e) - truth) / truth, 2)))
 #> # A tibble: 1 × 2
 #>   hartley    fb
 #>     <dbl> <dbl>

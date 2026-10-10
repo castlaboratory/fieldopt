@@ -40,7 +40,8 @@ attribute columns.
 ``` r
 if (requireNamespace("sf", quietly = TRUE)) {
   sq <- sf::st_sfc(sf::st_polygon(list(rbind(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)))),
-                   crs = 4326)
+    crs = 4326
+  )
   cells <- sf::st_sf(crop = 3, geometry = sf::st_make_grid(sq, n = 3))
   as_frame(cells)
 }
