@@ -40,7 +40,7 @@ Survey Design under Real Field Cost*. R package version 0.1.0,
 
     Crate (version)            Authors                                   Licence
     -------------------------  ----------------------------------------  ------------------------------------
-    fieldopt-core (0.2.3)      André Leite, Raydonal Ospina,             GPL-3.0-or-later
+    fieldopt-core (0.10.0)     André Leite, Raydonal Ospina,             GPL-3.0-or-later
                                Cristiano Ferraz
     extendr-api (0.9.0)        The extendr authors                       MIT
     extendr-ffi (0.9.0)        The extendr authors                       MIT

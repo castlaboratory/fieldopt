@@ -156,26 +156,26 @@ The final `fieldopt_dual_frame` allocation, with `cost` the routed cost
 
 ``` r
 set.seed(3)
-cells <- expand.grid(x = 1:15, y = 1:15)
+cells <- expand.grid(x = 1:12, y = 1:12)
 cells$unit <- paste0("c", seq_len(nrow(cells)))
-frame <- rbind(data.frame(unit = "depot", x = 8, y = 8), cells)
+frame <- rbind(data.frame(unit = "depot", x = 6, y = 6), cells)
 model <- field_cost_model(
   per_travel = 3, per_unit = 40, per_interview = 20,
   interviews_per_unit = 3
 )
 domains <- data.frame(
-  domain = c("a", "ab", "b"), size = c(600, 80, 20),
+  domain = c("a", "ab", "b"), size = c(400, 60, 20),
   mean = c(6, 30, 45), sd = c(5, 20, 35)
 )
 dual_frame_design(frame, "depot", model, domains,
   cost_b = 45, deff_a = 1.5,
-  target_cv = 0.05, method = "euclidean", n_rep = 2, iterations = 20
+  target_cv = 0.05, method = "euclidean", n_rep = 1, iterations = 10
 )
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 119000: n_A = 114 (frame A, cost 102.2/unit),
-#> n_B = 99 (frame B, cost 45/unit), theta = 0.116 (optimised).
-#> Cost 16290; variance 118800 (frame A 118000, frame B 545); CV 4.99% of the
-#> total 6900.
-#> Expected overlap units: 13.4 in the A sample, 79.2 in the B sample.
+#> Minimum cost for target variance 65020: n_A = 91 (frame A, cost 102.1/unit),
+#> n_B = 80 (frame B, cost 45/unit), theta = 0.103 (optimised).
+#> Cost 13020; variance 65020 (frame A 65000, frame B 0); CV 5% of the total 5100.
+#> Expected overlap units: 11.9 in the A sample, 60 in the B sample; a bound on a
+#> sample size was active.
 ```

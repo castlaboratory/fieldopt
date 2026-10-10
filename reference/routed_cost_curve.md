@@ -178,11 +178,11 @@ curve <- routed_cost_curve(frame, "depot", model,
 curve
 #> 
 #> ── Routed cost curve ───────────────────────────────────────────────────────────
-#> G(n) = 1.339 + 39.05 n + 47.64 sqrt(n) (cost; 4 sample sizes from 10 to 80, 2
+#> G(n) = 3.9 + 39.17 n + 46.46 sqrt(n) (cost; 4 sample sizes from 10 to 80, 2
 #> routed samples each, lpm selection; R-squared 1).
-#> In Hansen, Hurwitz and Madow's notation: C0 = 47.64 (travel), C1 = 39.05 (per
+#> In Hansen, Hurwitz and Madow's notation: C0 = 46.46 (travel), C1 = 39.17 (per
 #> primary unit).
-#> At n = 30: average cost 47.79, marginal cost 43.4 per unit.
+#> At n = 30: average cost 47.79, marginal cost 43.41 per unit.
 predict(curve, c(30, 60), type = "marginal")
-#> [1] 43.39533 42.12147
+#> [1] 43.41366 42.17136
 ```

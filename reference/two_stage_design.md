@@ -162,9 +162,9 @@ H. and Hammersley, J. M. (1959). The shortest path through many points.
 
 ``` r
 set.seed(2)
-cells <- expand.grid(x = 1:15, y = 1:15)
+cells <- expand.grid(x = 1:12, y = 1:12)
 cells$unit <- paste0("c", seq_len(nrow(cells)))
-frame <- rbind(data.frame(unit = "depot", x = 8, y = 8), cells)
+frame <- rbind(data.frame(unit = "depot", x = 6, y = 6), cells)
 model <- field_cost_model(
   per_travel = 3, per_unit = 40, per_interview = 20,
   interviews_per_unit = 1
@@ -176,6 +176,6 @@ two_stage_design(frame, "depot", model,
 )
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
-#> n = 55 primary units with m = 4 secondary units each (optimal m 3.87): cost
-#> 6899, variance of the total 1785000 (SE 1336, CV 4.95%).
+#> n = 61 primary units with m = 3 secondary units each (optimal m 3.83): cost
+#> 6353, variance of the total 743400 (SE 862.2, CV 4.99%).
 ```

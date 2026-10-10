@@ -2,6 +2,16 @@
 
 ## fieldopt 0.1.0
 
+- [`cost_variance_frontier()`](https://castlaboratory.github.io/fieldopt/reference/cost_variance_frontier.md)
+  and everything built on it
+  ([`routed_unit_cost()`](https://castlaboratory.github.io/fieldopt/reference/routed_unit_cost.md),
+  [`routed_cost_curve()`](https://castlaboratory.github.io/fieldopt/reference/routed_cost_curve.md),
+  [`two_stage_design()`](https://castlaboratory.github.io/fieldopt/reference/two_stage_design.md),
+  [`dual_frame_design()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_design.md))
+  route the simulated samples without the optimality certificate of
+  single tours, which only adds proof time: about 14 times faster on
+  single-tour problems.
+
 - The local-mean variance estimator
   ([`design_variance()`](https://castlaboratory.github.io/fieldopt/reference/design_variance.md)
   for `"lpm"`, `"cube"` and single-replicate systematic samples)
