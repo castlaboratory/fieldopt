@@ -4,7 +4,8 @@
 #
 # Stage 1 tabulates the routed cost curve T(n) of each frame, selection design
 # and route limit on a grid of sample sizes (cost_variance_frontier). Stage 2
-# runs the two-stage allocations (A linear, B routed loop, C oracle) and
+# runs the two-stage allocations (A linear, B average-cost routed loop, B' marginal
+# loop on the curve, P the package's two_stage_design(), C oracle) and
 # stage 3 the dual-frame allocations. Every unit of work is saved as one rds in
 # experiments/out/e2/ and skipped when the file exists, so the script resumes.
 suppressPackageStartupMessages({
@@ -13,6 +14,7 @@ suppressPackageStartupMessages({
   library(tibble)
   library(purrr)
 })
+source("experiments/run/e2_average_loops.R")   # procedure B: the package's loop before 2026-10-10
 args <- commandArgs(trailingOnly = TRUE)
 cores <- if (length(args) >= 1) as.integer(args[1]) else 10L
 pilot <- length(args) >= 2 && args[2] == "pilot"
@@ -193,9 +195,12 @@ run_two_stage <- function(i, s2_ratio) {
   # --- target variance
   C <- oracle_ts(Tn, N, M, s1, s2, c2, target_variance = target_variance, n_max = n_max)
   A <- two_stage_allocation(N, M, s1, s2, c1 = naive_c1(frame), c2 = c2, target_variance = tv_total)
-  B <- two_stage_design(fr, "depot", cost_model_of(limit, per_interview = c2), m_secondary = M,
+  B <- average_two_stage_design(fr, "depot", cost_model_of(limit, per_interview = c2), m_secondary = M,
     s2_between = s1, s2_within = s2, target_variance = tv_total, matrix = matrices[[frame]],
     selection = selection, max_length = limit_of(frame, limit), n_rep = R_REP, iterations = ITER, seed = 23)
+  P <- two_stage_design(fr, "depot", cost_model_of(limit, per_interview = c2), m_secondary = M,
+    s2_between = s1, s2_within = s2, target_variance = tv_total, matrix = matrices[[frame]],
+    selection = selection, max_length = limit_of(frame, limit), n_rep = R_REP, iterations = ITER, seed = 41)
   Gp <- curve_deriv(cv)
   Bm <- marginal_loop(\(c1) two_stage_allocation(N, M, s1, s2, c1 = c1, c2 = c2, target_variance = tv_total),
                       Gp, naive_c1(frame))
@@ -203,15 +208,19 @@ run_two_stage <- function(i, s2_ratio) {
     A = evaluate(A$n, A$m) |> mutate(c1_used = A$inputs$c1, claimed_cost = A$cost),
     B = evaluate(B$n, B$m) |> mutate(c1_used = B$c1, claimed_cost = B$cost, rounds = nrow(B$history), converged = B$converged),
     `B'` = evaluate(Bm$n, Bm$m) |> mutate(c1_used = Bm$c1, claimed_cost = Bm$cost, rounds = Bm$rounds, converged = Bm$converged),
+    P = evaluate(P$n, P$m) |> mutate(c1_used = P$c1, claimed_cost = P$cost, rounds = nrow(P$history), converged = P$converged),
     C = C |> mutate(c1_used = Tn(C$n) / C$n, claimed_cost = C$cost),
     .id = "procedure") |> mutate(constraint = "target_variance", target = target_variance)
   # --- budget = the oracle's cost at the target
   budget <- C$cost
   Cb <- oracle_ts(Tn, N, M, s1, s2, c2, budget = budget, n_max = n_max)
   Ab <- two_stage_allocation(N, M, s1, s2, c1 = naive_c1(frame), c2 = c2, budget = budget)
-  Bb <- two_stage_design(fr, "depot", cost_model_of(limit, per_interview = c2), m_secondary = M,
+  Bb <- average_two_stage_design(fr, "depot", cost_model_of(limit, per_interview = c2), m_secondary = M,
     s2_between = s1, s2_within = s2, budget = budget, matrix = matrices[[frame]],
     selection = selection, max_length = limit_of(frame, limit), n_rep = R_REP, iterations = ITER, seed = 29)
+  Pb <- two_stage_design(fr, "depot", cost_model_of(limit, per_interview = c2), m_secondary = M,
+    s2_between = s1, s2_within = s2, budget = budget, matrix = matrices[[frame]],
+    selection = selection, max_length = limit_of(frame, limit), n_rep = R_REP, iterations = ITER, seed = 43)
   Bmb <- marginal_loop(\(c1) two_stage_allocation(N, M, s1, s2, c1 = c1, c2 = c2, budget = budget),
                        Gp, naive_c1(frame))
   # the marginal rule fixes m; the number of primary units comes from the true cost
@@ -222,6 +231,7 @@ run_two_stage <- function(i, s2_ratio) {
     A = evaluate(Ab$n, Ab$m) |> mutate(c1_used = Ab$inputs$c1, claimed_cost = Ab$cost),
     B = evaluate(Bb$n, Bb$m) |> mutate(c1_used = Bb$c1, claimed_cost = Bb$cost, rounds = nrow(Bb$history), converged = Bb$converged),
     `B'` = evaluate(Bmb$n, Bmb$m) |> mutate(c1_used = Bmb$c1, claimed_cost = Bmb$cost, rounds = Bmb$rounds, converged = Bmb$converged),
+    P = evaluate(Pb$n, Pb$m) |> mutate(c1_used = Pb$c1, claimed_cost = Pb$cost, rounds = nrow(Pb$history), converged = Pb$converged),
     C = Cb |> mutate(c1_used = Tn(Cb$n) / Cb$n, claimed_cost = Cb$cost),
     .id = "procedure") |> mutate(constraint = "budget", target = budget)
   res <- list_rbind(rows) |>
@@ -309,9 +319,12 @@ run_dual <- function(i) {
   cost_a_naive <- PER_UNIT + PER_INTERVIEW + PER_TRAVEL * median(m[dd, -dd])
   C <- oracle_dual(Tn, d, COST_B, target_variance = target_variance, n_max = n_max)
   A <- dual_frame_allocation(d, cost_a = cost_a_naive, cost_b = COST_B, target_variance = target_variance)
-  B <- dual_frame_design(fr, "depot", cmA, d, cost_b = COST_B, target_variance = target_variance,
+  B <- average_dual_frame_design(fr, "depot", cmA, d, cost_b = COST_B, target_variance = target_variance,
     matrix = matrices[[frame]], selection = selection, max_length = limit_of(frame, limit),
     n_rep = R_REP, iterations = ITER, seed = 31)
+  P <- dual_frame_design(fr, "depot", cmA, d, cost_b = COST_B, target_variance = target_variance,
+    matrix = matrices[[frame]], selection = selection, max_length = limit_of(frame, limit),
+    n_rep = R_REP, iterations = ITER, seed = 47)
   Gp0 <- curve_deriv(cv)
   Gp <- function(n) Gp0(n) + PER_INTERVIEW
   dual_alloc <- function(c1, ...) {
@@ -324,14 +337,18 @@ run_dual <- function(i) {
     A = evaluate(A$n_a, A$n_b, A$theta) |> mutate(cost_a_used = cost_a_naive, claimed_cost = A$cost),
     B = evaluate(B$n_a, B$n_b, B$theta) |> mutate(cost_a_used = B$cost_a, claimed_cost = B$cost, rounds = nrow(B$history), converged = B$converged),
     `B'` = evaluate(Bm$n_a, Bm$n_b, Bm$theta) |> mutate(cost_a_used = Bm$c1, claimed_cost = Bm$cost, rounds = Bm$rounds, converged = Bm$converged),
+    P = evaluate(P$n_a, P$n_b, P$theta) |> mutate(cost_a_used = P$cost_a, claimed_cost = P$cost, rounds = nrow(P$history), converged = P$converged),
     C = C |> mutate(cost_a_used = Tn(C$n_a) / C$n_a, claimed_cost = C$cost),
     .id = "procedure") |> mutate(constraint = "target_variance", target = target_variance)
   budget <- C$cost
   Cb <- oracle_dual(Tn, d, COST_B, budget = budget, n_max = n_max)
   Ab <- dual_frame_allocation(d, cost_a = cost_a_naive, cost_b = COST_B, budget = budget)
-  Bb <- dual_frame_design(fr, "depot", cmA, d, cost_b = COST_B, budget = budget,
+  Bb <- average_dual_frame_design(fr, "depot", cmA, d, cost_b = COST_B, budget = budget,
     matrix = matrices[[frame]], selection = selection, max_length = limit_of(frame, limit),
     n_rep = R_REP, iterations = ITER, seed = 37)
+  Pb <- dual_frame_design(fr, "depot", cmA, d, cost_b = COST_B, budget = budget,
+    matrix = matrices[[frame]], selection = selection, max_length = limit_of(frame, limit),
+    n_rep = R_REP, iterations = ITER, seed = 53)
   Bmb <- marginal_loop(\(c1) dual_alloc(c1, budget = budget), Gp, cost_a_naive)
   NB <- d$size[3] + d$size[2]
   ratio <- Bmb$n_b / Bmb$n_a
@@ -346,6 +363,7 @@ run_dual <- function(i) {
     A = evaluate(Ab$n_a, Ab$n_b, Ab$theta) |> mutate(cost_a_used = cost_a_naive, claimed_cost = Ab$cost),
     B = evaluate(Bb$n_a, Bb$n_b, Bb$theta) |> mutate(cost_a_used = Bb$cost_a, claimed_cost = Bb$cost, rounds = nrow(Bb$history), converged = Bb$converged),
     `B'` = evaluate(Bmb$n_a, Bmb$n_b, Bmb$theta) |> mutate(cost_a_used = Bmb$c1, claimed_cost = Bmb$cost, rounds = Bmb$rounds, converged = Bmb$converged),
+    P = evaluate(Pb$n_a, Pb$n_b, Pb$theta) |> mutate(cost_a_used = Pb$cost_a, claimed_cost = Pb$cost, rounds = nrow(Pb$history), converged = Pb$converged),
     C = Cb |> mutate(cost_a_used = Tn(Cb$n_a) / Cb$n_a, claimed_cost = Cb$cost),
     .id = "procedure") |> mutate(constraint = "budget", target = budget)
   res <- bind_rows(v_rows, b_rows) |>

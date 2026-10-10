@@ -16,7 +16,7 @@ dir.create(fig_dir, showWarnings = FALSE)
 res <- readRDS(file.path(out_dir, "e2_results.rds"))
 st <- res$settings
 curves <- res$curves
-proc_levels <- c("A", "B", "B'", "C")
+proc_levels <- c("A", "B", "B'", "P", "C")
 pal <- c(A = "#eb6834", B = "#2a78d6", `B'` = "#1baf7a", C = "#eda100") # validated (dataviz skill)
 theme_set(theme_minimal(base_size = 11) + theme(
   panel.grid.minor = element_blank(), panel.grid.major = element_line(colour = "#e5e5e5", linewidth = 0.3),
@@ -210,11 +210,15 @@ txt <- c(
   "",
   "- **A, linear**: the classical allocation with the package's default constant c1 = per-unit cost +",
   "  per-minute cost x median one-way trip from the depot (`c1_start` of `two_stage_design()`).",
-  "- **B, routed loop**: `two_stage_design()` / `dual_frame_design()`, the fixed-point iteration that",
-  "  replaces c1 by the average routed cost T(n)/n at the current n.",
+  "- **B, routed loop**: the package's `two_stage_design()` / `dual_frame_design()` before 2026-10-10",
+  "  (kept in `e2_average_loops.R`), the fixed-point iteration that replaces c1 by the average routed",
+  "  cost T(n)/n at the current n.",
   "- **B', marginal loop**: the same iteration with the marginal cost T'(n) (finite differences on the",
   "  interpolated curve). Under a budget the marginal rule fixes the split (m, or theta and n_b/n_a) and",
   "  the level comes from the true cost curve.",
+  "- **P, package**: `two_stage_design()` / `dual_frame_design()` since 2026-10-10: fits G(n) = c0 + a n",
+  "  + b sqrt(n) from samples routed at a few sizes around the allocation and iterates with G'(n);",
+  "  under a budget the sizes come from the fitted curve.",
   "- **C, oracle**: exhaustive search over (n, m) or (n_a, n_b, theta) with the true routed cost curve.",
   "",
   sprintf("Scenarios: %d cost curves, %d two-stage and %d dual-frame scenarios, each with the two constraints.", n_scen$curves, n_scen$two_stage, n_scen$dual),
@@ -290,6 +294,10 @@ txt <- c(
   "   replaced by the marginal routed cost G'(n), and under a budget the level of n must come from the",
   "   true cost curve. This is Hansen, Hurwitz and Madow's (1953, Vol. II, ch. 6 sec. 11) optimum for a",
   "   cost with a sqrt(n) travel term (see paper/literature.md); what is new is measuring G(n) by routing.",
+  "   **P, the package's two_stage_design() and dual_frame_design() since 2026-10-10**, fit G(n) =",
+  "   c0 + a n + b sqrt(n) from a few routed sizes and allocate with G'(n): they match B' (excess cost at",
+  "   most 0.2% two-stage and 1.4% dual frame, excess variance at most 1.4%) without the full cost curve.",
+  "   B reproduces the package's loop before that date (experiments/run/e2_average_loops.R).",
   "4. **The travel law is Beardwood-Halton-Hammersley in every frame**, also with daily routes: the",
   "   exponent of n is 0.43 to 0.51 and, for single tours, beta is 0.95 on the real grid and 0.83 to 0.88",
   "   on the uniform grid (above the 0.71 of random points because the depot sits on the tour and the",
