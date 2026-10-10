@@ -26,11 +26,13 @@ First submission.
   offline with `cargo build --offline -j 2`; nothing is downloaded during the
   installation. The crates and their authors and licences are listed in
   `inst/AUTHORS` and acknowledged in `Authors@R`. The computational crate
-  `fieldopt-core` (0.9.1) is written by the package authors and published on
+  `fieldopt-core` (0.10.0) is written by the package authors and published on
   crates.io. The R wrappers of the Rust functions are shipped in the package
   (`R/extendr-wrappers.R`); the installation runs a single `cargo build`.
 * Examples run in under two seconds each; the only `\dontrun{}` example
   queries a public routing server (the `osrm` package, in Suggests). The test
   that queries that server is skipped on CRAN; the connector is otherwise
   tested with a mocked `osrm::osrmTable()`.
-* The four vignettes build in about 15 seconds together.
+* The seven vignettes are pre-computed (their results are stored in the
+  `.Rmd` files, built from `.Rmd.orig` sources excluded from the tarball), so
+  building them only runs pandoc.

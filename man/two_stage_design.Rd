@@ -107,9 +107,9 @@ cost of the best design found by exhaustive search, the average rule up to
 }
 \examples{
 set.seed(2)
-cells <- expand.grid(x = 1:15, y = 1:15)
+cells <- expand.grid(x = 1:12, y = 1:12)
 cells$unit <- paste0("c", seq_len(nrow(cells)))
-frame <- rbind(data.frame(unit = "depot", x = 8, y = 8), cells)
+frame <- rbind(data.frame(unit = "depot", x = 6, y = 6), cells)
 model <- field_cost_model(
   per_travel = 3, per_unit = 40, per_interview = 20,
   interviews_per_unit = 1

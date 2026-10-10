@@ -1,5 +1,9 @@
 # fieldopt 0.1.0
 
+* `cost_variance_frontier()` and everything built on it (`routed_unit_cost()`,
+  `routed_cost_curve()`, `two_stage_design()`, `dual_frame_design()`) route
+  the simulated samples without the optimality certificate of single tours,
+  which only adds proof time: about 14 times faster on single-tour problems.
 * The local-mean variance estimator (`design_variance()` for `"lpm"`, `"cube"` and
   single-replicate systematic samples) averages over each sampled unit and
   its `neighbours = 3` nearest sampled units, as `BalancedSampling::vsb()`

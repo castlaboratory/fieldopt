@@ -89,7 +89,8 @@ cost_variance_frontier <- function(frame, depot, cost_model, n_grid, y = NULL, s
       sel <- s$unit[s$sampled]
       rt <- route_fieldwork(matrix,
         units = sel, depot = depot, max_length = max_length, max_stops = max_stops,
-        iterations = iterations, seed = seed + r, cost_model = cost_model
+        iterations = iterations, seed = seed + r, cost_model = cost_model,
+        certify = 0   # simulated samples need costs, not optimality proofs
       )
       cost[r] <- rt$cost[["total"]]
       travel[r] <- rt$total
