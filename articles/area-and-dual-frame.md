@@ -71,7 +71,7 @@ cells_s
 #>  5     5     1 c5    low           1 0.0501 FALSE  
 #>  6     6     1 c6    low           1 0.0501 FALSE  
 #>  7     7     1 c7    low           1 0.0501 FALSE  
-#>  8     8     1 c8    low           1 0.0501 TRUE   
+#>  8     8     1 c8    low           1 0.0501 FALSE  
 #>  9     9     1 c9    low           1 0.0501 FALSE  
 #> 10    10     1 c10   low           1 0.0501 FALSE  
 #> # ℹ 890 more rows
@@ -95,7 +95,7 @@ hits <- data.frame(unit = points$unit, establishment = paste0(points$unit, which
 hits$y <- areas$y[match(hits$establishment, areas$establishment)]
 nrow(hits); length(unique(hits$establishment))
 #> [1] 401
-#> [1] 170
+#> [1] 168
 ```
 
 ## The multiplicity estimator
@@ -113,7 +113,7 @@ point_estimator(hits, cells_s)
 #> # A tibble: 1 × 10
 #>    total variance    se     cv variance_srs     n     N variance_method   n_hits
 #>    <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>              <int>
-#> 1 21557. 1390104. 1179. 0.0547     4322582.   100   900 stratified local…    401
+#> 1 22091. 1191097. 1091. 0.0494     3381540.   100   900 stratified local…    401
 #> # ℹ 1 more variable: n_establishments <int>
 truth
 #> [1] 22075.4
@@ -152,7 +152,7 @@ routed_unit_cost(frame, "depot", model, n = sum(n_h), method = "euclidean",
 #> # A tibble: 1 × 6
 #>       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep
 #>   <dbl>         <dbl>           <dbl>     <dbl>       <dbl> <dbl>
-#> 1   100          167.            2.68    16670.           1     3
+#> 1   100          167.            2.67    16666.           1     3
 ```
 
 ## The design effect of point sampling
@@ -172,7 +172,7 @@ deff
 #> # A tibble: 1 × 10
 #>   n_sim  total mean_estimate  bias variance     cv mean_variance_estimate
 #> * <dbl>  <dbl>         <dbl> <dbl>    <dbl>  <dbl>                  <dbl>
-#> 1    60 22075.        22132.  56.8 1783359. 0.0605               1413371.
+#> 1    60 22075.        22189.  114. 1120913. 0.0480               1416757.
 #> # ℹ 3 more variables: interviews <dbl>, variance_srs <dbl>, deff <dbl>
 ```
 
@@ -202,13 +202,13 @@ ts
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
 #> n = 170 primary units with m = 9 secondary units each (optimal m 9): cost
-#> 49300, variance of the total 1218000 (SE 1104, CV 5%).
+#> 49310, variance of the total 1218000 (SE 1104, CV 5%).
 ts$history
 #> # A tibble: 2 × 6
 #>   round    c1     n     m   cost variance_total
 #>   <int> <dbl> <int> <int>  <dbl>          <dbl>
 #> 1     1  90.1   170     9 53568.       1218047.
-#> 2     2  65.0   170     9 49299.       1218047.
+#> 2     2  65.0   170     9 49308.       1218047.
 ```
 
 ## Dual-frame allocation: area plus list
@@ -233,34 +233,33 @@ df <- dual_frame_design(frame, "depot", model, domains, cost_b = 45, deff_a = de
 df
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 878900: n_A = 81 (frame A, cost 167.7/unit),
-#> n_B = 135 (frame B, cost 45/unit), theta = 0.154 (optimised).
-#> Cost 19660; variance 876600 (frame A 696000, frame B 181000); CV 4.99% of the
+#> Minimum cost for target variance 878900: n_A = 56 (frame A, cost 169.4/unit),
+#> n_B = 117 (frame B, cost 45/unit), theta = 0.168 (optimised).
+#> Cost 14750; variance 875300 (frame A 647000, frame B 229000); CV 4.99% of the
 #> total 18750.
-#> Expected overlap units: 11.6 in the A sample, 112.5 in the B sample.
+#> Expected overlap units: 8 in the A sample, 97.5 in the B sample.
 df$history
 #> # A tibble: 3 × 7
 #>   round cost_a   n_a   n_b theta   cost variance
 #>   <int>  <dbl> <int> <int> <dbl>  <dbl>    <dbl>
-#> 1     1   190.    80   141 0.155 21553.  871821.
-#> 2     2   167.    81   135 0.153 19642.  876506.
-#> 3     3   168.    81   135 0.154 19656.  876586.
+#> 1     1   190.    55   122 0.153 15946.  870584.
+#> 2     2   169.    56   117 0.168 14750.  875297.
+#> 3     3   169.    56   117 0.168 14750.  875304.
 tidy(df)
 #> # A tibble: 2 × 8
-#>   frame     n cost_per_unit   cost  deff variance overlap_units
-#>   <chr> <int>         <dbl>  <dbl> <dbl>    <dbl>         <dbl>
-#> 1 A        81          168. 13581. 0.839  695917.          11.6
-#> 2 B       135           45   6075  1      180670.         112. 
-#> # ℹ 1 more variable: weight_on_overlap <dbl>
+#>   frame     n cost_per_unit  cost  deff variance overlap_units weight_on_overlap
+#>   <chr> <int>         <dbl> <dbl> <dbl>    <dbl>         <dbl>             <dbl>
+#> 1 A        56          169. 9485. 0.528  646660.           8               0.168
+#> 2 B       117           45  5265  1      228645.          97.5             0.832
 dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$deff,
                       theta = "screening", target_cv = 0.05)
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 878900: n_A = 89 (frame A, cost 167.7/unit),
-#> n_B = 151 (frame B, cost 45/unit), theta = 0 (fixed).
-#> Cost 21720; variance 875000 (frame A 708000, frame B 167000); CV 4.99% of the
+#> Minimum cost for target variance 878900: n_A = 62 (frame A, cost 169.4/unit),
+#> n_B = 131 (frame B, cost 45/unit), theta = 0 (fixed).
+#> Cost 16400; variance 868400 (frame A 650000, frame B 219000); CV 4.97% of the
 #> total 18750.
-#> Expected overlap units: 12.7 in the A sample, 125.8 in the B sample.
+#> Expected overlap units: 8.9 in the A sample, 109.2 in the B sample.
 ```
 
 ## Estimating from both frames
@@ -288,23 +287,29 @@ sa <- select_units(cells, n = 40, strata = "intensity", seed = 3)
 sb <- select_units(list_frame, n = 20, method = "srs", seed = 4)
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain")
 #> # A tibble: 1 × 13
-#>    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
-#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
-#> 1 18502.  230821.  480. 0.0260 hartley   0.177 FALSE       9561.  6720.  8584.
+#>    total variance    se     cv estimator theta theta_fixed    y_a y_ab_a y_ab_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>        <dbl>  <dbl>  <dbl>
+#> 1 18802.  217013.  466. 0.0248 hartley   0.157 FALSE       10021.  5475.  8584.
 #> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", theta = "screening")
 #> # A tibble: 1 × 13
-#>    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
-#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
-#> 1 18832.  394133.  628. 0.0333 hartley       0 TRUE        9561.  6720.  8584.
+#>    total variance    se     cv estimator theta theta_fixed    y_a y_ab_a y_ab_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>        <dbl>  <dbl>  <dbl>
+#> 1 19292.  345814.  588. 0.0305 hartley       0 TRUE        10021.  5475.  8584.
 #> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", estimator = "fuller-burmeister")
 #> # A tibble: 1 × 13
-#>    total variance    se     cv estimator beta_1 beta_2   y_a y_ab_a y_ab_b   y_b
-#>    <dbl>    <dbl> <dbl>  <dbl> <chr>      <dbl>  <dbl> <dbl>  <dbl>  <dbl> <dbl>
-#> 1 18450.  229424.  479. 0.0260 fuller-b…  0.498  -19.1 9561.  6720.  8584.  686.
-#> # ℹ 2 more variables: n_a <int>, n_b <int>
+#>    total variance    se     cv estimator      beta_1 beta_2    y_a y_ab_a y_ab_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>           <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
+#> 1 18802.  215797.  465. 0.0247 fuller-burmei…  0.386  -13.9 10021.  5475.  8584.
+#> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 ```
+
+The selection scales to national frames: the local pivotal method and
+the systematic and cube methods run on a million cells in about a second
+(a grid index keeps the nearest-neighbour searches local), and the
+selection is done within strata, so the size of the whole frame is not a
+constraint.
 
 ## Auxiliaries: the ratio estimator and balanced samples
 
@@ -327,12 +332,12 @@ ratio_estimator(s_lpm, y = "crop_r", x = "farmland")[, c("total", "se", "varianc
 #> # A tibble: 1 × 4
 #>    total    se variance variance_ht
 #>    <dbl> <dbl>    <dbl>       <dbl>
-#> 1 23658.  453.  205339.    1039115.
+#> 1 22495.  391.  152859.    1266972.
 s_cube <- select_units(cells, n = 40, strata = "intensity", method = "cube", balance = "farmland", seed = 5)
 c(lpm = spatial_balance(s_lpm), cube = spatial_balance(s_cube),
   srs = spatial_balance(select_units(cells, n = 40, strata = "intensity", method = "srs", seed = 5)))
 #>       lpm      cube       srs 
-#> 0.1231547 0.4083660 0.3075266
+#> 0.1117390 0.4083660 0.3075266
 ```
 
 ## References

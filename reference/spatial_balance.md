@@ -40,7 +40,7 @@ natural resources. *Journal of the American Statistical Association*,
 ``` r
 cells <- expand.grid(x = 1:10, y = 1:10)
 spatial_balance(select_units(cells, n = 10, method = "lpm", seed = 1))
-#> [1] 0.102
+#> [1] 0.128
 spatial_balance(select_units(cells, n = 10, method = "srs", seed = 1))
 #> [1] 0.268
 ```

@@ -50,7 +50,7 @@ design_variance(s, y = "crop")
 #> # A tibble: 1 × 8
 #>   total variance    se     cv variance_srs     n     N variance_method
 #>   <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>          
-#> 1 1589.    1690.  41.1 0.0259        9141.    20    80 local-mean     
+#> 1 1620.    1442.  38.0 0.0234        9260.    20    80 local-mean     
 r <- select_units(frame, n = 20, method = "systematic", replicates = 4)
 design_variance(r, y = "crop")
 #> # A tibble: 1 × 8

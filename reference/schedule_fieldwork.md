@@ -27,7 +27,8 @@ schedule_fieldwork(
   time_limit = NULL,
   alpha = 0.3,
   seed = 1,
-  engine = c("fieldopt", "vrpr")
+  engine = c("fieldopt", "vrpr"),
+  region = NULL
 )
 ```
 
@@ -74,6 +75,15 @@ schedule_fieldwork(
   Solver settings of
   [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md);
   both engines solve the multi-depot problem jointly.
+
+- region:
+
+  Optional data frame with columns `unit` and `region` covering every
+  unit and base: the schedule is then solved one region at a time (its
+  units with its bases) and the calendars are combined. This is how a
+  national survey is scheduled state by state without a single matrix
+  over everything; `matrix` may then hold only the pairs within each
+  region (other entries are ignored).
 
 ## Value
 

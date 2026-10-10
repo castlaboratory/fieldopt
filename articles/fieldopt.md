@@ -86,20 +86,20 @@ s[s$sampled, c("unit", "x", "y", "pi")]
 #> Warning: Unknown or uninitialised column: `sampled`.
 #> Sample of 0 units from 12 by "lpm".
 #> # A tibble: 12 × 4
-#>    unit      x     y    pi
-#>    <chr> <dbl> <dbl> <dbl>
-#>  1 s1    6.99   3.71   0.3
-#>  2 s2    5.57   8.75   0.3
-#>  3 s12   6.92   6.33   0.3
-#>  4 s14   8.49   8.86   0.3
-#>  5 s15   1.54   5.23   0.3
-#>  6 s19   3.18   9.58   0.3
-#>  7 s20   0.173  2.01   0.3
-#>  8 s24   0.614  4.56   0.3
-#>  9 s27   4.11   6.30   0.3
-#> 10 s32   1.75   3.79   0.3
-#> 11 s35   5.86   1.86   0.3
-#> 12 s37   2.10   7.18   0.3
+#>    unit       x     y    pi
+#>    <chr>  <dbl> <dbl> <dbl>
+#>  1 s3    1.40   4.35    0.3
+#>  2 s6    0.251  0.346   0.3
+#>  3 s8    8.61   2.95    0.3
+#>  4 s11   0.0593 9.72    0.3
+#>  5 s12   6.92   6.33    0.3
+#>  6 s15   1.54   5.23    0.3
+#>  7 s21   3.42   2.98    0.3
+#>  8 s22   3.43   8.96    0.3
+#>  9 s27   4.11   6.30    0.3
+#> 10 s35   5.86   1.86    0.3
+#> 11 s36   4.26   6.33    0.3
+#> 12 s40   4.47   9.00    0.3
 ```
 
 [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
@@ -117,12 +117,12 @@ r <- route_fieldwork(m, units = s$unit[s$sampled], depot = "depot",
 r
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 3 routes from "depot" through 12 units: total travel 38.74 distance (proven
+#> 3 routes from "depot" through 12 units: total travel 42.62 distance (proven
 #> optimal).
-#> Route 1 (7.786): s1 > s35
-#> Route 2 (17.02): s12 > s14 > s2 > s19 > s37
-#> Route 3 (13.93): s27 > s15 > s24 > s20 > s32
-#> Cost (BRL): travel 77.47 + routes 0 + units 360 + interviews 480 = 917.5.
+#> Route 1 (17.81): s3 > s15 > s11 > s22 > s40
+#> Route 2 (21.56): s21 > s6 > s35 > s8 > s12
+#> Route 3 (3.254): s36 > s27
+#> Cost (BRL): travel 85.24 + routes 0 + units 360 + interviews 480 = 925.2.
 autoplot(r)
 ```
 
@@ -141,7 +141,7 @@ design_variance(s, y = "crop")
 #> # A tibble: 1 × 8
 #>   total variance    se     cv variance_srs     n     N variance_method
 #>   <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>          
-#> 1 1265.    2175.  46.6 0.0369        7079.    12    40 local-mean
+#> 1 1218.    3295.  57.4 0.0471        6196.    12    40 local-mean
 sum(frame$crop, na.rm = TRUE)
 #> [1] 1241.481
 ```
@@ -165,12 +165,12 @@ f
 #> # A tibble: 6 × 9
 #>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
 #> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>
-#> 1     6      475.    5.92          79.2        27.6           2        20211.
-#> 2     9      700.    6.77          77.8        35.0           2         6185.
-#> 3    12      925.    7.95          77.1        42.6           3         3122.
-#> 4    16     1222.    6.04          76.4        51.2           4         1632.
-#> 5    20     1517.    3.42          75.9        58.5           4          909.
-#> 6    24     1809.    5.11          75.4        64.7           5          558.
+#> 1     6      475.   6.08           79.2        27.6           2        20214.
+#> 2     9      701.   4.64           77.9        35.5           2         6631.
+#> 3    12      925.   8.47           77.1        42.7           3         3205.
+#> 4    16     1218.   6.22           76.1        48.9           4         1632.
+#> 5    20     1517.   0.949          75.9        58.7           4          947.
+#> 6    24     1810.   3.69           75.4        65.1           5          554.
 #> # ℹ 2 more variables: cv_mean <dbl>, n_rep <dbl>
 autoplot(f)
 ```

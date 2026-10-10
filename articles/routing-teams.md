@@ -27,10 +27,10 @@ one <- route_fieldwork(m, units = sel, depot = "depot", cost_model = model)
 one
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 1 route from "depot" through 18 units: total travel 281.1 km (proven optimal).
-#> Route 1 (281.1): s30 > s9 > s32 > s27 > s48 > s1 > s29 > s31 > s43 > s19 > s6 >
-#> s13 > s54 > s47 > s4 > s16 > s12 > s37
-#> Cost (BRL): travel 506 + routes 0 + units 720 + interviews 1296 = 2522.
+#> 1 route from "depot" through 18 units: total travel 260.6 km (proven optimal).
+#> Route 1 (260.6): s10 > s30 > s44 > s52 > s38 > s25 > s23 > s27 > s40 > s34 >
+#> s18 > s58 > s47 > s22 > s28 > s21 > s39 > s6
+#> Cost (BRL): travel 469.1 + routes 0 + units 720 + interviews 1296 = 2485.
 ```
 
 ## Routes limited by length
@@ -46,13 +46,13 @@ days <- route_fieldwork(m, units = sel, depot = "depot", max_length = 100,
 days
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 4 routes from "depot" through 18 units: total travel 382 km (lower bound 213.2,
-#> gap 79.2%).
-#> Route 1 (98.76): s31 > s32 > s9 > s30
-#> Route 2 (97.48): s47 > s4 > s16 > s12
-#> Route 3 (86.76): s37 > s54 > s13 > s6 > s19 > s43
-#> Route 4 (99.02): s27 > s48 > s1 > s29
-#> Cost (BRL): travel 687.6 + routes 0 + units 720 + interviews 1296 = 2704.
+#> 4 routes from "depot" through 18 units: total travel 354.8 km (lower bound
+#> 189.8, gap 87%).
+#> Route 1 (97.7): s27 > s23 > s25 > s38 > s52
+#> Route 2 (91.75): s30 > s18 > s34 > s40 > s44 > s10
+#> Route 3 (78.45): s6 > s39 > s21 > s28
+#> Route 4 (86.94): s58 > s47 > s22
+#> Cost (BRL): travel 638.7 + routes 0 + units 720 + interviews 1296 = 2655.
 autoplot(days)
 ```
 
@@ -70,14 +70,14 @@ stops <- route_fieldwork(m, units = sel, depot = "depot", max_stops = 4,
 stops
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 5 routes from "depot" through 18 units: total travel 405.2 km (lower bound
-#> 213.2, gap 90.1%).
-#> Route 1 (25.21): s37 > s30
-#> Route 2 (82.91): s54 > s13 > s19 > s6
-#> Route 3 (120.2): s9 > s32 > s27 > s48
-#> Route 4 (97.48): s47 > s4 > s16 > s12
-#> Route 5 (79.38): s31 > s1 > s29 > s43
-#> Cost (BRL): travel 729.4 + routes 0 + units 720 + interviews 1296 = 2745.
+#> 5 routes from "depot" through 18 units: total travel 372 km (lower bound 189.8,
+#> gap 96%).
+#> Route 1 (108.7): s18 > s34 > s40 > s27
+#> Route 2 (73.8): s52 > s38 > s23 > s25
+#> Route 3 (78.45): s28 > s21 > s39 > s6
+#> Route 4 (86.94): s58 > s47 > s22
+#> Route 5 (24.12): s30 > s44 > s10
+#> Cost (BRL): travel 669.5 + routes 0 + units 720 + interviews 1296 = 2686.
 ```
 
 ## Comparing
@@ -89,9 +89,9 @@ data.frame(organisation = c("one tour", "100 km per route", "4 stops per route")
            travel_km = round(c(one$total, days$total, stops$total), 1),
            cost = round(c(one$cost[["total"]], days$cost[["total"]], stops$cost[["total"]])))
 #>        organisation routes travel_km cost
-#> 1          one tour      1     281.1 2522
-#> 2  100 km per route      4     382.0 2704
-#> 3 4 stops per route      5     405.2 2745
+#> 1          one tour      1     260.6 2485
+#> 2  100 km per route      4     354.8 2655
+#> 3 4 stops per route      5     372.0 2686
 ```
 
 The travel grows with the number of routes because every route starts
@@ -149,20 +149,20 @@ day <- route_fieldwork(m_min, units = sel, depot = "depot", max_length = 480, se
 day
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
-#> 6 routes from "depot" through 18 units: total travel 650.3 min (lower bound
-#> 277.2, gap 135%).
-#> Route 1 (115.1, duration 475.1): s30 > s9 > s32
-#> Route 2 (117.9, duration 477.9): s47 > s4 > s12
-#> Route 3 (107, duration 467): s6 > s19 > s13
-#> Route 4 (102.8, duration 462.8): s43 > s29 > s1
-#> Route 5 (108.4, duration 468.4): s31 > s48 > s27
-#> Route 6 (99.3, duration 459.3): s16 > s54 > s37
-#> Cost (BRL): travel 325.2 + routes 2400 + units 360 + interviews 810 = 3895.
+#> 6 routes from "depot" through 18 units: total travel 571.4 min (lower bound
+#> 246.7, gap 132%).
+#> Route 1 (31.35, duration 391.4): s10 > s44 > s30
+#> Route 2 (113, duration 473): s58 > s47 > s22
+#> Route 3 (99.32, duration 459.3): s39 > s21 > s28
+#> Route 4 (116, duration 476): s6 > s25 > s23
+#> Route 5 (115.9, duration 475.9): s40 > s34 > s18
+#> Route 6 (95.81, duration 455.8): s52 > s38 > s27
+#> Cost (BRL): travel 285.7 + routes 2400 + units 360 + interviews 810 = 3856.
 glance(day)
 #> # A tibble: 1 × 9
 #>   n_units n_routes total lower_bound   gap optimal longest_route travel_unit
 #>     <int>    <int> <dbl>       <dbl> <dbl> <lgl>           <dbl> <chr>      
-#> 1      18        6  650.        277.  1.35 FALSE            118. min        
+#> 1      18        6  571.        247.  1.32 FALSE            116. min        
 #> # ℹ 1 more variable: cost <dbl>
 ```
 
@@ -187,21 +187,27 @@ sch
 #> 18 units, 2 bases, 2 teams, 6 days available: the work fits.
 #> "depot": 15 units, 1 team, 5 routes, 5 of 6 days.
 #> "base2": 3 units, 1 team, 1 route, 1 of 6 days.
-#> Cost (BRL): 3878.
+#> Cost (BRL): 3852.
 head(sch$calendar[, c("base", "team", "day", "stops", "travel", "duration")])
 #> # A tibble: 6 × 6
 #>   base  team      day stops travel duration
 #>   <chr> <chr>   <int> <int>  <dbl>    <dbl>
-#> 1 base2 base2-1     1     3  118.      478.
-#> 2 depot depot-1     1     3  118.      478.
-#> 3 depot depot-1     2     3  118.      478.
-#> 4 depot depot-1     3     3  104.      464.
-#> 5 depot depot-1     4     3   84.9     445.
-#> 6 depot depot-1     5     3   71.1     431.
+#> 1 base2 base2-1     1     3   97.7     458.
+#> 2 depot depot-1     1     3  116.      476.
+#> 3 depot depot-1     2     3  113.      473.
+#> 4 depot depot-1     3     3   99.3     459.
+#> 5 depot depot-1     4     3   80.0     440.
+#> 6 depot depot-1     5     3   58.6     419.
 autoplot(sch)
 ```
 
 ![](routing-teams_files/figure-html/schedule-1.png)
+
+For a survey over a whole country the schedule is solved region by
+region: `schedule_fieldwork(region = )` takes a table of units and bases
+with their region, solves each region with its own bases and combines
+the calendars, so no travel matrix over the whole country is ever
+needed.
 
 The distribution of the routes over teams and days follows a simple rule
 (longest route first). When the field has constraints of its own, a team
@@ -255,7 +261,7 @@ quick <- route_fieldwork(m, units = sel, depot = "depot", iterations = 10, seed 
 long <- route_fieldwork(m, units = sel, depot = "depot", iterations = 500, seed = 2)
 c(quick = quick$total, long = long$total, bound = long$lower_bound)
 #>    quick     long    bound 
-#> 281.1368 281.1368 281.1368
+#> 260.6363 260.6363 260.6363
 ```
 
 The solver was run on classical benchmark instances with rounded
@@ -306,5 +312,5 @@ v <- route_fieldwork(m, units = sel, depot = "depot", max_length = 100,
                      cost_model = model, engine = "vrpr", time_limit = 1)
 c(fieldopt = days$total, vrpr = v$total)
 #> fieldopt     vrpr 
-#> 382.0247 382.0247
+#> 354.8313 354.8313
 ```

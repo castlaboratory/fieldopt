@@ -120,5 +120,5 @@ routed_unit_cost(frame, "depot", model, n = 12, method = "euclidean", n_rep = 3,
 #> # A tibble: 1 × 6
 #>       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep
 #>   <dbl>         <dbl>           <dbl>     <dbl>       <dbl> <dbl>
-#> 1    12          75.8            2.91      910.           1     3
+#> 1    12          75.6            2.78      907.           1     3
 ```

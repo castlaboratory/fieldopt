@@ -51,6 +51,6 @@ ratio_estimator(s, y = "crop", x = "farmland")
 #> # A tibble: 1 × 11
 #>   total variance    se     cv ratio x_total variance_ht variance_srs     n     N
 #>   <dbl>    <dbl> <dbl>  <dbl> <dbl>   <dbl>       <dbl>        <dbl> <int> <int>
-#> 1 3186.    9389.  96.9 0.0304 0.380   8377.      77549.        8878.    24   144
+#> 1 3323.    5554.  74.5 0.0224 0.397   8377.      72593.        4211.    24   144
 #> # ℹ 1 more variable: variance_method <chr>
 ```

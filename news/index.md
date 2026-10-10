@@ -11,6 +11,14 @@
   multi-depot instances the solver reaches or beats the best known
   solution on 11 and stays within 1.6% on the rest, in 1 to 26 seconds.
 
+- `select_units(method = "lpm")` and
+  [`spatial_balance()`](https://castlaboratory.github.io/fieldopt/reference/spatial_balance.md)
+  use a grid spatial index (engine `fieldopt-core` 0.9.1): a frame of a
+  million cells is sampled in under a second instead of hours.
+  `schedule_fieldwork(region = )` solves one region at a time and
+  combines the calendars, the way a national survey is scheduled state
+  by state.
+
 - [`schedule_calendar()`](https://castlaboratory.github.io/fieldopt/reference/schedule_calendar.md)
   redistributes the routes of a schedule over teams and days as an
   integer programme solved with the `highs` package (in Suggests): team

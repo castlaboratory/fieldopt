@@ -88,7 +88,8 @@ which team visits which units on which day, and whether the work fits.</p>
 <span>  time_limit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fieldopt"</span>, <span class="st">"vrpr"</span><span class="op">)</span></span>
+<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fieldopt"</span>, <span class="st">"vrpr"</span><span class="op">)</span>,</span>
+<span>  region <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -131,6 +132,15 @@ charged once per team-day and enters the objective.</p></dd>
 <dt id="arg-iterations-time-limit-alpha-seed-engine">iterations, time_limit, alpha, seed, engine<a class="anchor" aria-label="anchor" href="#arg-iterations-time-limit-alpha-seed-engine"></a></dt>
 <dd><p>Solver settings of
 <code><a href="route_fieldwork.html">route_fieldwork()</a></code>; both engines solve the multi-depot problem jointly.</p></dd>
+
+
+<dt id="arg-region">region<a class="anchor" aria-label="anchor" href="#arg-region"></a></dt>
+<dd><p>Optional data frame with columns <code>unit</code> and <code>region</code>
+covering every unit and base: the schedule is then solved one region at
+a time (its units with its bases) and the calendars are combined. This
+is how a national survey is scheduled state by state without a single
+matrix over everything; <code>matrix</code> may then hold only the pairs within
+each region (other entries are ignored).</p></dd>
 
 </dl></div>
     <div class="section level2">
