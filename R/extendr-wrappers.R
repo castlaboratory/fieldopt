@@ -13,7 +13,7 @@ travel_matrix_rs <- function(a, b, method) .Call(wrap__travel_matrix_rs, a, b, m
 #' Routing. `matrix` is the row-major n x n travel matrix; `depot` and
 #' `units` are 0-based indices; `service` and `demand` have one entry per node (or none).
 #' @noRd
-route_rs <- function(matrix, n, depot, units, service, demand, max_length, max_stops, capacity, iterations, alpha, seed) .Call(wrap__route_rs, matrix, n, depot, units, service, demand, max_length, max_stops, capacity, iterations, alpha, seed)
+route_rs <- function(matrix, n, depot, units, service, demand, max_length, max_stops, capacity, iterations, time_limit, alpha, seed) .Call(wrap__route_rs, matrix, n, depot, units, service, demand, max_length, max_stops, capacity, iterations, time_limit, alpha, seed)
 
 #' Size-proportional inclusion probabilities summing to `n`.
 #' @noRd

@@ -25,8 +25,9 @@ inside them) and a list frame needs.
   the service time at each unit), stops and capacity, on symmetric or
   road-network matrices: exact up to 13 units, otherwise a hybrid genetic
   search with the optimal split of the tour and a granular local search
-  (optimal on the classical TSPLIB instances, within 1.2% on the Augerat CVRP
-  set A), with the Held-Karp bound and a proof of optimality when it closes.
+  (optimal on the classical TSPLIB instances, within 0.7% on the Augerat CVRP
+  set A), with the Held-Karp bound and a proof of optimality when it closes;
+  `engine = "vrpr"` hands the same problem to the PyVRP solver.
 - `schedule_fieldwork()` assigns the units to several bases, routes each
   base and distributes the routes over the teams and the days available: a
   calendar that says whether the field work fits.

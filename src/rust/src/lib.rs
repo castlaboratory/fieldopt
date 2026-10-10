@@ -38,7 +38,7 @@ fn travel_matrix_rs(a: &[f64], b: &[f64], method: &str) -> extendr_api::Result<V
 /// @noRd
 #[extendr]
 fn route_rs(matrix: &[f64], n: i32, depot: i32, units: &[i32], service: &[f64], demand: &[f64], max_length: f64, max_stops: f64,
-            capacity: f64, iterations: i32, alpha: f64, seed: f64) -> extendr_api::Result<List> {
+            capacity: f64, iterations: i32, time_limit: f64, alpha: f64, seed: f64) -> extendr_api::Result<List> {
     let m = err(Matrix::from_vec(n as usize, matrix.to_vec()))?;
     let units: Vec<usize> = units.iter().map(|&u| u as usize).collect();
     let limits = RouteLimits {
@@ -46,7 +46,7 @@ fn route_rs(matrix: &[f64], n: i32, depot: i32, units: &[i32], service: &[f64], 
         max_stops: if max_stops.is_finite() { max_stops as usize } else { usize::MAX },
         capacity: if capacity.is_finite() { capacity } else { f64::INFINITY },
     };
-    let options = GraspOptions { iterations: iterations as usize, alpha, seed: seed as u64 };
+    let options = GraspOptions { iterations: iterations as usize, time_limit: if time_limit.is_finite() { time_limit } else { f64::INFINITY }, alpha, seed: seed as u64 };
     let sol = err(solve_routes(&m, depot as usize, &units, service, demand, limits, options))?;
     let routes: Vec<Robj> = sol.routes.iter().map(|r| r.iter().map(|&u| u as i32).collect::<Vec<i32>>().into()).collect();
     Ok(list!(

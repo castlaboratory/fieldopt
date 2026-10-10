@@ -27,7 +27,11 @@
 #' @param assign `"nearest"` or `"balanced"` (see Details).
 #' @param cost_model Optional [field_cost_model()]; its `per_route` cost is
 #'   charged once per team-day.
-#' @param iterations,alpha,seed Solver settings of [route_fieldwork()].
+#' @param iterations,time_limit,alpha,seed,engine Solver settings of
+#'   [route_fieldwork()]. With `engine = "vrpr"` the assignment of units to
+#'   bases and the routes are optimised jointly (a multi-depot problem with
+#'   `teams * days` routes available per base and the `per_route` cost of the
+#'   cost model in the objective), and `assign` is ignored.
 #' @return An object of class `fieldopt_schedule`: `calendar` (a tibble with
 #'   one row per route: `base`, `team`, `day`, `route`, `stops`, `travel`,
 #'   `duration`, and `units` as a list column), `assignment` (unit, base),
@@ -46,8 +50,9 @@
 #' sch$calendar
 schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_length = Inf, max_stops = Inf,
                                service_time = 0, assign = c("nearest", "balanced"), cost_model = NULL,
-                               iterations = 100, alpha = 0.3, seed = 1) {
+                               iterations = 100, time_limit = NULL, alpha = 0.3, seed = 1, engine = c("fieldopt", "vrpr")) {
   assign <- rlang::arg_match(assign)
+  engine <- rlang::arg_match(engine)
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix); m <- unclass(matrix)
   if (is.null(names(teams))) {
@@ -64,7 +69,15 @@ schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_len
   # assignment of units to bases
   dist_to <- m[units, bases, drop = FALSE] + t(m[bases, units, drop = FALSE])  # out and back
   base_of <- bases[apply(dist_to, 1, which.min)]
-  if (assign == "balanced" && length(bases) > 1) {
+  joint <- NULL
+  if (engine == "vrpr") {
+    service <- service_vector(service_time, nm)
+    joint <- route_with_vrpr(matrix, units = units, bases = bases, vehicles = teams * days, max_length = max_length, max_stops = max_stops,
+                             service = service, demand = rep(0, length(nm)), capacity = Inf,
+                             per_route = if (is.null(cost_model)) 0 else cost_model$per_route, per_travel = if (is.null(cost_model)) 1 else cost_model$per_travel,
+                             time_limit = if (is.null(time_limit)) 5 else time_limit, seed = seed)
+    for (k in seq_along(joint$routes)) base_of[match(joint$routes[[k]], units)] <- joint$base[k]
+  } else if (assign == "balanced" && length(bases) > 1) {
     service <- service_vector(service_time, nm)
     # expected routes per base from a crude capacity: stops per route and length per route
     expected_routes <- function(b, us) {
@@ -105,7 +118,8 @@ schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_len
       next
     }
     r <- route_fieldwork(matrix, units = us, depot = b, max_length = max_length, max_stops = max_stops,
-                         service_time = service_time, iterations = iterations, alpha = alpha, seed = seed, cost_model = cost_model)
+                         service_time = service_time, iterations = iterations, time_limit = time_limit, alpha = alpha, seed = seed,
+                         cost_model = cost_model, engine = engine)
     routes[[b]] <- r
     if (!is.null(r$cost)) cost <- cost + r$cost[["total"]]
     # longest-processing-time first over the teams of the base
@@ -126,7 +140,7 @@ schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_len
   if (nrow(calendar)) calendar <- calendar[order(calendar$base, calendar$team, calendar$day), ]
   summary <- do.call(rbind, summ[bases])
   structure(list(calendar = calendar, assignment = assignment, routes = routes, summary = summary,
-                 fits = all(summary$fits), days = days, teams = teams, cost = if (is.null(cost_model)) NULL else cost,
+                 fits = all(summary$fits), days = days, teams = teams, cost = if (is.null(cost_model)) NULL else cost, engine = engine,
                  cost_model = cost_model, travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"),
                  method = attr(matrix, "method")), class = "fieldopt_schedule")
 }

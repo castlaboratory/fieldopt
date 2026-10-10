@@ -28,6 +28,7 @@ OpenStreetMap
 ORCID
 OSRM
 Prins
+PyVRP
 Schelin
 SRS
 st
@@ -39,3 +40,4 @@ UFBA
 UFPE
 unsampled
 Voronoi
+vrpr

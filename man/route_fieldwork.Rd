@@ -14,9 +14,11 @@ route_fieldwork(
   demand = 0,
   capacity = Inf,
   iterations = 200,
+  time_limit = NULL,
   alpha = 0.3,
   seed = 1,
-  cost_model = NULL
+  cost_model = NULL,
+  engine = c("fieldopt", "vrpr")
 )
 }
 \arguments{
@@ -42,7 +44,10 @@ samples to carry): a single number or a vector named by unit.}
 \item{capacity}{Maximum load of a route; \code{Inf} for none.}
 
 \item{iterations}{Offspring of the genetic search (ignored when the
-instance is solved exactly).}
+instance is solved exactly or when \code{time_limit} is given).}
+
+\item{time_limit}{Seconds of search instead of \code{iterations} (\code{NULL} for
+none); the only stopping rule of the \code{"vrpr"} engine (default 5 s).}
 
 \item{alpha}{Greediness of the constructions that seed the population, in
 \verb{[0, 1]} (0 greedy, 1 random).}
@@ -50,6 +55,12 @@ instance is solved exactly).}
 \item{seed}{Seed of the solver.}
 
 \item{cost_model}{Optional \code{\link[=field_cost_model]{field_cost_model()}} to price the solution.}
+
+\item{engine}{\code{"fieldopt"} (the built-in solver) or \code{"vrpr"}, the PyVRP
+solver through the \code{vrpr} package (in Suggests): stronger on large
+instances and with long runs, with the same inputs and outputs, except
+that it takes one of \code{max_stops} and \code{capacity}, gives no lower bound and
+charges a cost model's \code{per_route} inside its objective.}
 }
 \value{
 An object of class \code{fieldopt_routes}: \code{routes} (a tibble with

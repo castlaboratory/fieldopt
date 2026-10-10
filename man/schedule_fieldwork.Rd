@@ -16,8 +16,10 @@ schedule_fieldwork(
   assign = c("nearest", "balanced"),
   cost_model = NULL,
   iterations = 100,
+  time_limit = NULL,
   alpha = 0.3,
-  seed = 1
+  seed = 1,
+  engine = c("fieldopt", "vrpr")
 )
 }
 \arguments{
@@ -41,7 +43,11 @@ accepted when \code{bases} is given.}
 \item{cost_model}{Optional \code{\link[=field_cost_model]{field_cost_model()}}; its \code{per_route} cost is
 charged once per team-day.}
 
-\item{iterations, alpha, seed}{Solver settings of \code{\link[=route_fieldwork]{route_fieldwork()}}.}
+\item{iterations, time_limit, alpha, seed, engine}{Solver settings of
+\code{\link[=route_fieldwork]{route_fieldwork()}}. With \code{engine = "vrpr"} the assignment of units to
+bases and the routes are optimised jointly (a multi-depot problem with
+\code{teams * days} routes available per base and the \code{per_route} cost of the
+cost model in the objective), and \code{assign} is ignored.}
 }
 \value{
 An object of class \code{fieldopt_schedule}: \code{calendar} (a tibble with

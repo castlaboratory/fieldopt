@@ -27,7 +27,14 @@
 #'   samples to carry): a single number or a vector named by unit.
 #' @param capacity Maximum load of a route; `Inf` for none.
 #' @param iterations Offspring of the genetic search (ignored when the
-#'   instance is solved exactly).
+#'   instance is solved exactly or when `time_limit` is given).
+#' @param time_limit Seconds of search instead of `iterations` (`NULL` for
+#'   none); the only stopping rule of the `"vrpr"` engine (default 5 s).
+#' @param engine `"fieldopt"` (the built-in solver) or `"vrpr"`, the PyVRP
+#'   solver through the `vrpr` package (in Suggests): stronger on large
+#'   instances and with long runs, with the same inputs and outputs, except
+#'   that it takes one of `max_stops` and `capacity`, gives no lower bound and
+#'   charges a cost model's `per_route` inside its objective.
 #' @param alpha Greediness of the constructions that seed the population, in
 #'   `[0, 1]` (0 greedy, 1 random).
 #' @param seed Seed of the solver.
@@ -54,7 +61,10 @@
 #'                      iterations = 50)
 #' r
 route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = Inf, service_time = 0,
-                            demand = 0, capacity = Inf, iterations = 200, alpha = 0.3, seed = 1, cost_model = NULL) {
+                            demand = 0, capacity = Inf, iterations = 200, time_limit = NULL, alpha = 0.3, seed = 1,
+                            cost_model = NULL, engine = c("fieldopt", "vrpr")) {
+  engine <- rlang::arg_match(engine)
+  if (!is.null(time_limit) && (!is.numeric(time_limit) || length(time_limit) != 1L || is.na(time_limit) || time_limit <= 0)) cli::cli_abort("{.arg time_limit} must be a positive number of seconds.")
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix)
   idx <- function(v, what) {
@@ -78,19 +88,33 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
                                       i = "Raise {.arg max_length}, move the depot or drop {cli::qty(length(far))}{?this unit/these units}."))
   }
   if (is.finite(max_stops) && max_stops < 1) cli::cli_abort("{.arg max_stops} must be at least 1.")
-  res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, u - 1L, service, dem, as.numeric(max_length),
-                  as.numeric(max_stops), as.numeric(capacity), as.integer(iterations), alpha, seed)
+  if (engine == "vrpr") {
+    if (!is.null(cost_model) && !inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
+    v <- route_with_vrpr(matrix, units = nm[u], bases = nm[d], vehicles = length(u), max_length = max_length, max_stops = max_stops,
+                         service = service, demand = dem, capacity = capacity,
+                         per_route = if (is.null(cost_model)) 0 else cost_model$per_route, per_travel = if (is.null(cost_model)) 1 else cost_model$per_travel,
+                         time_limit = if (is.null(time_limit)) 5 else time_limit, seed = seed)
+    mm <- unclass(matrix)
+    res <- list(routes = lapply(v$routes, function(r) match(r, nm) - 1L))
+    res$lengths <- vapply(v$routes, function(r) mm[nm[d], r[1]] + sum(mm[cbind(r[-length(r)], r[-1])]) + mm[r[length(r)], nm[d]], numeric(1))
+    res$durations <- res$lengths + vapply(v$routes, function(r) sum(service[match(r, nm)]), numeric(1))
+    res$loads <- vapply(v$routes, function(r) sum(dem[match(r, nm)]), numeric(1))
+    res$total <- sum(res$lengths); res$lower_bound <- NA_real_; res$optimal <- FALSE; res$best_iteration <- NA_integer_
+  } else {
+    res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, u - 1L, service, dem, as.numeric(max_length),
+                    as.numeric(max_stops), as.numeric(capacity), as.integer(iterations), if (is.null(time_limit)) Inf else as.numeric(time_limit), alpha, seed)
+  }
   routes <- do.call(rbind, lapply(seq_along(res$routes), function(k) {
     r <- res$routes[[k]] + 1L
     tibble::tibble(route = k, stop = seq_along(r), unit = nm[r])
   }))
   out <- list(routes = routes, lengths = res$lengths, durations = res$durations, loads = res$loads, total = res$total,
               lower_bound = res$lower_bound, optimal = res$optimal,
-              gap = if (res$lower_bound > 0) (res$total - res$lower_bound) / res$lower_bound else NA_real_,
+              gap = if (!is.na(res$lower_bound) && res$lower_bound > 0) (res$total - res$lower_bound) / res$lower_bound else NA_real_,
               best_iteration = res$best_iteration,
               n_routes = length(res$routes), depot = nm[d], units = nm[u],
               limits = c(max_length = max_length, max_stops = max_stops, capacity = capacity), service_time = service, demand = dem,
-              options = list(iterations = iterations, alpha = alpha, seed = seed),
+              options = list(iterations = iterations, time_limit = time_limit, alpha = alpha, seed = seed), engine = engine,
               travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"),
               matrix = matrix)
   if (!is.null(cost_model)) {
@@ -118,7 +142,8 @@ service_vector <- function(service_time, nm, arg = "service_time") {
 #' @export
 print.fieldopt_routes <- function(x, ...) {
   cli::cli_h1("Field routes")
-  cli::cli_text("{x$n_routes} route{?s} from {.val {x$depot}} through {length(x$units)} unit{?s}: total travel {signif(x$total, 4)} {x$travel_unit}{if (isTRUE(x$optimal)) ' (proven optimal)' else paste0(' (lower bound ', signif(x$lower_bound, 4), if (is.na(x$gap)) '' else paste0(', gap ', signif(100 * x$gap, 3), '%'), ')')}.")
+  tail <- if (isTRUE(x$optimal)) " (proven optimal)" else if (identical(x$engine, "vrpr")) " (vrpr engine)" else paste0(" (lower bound ", signif(x$lower_bound, 4), if (is.na(x$gap)) "" else paste0(", gap ", signif(100 * x$gap, 3), "%"), ")")
+  cli::cli_text("{x$n_routes} route{?s} from {.val {x$depot}} through {length(x$units)} unit{?s}: total travel {signif(x$total, 4)} {x$travel_unit}{tail}.")
   served <- any(x$service_time > 0)
   for (k in seq_len(x$n_routes)) {
     r <- x$routes$unit[x$routes$route == k]

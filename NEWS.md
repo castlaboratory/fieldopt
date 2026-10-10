@@ -5,7 +5,13 @@
   with the optimal split of giant tours and a granular local search with
   inter-route moves (relocate, swap, 2-opt*); the Held-Karp bound replaces
   the two-edge bound for single tours and `optimal` reports proven optimality;
-  `route_fieldwork()` gains `demand` and `capacity`. On TSPLIB and Augerat set A the solver is optimal or within 1.2% of the optimum in about a second.
+  `route_fieldwork()` gains `demand`, `capacity`, `time_limit` and
+  `engine = "vrpr"` (the PyVRP solver through the `vrpr` package, also in
+  `schedule_fieldwork()`, where it optimises the assignment to bases jointly
+  with the routes). The built-in solver has SWAP* and intra-route swaps,
+  population restarts and a time limit (engine 0.6.0): on TSPLIB it is optimal
+  and on Augerat set A within 0.7% of the optimum (0.12% on average) in about
+  a second.
 
 * New tools (engine `fieldopt-core` 0.4.0): `route_fieldwork()` takes a
   `service_time` per unit that counts towards `max_length` and reports route
