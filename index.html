@@ -105,7 +105,7 @@
 <li>
 <code><a href="reference/cost_variance_frontier.html">cost_variance_frontier()</a></code> simulates designs over a grid of sample sizes and returns the trade-off between field cost and variance.</li>
 <li>
-<code><a href="reference/as_frame.html">as_frame()</a></code> and <code><a href="reference/as_sf.html">as_sf()</a></code> move between <code>sf</code> layers and the plain frames the package works on.</li>
+<code><a href="reference/as_frame.html">as_frame()</a></code>, <code><a href="reference/as_sf.html">as_sf()</a></code> and <code><a href="reference/read_areaframe.html">read_areaframe()</a></code> move between spatial layers (or the cells exported by an area-frame service) and the plain frames the package works on; <code><a href="reference/frame_overlap.html">frame_overlap()</a></code> matches a list frame to the cells and marks the overlap domain; <code><a href="reference/as_svydesign.html">as_svydesign()</a></code> hands a sample to the <code>survey</code> package for calibration, domains and nonresponse adjustment.</li>
 </ul>
 <p>The numerical engine is the Rust crate <a href="https://github.com/castlaboratory/fieldopt-core" class="external-link"><code>fieldopt-core</code></a>, usable on its own from Rust or from other languages.</p>
 <div class="section level2">

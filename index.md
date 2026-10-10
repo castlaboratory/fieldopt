@@ -86,10 +86,17 @@ frame (grid cells, points inside them) and a list frame needs.
 - [`cost_variance_frontier()`](https://castlaboratory.github.io/fieldopt/reference/cost_variance_frontier.md)
   simulates designs over a grid of sample sizes and returns the
   trade-off between field cost and variance.
-- [`as_frame()`](https://castlaboratory.github.io/fieldopt/reference/as_frame.md)
-  and
+- [`as_frame()`](https://castlaboratory.github.io/fieldopt/reference/as_frame.md),
   [`as_sf()`](https://castlaboratory.github.io/fieldopt/reference/as_sf.md)
-  move between `sf` layers and the plain frames the package works on.
+  and
+  [`read_areaframe()`](https://castlaboratory.github.io/fieldopt/reference/read_areaframe.md)
+  move between spatial layers (or the cells exported by an area-frame
+  service) and the plain frames the package works on;
+  [`frame_overlap()`](https://castlaboratory.github.io/fieldopt/reference/frame_overlap.md)
+  matches a list frame to the cells and marks the overlap domain;
+  [`as_svydesign()`](https://castlaboratory.github.io/fieldopt/reference/as_svydesign.md)
+  hands a sample to the `survey` package for calibration, domains and
+  nonresponse adjustment.
 
 The numerical engine is the Rust crate
 [`fieldopt-core`](https://github.com/castlaboratory/fieldopt-core),

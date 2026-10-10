@@ -152,7 +152,7 @@ routed_unit_cost(frame, "depot", model, n = sum(n_h), method = "euclidean",
 #> # A tibble: 1 × 6
 #>       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep
 #>   <dbl>         <dbl>           <dbl>     <dbl>       <dbl> <dbl>
-#> 1   100          167.            2.67    16666.           1     3
+#> 1   100          167.            2.67    16667.           1     3
 ```
 
 ## The design effect of point sampling
@@ -264,6 +264,14 @@ dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$de
 
 ## Estimating from both frames
 
+The domains come from the overlap between the frames:
+[`frame_overlap()`](https://castlaboratory.github.io/fieldopt/reference/frame_overlap.md)
+places each listed establishment in the cell it falls in (by
+coordinates, by polygons, or by a table of pairs from record linkage,
+for example with the `reclin2` package) and marks it `ab` or `b`, and
+tells each cell which listed establishments it holds, which is what the
+teams use to screen the overlap out of the area sample.
+
 Once both samples are in,
 [`dual_frame_estimator()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_estimator.md)
 combines them. Each sampled unit carries its domain (`a` or `ab` on the
@@ -310,6 +318,26 @@ the systematic and cube methods run on a million cells in about a second
 (a grid index keeps the nearest-neighbour searches local), and the
 selection is done within strata, so the size of the whole frame is not a
 constraint.
+
+For everything else the estimation needs, calibration to known totals,
+domain estimates, nonresponse adjustment,
+[`as_svydesign()`](https://castlaboratory.github.io/fieldopt/reference/as_svydesign.md)
+hands a sample to the `survey` package as a design object with the right
+weights, strata and, for replicated systematic samples, the replicate
+weights.
+
+``` r
+
+d <- as_svydesign(sa)
+survey::svytotal(~crop_est, d)
+#>          total     SE
+#> crop_est 15496 1828.3
+survey::svyby(~crop_est, ~intensity, d, survey::svytotal)
+#>      intensity crop_est        se
+#> low        low 5046.943  300.3568
+#> mid        mid 3494.187  151.6314
+#> high      high 6954.904 1797.0785
+```
 
 ## Auxiliaries: the ratio estimator and balanced samples
 

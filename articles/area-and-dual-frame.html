@@ -219,7 +219,7 @@ assumed.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 6</span></span></span>
 <span><span class="co">#&gt;       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   100          167.            2.67    <span style="text-decoration: underline;">16</span>666.           1     3</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   100          167.            2.67    <span style="text-decoration: underline;">16</span>667.           1     3</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="the-design-effect-of-point-sampling">The design effect of point sampling<a class="anchor" aria-label="anchor" href="#the-design-effect-of-point-sampling"></a>
@@ -322,6 +322,13 @@ gives the design in which the area sample does not use the overlap.</p>
 <div class="section level2">
 <h2 id="estimating-from-both-frames">Estimating from both frames<a class="anchor" aria-label="anchor" href="#estimating-from-both-frames"></a>
 </h2>
+<p>The domains come from the overlap between the frames:
+<code><a href="../reference/frame_overlap.html">frame_overlap()</a></code> places each listed establishment in the
+cell it falls in (by coordinates, by polygons, or by a table of pairs
+from record linkage, for example with the <code>reclin2</code> package)
+and marks it <code>ab</code> or <code>b</code>, and tells each cell
+which listed establishments it holds, which is what the teams use to
+screen the overlap out of the area sample.</p>
 <p>Once both samples are in, <code><a href="../reference/dual_frame_estimator.html">dual_frame_estimator()</a></code>
 combines them. Each sampled unit carries its domain (<code>a</code> or
 <code>ab</code> on the area frame, <code>b</code> or <code>ab</code> on
@@ -364,6 +371,21 @@ the systematic and cube methods run on a million cells in about a second
 (a grid index keeps the nearest-neighbour searches local), and the
 selection is done within strata, so the size of the whole frame is not a
 constraint.</p>
+<p>For everything else the estimation needs, calibration to known
+totals, domain estimates, nonresponse adjustment,
+<code><a href="../reference/as_svydesign.html">as_svydesign()</a></code> hands a sample to the <code>survey</code>
+package as a design object with the right weights, strata and, for
+replicated systematic samples, the replicate weights.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_svydesign.html">as_svydesign</a></span><span class="op">(</span><span class="va">sa</span><span class="op">)</span></span>
+<span><span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/surveysummary.html" class="external-link">svytotal</a></span><span class="op">(</span><span class="op">~</span><span class="va">crop_est</span>, <span class="va">d</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          total     SE</span></span>
+<span><span class="co">#&gt; crop_est 15496 1828.3</span></span>
+<span><span class="fu">survey</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survey/man/svyby.html" class="external-link">svyby</a></span><span class="op">(</span><span class="op">~</span><span class="va">crop_est</span>, <span class="op">~</span><span class="va">intensity</span>, <span class="va">d</span>, <span class="fu">survey</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/survey/man/surveysummary.html" class="external-link">svytotal</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt;      intensity crop_est        se</span></span>
+<span><span class="co">#&gt; low        low 5046.943  300.3568</span></span>
+<span><span class="co">#&gt; mid        mid 3494.187  151.6314</span></span>
+<span><span class="co">#&gt; high      high 6954.904 1797.0785</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="auxiliaries-the-ratio-estimator-and-balanced-samples">Auxiliaries: the ratio estimator and balanced samples<a class="anchor" aria-label="anchor" href="#auxiliaries-the-ratio-estimator-and-balanced-samples"></a>
@@ -376,7 +398,7 @@ sample whose Horvitz-Thompson estimates of the auxiliaries match their
 totals. <code><a href="../reference/spatial_balance.html">spatial_balance()</a></code> measures how evenly a sample
 covers the territory (Stevens and Olsen’s Voronoi measure: zero is
 perfect).</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cells</span><span class="op">$</span><span class="va">farmland</span> <span class="op">&lt;-</span> <span class="va">cells</span><span class="op">$</span><span class="va">size</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cells</span><span class="op">)</span>, <span class="fl">15</span>, <span class="fl">35</span><span class="op">)</span></span>
 <span><span class="va">cells</span><span class="op">$</span><span class="va">crop_r</span> <span class="op">&lt;-</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">cells</span><span class="op">$</span><span class="va">farmland</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cells</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">s_lpm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">cells</span>, n <span class="op">=</span> <span class="fl">40</span>, strata <span class="op">=</span> <span class="st">"intensity"</span>, seed <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>

@@ -12,6 +12,7 @@
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/allocation-methods.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/as_frame.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/as_sf.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/as_svydesign.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_frontier.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_routes.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/autoplot.fieldopt_sample.html</loc></url>
@@ -26,11 +27,13 @@
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/field_cost_model.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/fieldopt-package.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/frame_allocation.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/frame_overlap.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/index.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/multivariate_allocation.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/point_design_effect.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/point_estimator.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/ratio_estimator.html</loc></url>
+<url><loc>https://castlaboratory.github.io/fieldopt/reference/read_areaframe.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/reexports.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.html</loc></url>
 <url><loc>https://castlaboratory.github.io/fieldopt/reference/routed_unit_cost.html</loc></url>

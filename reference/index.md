@@ -10,6 +10,8 @@
   : Turn a spatial object into a frame
 - [`as_sf()`](https://castlaboratory.github.io/fieldopt/reference/as_sf.md)
   : Put results back on the geometries of a spatial frame
+- [`read_areaframe()`](https://castlaboratory.github.io/fieldopt/reference/read_areaframe.md)
+  : Read the cells of an area frame exported by the areaframe service
 
 ## Routing the field work
 
@@ -51,6 +53,10 @@
   : Ratio estimate of a total with an auxiliary variable
 - [`dual_frame_estimator()`](https://castlaboratory.github.io/fieldopt/reference/dual_frame_estimator.md)
   : Dual-frame estimate of a total
+- [`as_svydesign()`](https://castlaboratory.github.io/fieldopt/reference/as_svydesign.md)
+  : Hand a sample to the survey package
+- [`frame_overlap()`](https://castlaboratory.github.io/fieldopt/reference/frame_overlap.md)
+  : Overlap between a list frame and the area frame
 - [`segment_estimator()`](https://castlaboratory.github.io/fieldopt/reference/segment_estimator.md)
   : Segment estimators of a total from an area sample of segments
 - [`point_estimator()`](https://castlaboratory.github.io/fieldopt/reference/point_estimator.md)

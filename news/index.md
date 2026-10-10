@@ -11,6 +11,20 @@
   multi-depot instances the solver reaches or beats the best known
   solution on 11 and stays within 1.6% on the rest, in 1 to 26 seconds.
 
+- Connectors:
+  [`as_svydesign()`](https://castlaboratory.github.io/fieldopt/reference/as_svydesign.md)
+  hands a sample to the `survey` package (a replicate-weight design for
+  replicated systematic samples, Brewer’s or the simple-random-sampling
+  approximation otherwise) for calibration, domains and nonresponse
+  adjustment;
+  [`frame_overlap()`](https://castlaboratory.github.io/fieldopt/reference/frame_overlap.md)
+  matches the establishments of a list frame to the cells of the area
+  frame (coordinates, polygons or a table of linked pairs) and marks the
+  overlap domain;
+  [`read_areaframe()`](https://castlaboratory.github.io/fieldopt/reference/read_areaframe.md)
+  reads the cells exported by the area-frame service (Parquet with WKB
+  geometries) or any spatial file.
+
 - `select_units(method = "lpm")` and
   [`spatial_balance()`](https://castlaboratory.github.io/fieldopt/reference/spatial_balance.md)
   use a grid spatial index (engine `fieldopt-core` 0.9.1): a frame of a
