@@ -42,7 +42,9 @@ schedule_fieldwork(
 
 - units:
 
-  Names of the units to visit.
+  Names of the units to visit, or a
+  [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
+  sample.
 
 - teams:
 

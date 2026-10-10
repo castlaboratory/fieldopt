@@ -45,7 +45,9 @@ route_fieldwork(
 
 - units:
 
-  Names (or indices in the matrix) of the units to visit.
+  Names (or indices in the matrix) of the units to visit, or a
+  [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
+  sample, whose sampled units are visited.
 
 - depot:
 

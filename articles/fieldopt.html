@@ -129,11 +129,13 @@ back on the geometries for maps.</p>
 <h2 id="travel-and-cost">Travel and cost<a class="anchor" aria-label="anchor" href="#travel-and-cost"></a>
 </h2>
 <p><code><a href="../reference/travel_matrix.html">travel_matrix()</a></code> computes the matrix of travel distances
-between all units. With longitude and latitude it uses great-circle
-distances in kilometres; with planar coordinates, as here, Euclidean
-distances. A matrix computed on a road network (for example with OSRM)
-can be passed through the <code>matrix</code> argument and is the better
-input when it exists.</p>
+between all units (or, given a sample and the depot as
+<code>bases</code>, only between the depot and the sampled units, which
+is what the routing needs). With longitude and latitude it uses
+great-circle distances in kilometres; with planar coordinates, as here,
+Euclidean distances. A matrix computed on a road network (for example
+with OSRM) can be passed through the <code>matrix</code> argument and is
+the better input when it exists.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/travel_matrix.html">travel_matrix</a></span><span class="op">(</span><span class="va">frame</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span></span>
 <span><span class="va">m</span></span>
@@ -159,11 +161,8 @@ structured variables; it also spreads the units over the territory,
 which is exactly what makes the field work longer. Making that tension
 explicit is the point of the package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">units</span> <span class="op">&lt;-</span> <span class="va">frame</span><span class="op">[</span><span class="va">frame</span><span class="op">$</span><span class="va">unit</span> <span class="op">!=</span> <span class="st">"depot"</span>, <span class="op">]</span></span>
-<span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span><span class="va">units</span>, n <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
-<span><span class="va">s</span><span class="op">[</span><span class="va">s</span><span class="op">$</span><span class="va">sampled</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unit"</span>, <span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"pi"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; Warning: Unknown or uninitialised column: `sampled`.</span></span>
-<span><span class="co">#&gt; Sample of 0 units from 12 by "lpm".</span></span>
+<code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">frame</span><span class="op">[</span><span class="va">frame</span><span class="op">$</span><span class="va">unit</span> <span class="op">!=</span> <span class="st">"depot"</span>, <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span><span class="va">s</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/sampled.html">sampled</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span>select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">unit</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">pi</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 12 × 4</span></span>
 <span><span class="co">#&gt;    unit       x     y    pi</span></span>
 <span><span class="co">#&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
@@ -182,13 +181,15 @@ explicit is the point of the package.</p>
 <p><code><a href="../reference/route_fieldwork.html">route_fieldwork()</a></code> routes the field work from the depot
 through the selected units. Without limits it returns one tour; with a
 maximum length or a maximum number of stops per route, it splits the
-work into routes, one per team or per day. The solver is a GRASP
-heuristic with local search and an optimal split of the tour, and
-reports the gap to a lower bound so that the quality of the solution is
-visible.</p>
+work into routes, one per team or per day. Small instances are solved
+exactly; larger ones by a hybrid genetic search with an optimal split of
+the tour and a local search, with a lower bound and, for single tours, a
+proof of optimality, so that the quality of the solution is visible. The
+sample can be piped straight into the routing.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span><span class="va">m</span>, units <span class="op">=</span> <span class="va">s</span><span class="op">$</span><span class="va">unit</span><span class="op">[</span><span class="va">s</span><span class="op">$</span><span class="va">sampled</span><span class="op">]</span>, depot <span class="op">=</span> <span class="st">"depot"</span>,</span>
-<span>                     max_stops <span class="op">=</span> <span class="fl">5</span>, cost_model <span class="op">=</span> <span class="va">model</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="va">s</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/travel_matrix.html">travel_matrix</a></span><span class="op">(</span>bases <span class="op">=</span> <span class="va">frame</span><span class="op">[</span><span class="va">frame</span><span class="op">$</span><span class="va">unit</span> <span class="op">==</span> <span class="st">"depot"</span>, <span class="op">]</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span>units <span class="op">=</span> <span class="va">s</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, max_stops <span class="op">=</span> <span class="fl">5</span>, cost_model <span class="op">=</span> <span class="va">model</span><span class="op">)</span></span>
 <span><span class="va">r</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Field routes ────────────────────────────────────────────────────────────────</span></span>

@@ -15,7 +15,9 @@ travel_matrix(
   measure = c("duration", "distance"),
   server = getOption("osrm.server"),
   profile = getOption("osrm.profile"),
-  block = 100
+  block = 100,
+  bases = NULL,
+  speed = NULL
 )
 ```
 
@@ -26,7 +28,11 @@ travel_matrix(
   Data frame or matrix with two coordinate columns: `lat`, `lon`
   (degrees) for `"haversine"` and `"osrm"`, or `x`, `y` (planar, any
   unit) for `"euclidean"`. Row names, or a column `unit`, name the
-  units.
+  units. A
+  [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
+  sample is accepted and only its sampled units are used, so that
+  `frame |> select_units(n) |> travel_matrix(bases = towns)` builds the
+  matrix of the field work.
 
 - method:
 
@@ -62,6 +68,17 @@ travel_matrix(
 
   For `"osrm"`: number of origins and of destinations per request
   (`block^2` cells each).
+
+- bases:
+
+  Optional data frame of depots (a `unit` column and the same coordinate
+  columns) put in front of `coords`.
+
+- speed:
+
+  Optional speed in coordinate units per hour (kilometres per hour with
+  `"haversine"`): the distances are turned into minutes and `unit`
+  becomes `"min"`. Ignored for `"osrm"` durations.
 
 ## Value
 

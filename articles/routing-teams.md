@@ -15,7 +15,7 @@ frame <- data.frame(unit = c("depot", paste0("s", 1:60)),
 m <- travel_matrix(frame)
 model <- field_cost_model(per_travel = 1.8, per_unit = 40, per_interview = 12,
                           interviews_per_unit = 6, currency = "BRL")
-s <- select_units(frame[-1, ], n = 18, seed = 3)
+s <- frame[-1, ] |> select_units(n = 18, seed = 3)
 sel <- s$unit[s$sampled]
 ```
 
@@ -143,11 +143,12 @@ a team-day (allowances, vehicle, lodging). Routes are then days of work.
 
 ``` r
 
-m_min <- travel_matrix(frame, detour = 1.3, unit = "min")   # treat the km as minutes at 60 km/h
 daily <- field_cost_model(per_travel = 0.5, per_route = 400, per_unit = 20, per_interview = 15,
                           interviews_per_unit = 3, currency = "BRL")
-day <- route_fieldwork(m_min, units = sel, depot = "depot", max_length = 480, service_time = 120,
-                       iterations = 50, cost_model = daily)
+day <- frame |>
+  travel_matrix(detour = 1.3, speed = 60) |>                    # kilometres at 60 km/h: minutes
+  route_fieldwork(units = sel, depot = "depot", max_length = 480, service_time = 120,
+                  iterations = 50, cost_model = daily)
 day
 #> 
 #> ── Field routes ────────────────────────────────────────────────────────────────
@@ -179,10 +180,11 @@ whether the work fits.
 
 ``` r
 
-frame2 <- rbind(frame, data.frame(unit = "base2", lat = -8.30, lon = -35.30))
-m2 <- travel_matrix(frame2, detour = 1.3, unit = "min")
-sch <- schedule_fieldwork(m2, units = sel, teams = c(depot = 1, base2 = 1), days = 6,
-                          max_length = 480, service_time = 120, iterations = 50, cost_model = daily)
+bases <- data.frame(unit = c("depot", "base2"), lat = c(-8.05, -8.30), lon = c(-35.00, -35.30))
+sch <- s |>
+  travel_matrix(bases = bases, detour = 1.3, speed = 60) |>
+  schedule_fieldwork(units = s, teams = c(depot = 1, base2 = 1), days = 6,
+                     max_length = 480, service_time = 120, iterations = 50, cost_model = daily)
 sch
 #> 
 #> ── Field schedule ──────────────────────────────────────────────────────────────

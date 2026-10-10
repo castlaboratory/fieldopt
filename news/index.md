@@ -11,6 +11,18 @@
   multi-depot instances the solver reaches or beats the best known
   solution on 11 and stays within 1.6% on the rest, in 1 to 26 seconds.
 
+- Pipe-friendly inputs:
+  [`travel_matrix()`](https://castlaboratory.github.io/fieldopt/reference/travel_matrix.md)
+  takes a sample (its sampled units only) with `bases` and a `speed`
+  that turns distances into minutes;
+  [`route_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/route_fieldwork.md)
+  and
+  [`schedule_fieldwork()`](https://castlaboratory.github.io/fieldopt/reference/schedule_fieldwork.md)
+  take the sample as `units`;
+  [`sampled()`](https://castlaboratory.github.io/fieldopt/reference/sampled.md)
+  returns the selected rows, so a plan reads
+  `frame |> select_units(n) |> travel_matrix(bases = towns, speed = 60) |> schedule_fieldwork(units = s, ...)`.
+
 - Connectors:
   [`as_svydesign()`](https://castlaboratory.github.io/fieldopt/reference/as_svydesign.md)
   hands a sample to the `survey` package (a replicate-weight design for

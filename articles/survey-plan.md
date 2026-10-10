@@ -103,14 +103,12 @@ the calendar says whether the work fits in the campaign.
 
 ``` r
 
-frame <- rbind(bases, data.frame(unit = s$unit[s$sampled], x = s$x[s$sampled], y = s$y[s$sampled]))
-m <- travel_matrix(frame, method = "euclidean", detour = 1.3, unit = "min")
-m[] <- m[] * 1.5                                 # 2 km per cell unit at 80 km/h: 1.5 min per unit
-m <- travel_matrix(frame, method = "euclidean", matrix = unclass(m), unit = "min")
 money <- field_cost_model(per_travel = 1.2, per_route = 600, per_unit = 40, per_interview = 25,
                           interviews_per_unit = 3, currency = "BRL")
-sch <- schedule_fieldwork(m, units = s$unit[s$sampled], teams = c(north = 2, south = 2), days = 12,
-                          max_length = 480, service_time = 180, cost_model = money, iterations = 100)
+sch <- s |>
+  travel_matrix(bases = bases, method = "euclidean", detour = 1.3, speed = 40) |>   # 40 units/h: minutes
+  schedule_fieldwork(units = s, teams = c(north = 2, south = 2), days = 12,
+                     max_length = 480, service_time = 180, cost_model = money, iterations = 100)
 sch
 #> 
 #> ── Field schedule ──────────────────────────────────────────────────────────────

@@ -70,7 +70,9 @@ depot included, in one of three ways:</p>
 <span>  measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"duration"</span>, <span class="st">"distance"</span><span class="op">)</span>,</span>
 <span>  server <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"osrm.server"</span><span class="op">)</span>,</span>
 <span>  profile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"osrm.profile"</span><span class="op">)</span>,</span>
-<span>  block <span class="op">=</span> <span class="fl">100</span></span>
+<span>  block <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  bases <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  speed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -81,7 +83,10 @@ depot included, in one of three ways:</p>
 <dl><dt id="arg-coords">coords<a class="anchor" aria-label="anchor" href="#arg-coords"></a></dt>
 <dd><p>Data frame or matrix with two coordinate columns: <code>lat</code>, <code>lon</code>
 (degrees) for <code>"haversine"</code> and <code>"osrm"</code>, or <code>x</code>, <code>y</code> (planar, any unit)
-for <code>"euclidean"</code>. Row names, or a column <code>unit</code>, name the units.</p></dd>
+for <code>"euclidean"</code>. Row names, or a column <code>unit</code>, name the units. A
+<code><a href="select_units.html">select_units()</a></code> sample is accepted and only its sampled units are used,
+so that <code>frame |&gt; select_units(n) |&gt; travel_matrix(bases = towns)</code> builds
+the matrix of the field work.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
@@ -118,6 +123,17 @@ options.</p></dd>
 <dt id="arg-block">block<a class="anchor" aria-label="anchor" href="#arg-block"></a></dt>
 <dd><p>For <code>"osrm"</code>: number of origins and of destinations per
 request (<code>block^2</code> cells each).</p></dd>
+
+
+<dt id="arg-bases">bases<a class="anchor" aria-label="anchor" href="#arg-bases"></a></dt>
+<dd><p>Optional data frame of depots (a <code>unit</code> column and the same
+coordinate columns) put in front of <code>coords</code>.</p></dd>
+
+
+<dt id="arg-speed">speed<a class="anchor" aria-label="anchor" href="#arg-speed"></a></dt>
+<dd><p>Optional speed in coordinate units per hour (kilometres per
+hour with <code>"haversine"</code>): the distances are turned into minutes and
+<code>unit</code> becomes <code>"min"</code>. Ignored for <code>"osrm"</code> durations.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -38,6 +38,8 @@
 - [`select_units()`](https://castlaboratory.github.io/fieldopt/reference/select_units.md)
   : Select units with a spatially balanced or systematic probability
   sample
+- [`sampled()`](https://castlaboratory.github.io/fieldopt/reference/sampled.md)
+  : The sampled units of a sample
 - [`select_points()`](https://castlaboratory.github.io/fieldopt/reference/select_points.md)
   : Select points inside sampled grid cells
 - [`spatial_balance()`](https://castlaboratory.github.io/fieldopt/reference/spatial_balance.md)

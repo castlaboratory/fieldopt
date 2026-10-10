@@ -128,11 +128,10 @@ model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
                           interviews_per_unit = 4, currency = "BRL")
 
 # one design: select, route, price, estimate
-units <- frame[frame$unit != "depot", ]
-s <- select_units(units, n = 12)
-m <- travel_matrix(frame, method = "euclidean")
-r <- route_fieldwork(m, units = s$unit[s$sampled], depot = "depot",
-                     max_stops = 5, cost_model = model)
+s <- frame[frame$unit != "depot", ] |> select_units(n = 12)
+r <- s |>
+  travel_matrix(bases = frame[frame$unit == "depot", ], method = "euclidean") |>
+  route_fieldwork(units = s, depot = "depot", max_stops = 5, cost_model = model)
 r
 design_variance(s, y = "crop")
 
