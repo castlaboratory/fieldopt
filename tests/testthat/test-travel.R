@@ -55,10 +55,13 @@ test_that("the OSRM connector assembles blocks, sets units and reports snapping"
   calls <- 0
   fake <- function(src, dst = src, loc, exclude, measure = "duration", osrm.server = NULL, osrm.profile = NULL) {
     calls <<- calls + 1
-    i <- as.integer(sub("u", "", rownames(src))); j <- as.integer(sub("u", "", rownames(dst)))
+    i <- as.integer(sub("u", "", rownames(src)))
+    j <- as.integer(sub("u", "", rownames(dst)))
     d <- outer(i, j, function(a, b) abs(a - b) * 10)
-    list(durations = if (measure == "duration") d else NULL, distances = if (measure == "distance") d / 1000 * 60 else NULL,
-         sources = data.frame(lon = src$lon, lat = src$lat, snap = i / 10))
+    list(
+      durations = if (measure == "duration") d else NULL, distances = if (measure == "distance") d / 1000 * 60 else NULL,
+      sources = data.frame(lon = src$lon, lat = src$lat, snap = i / 10)
+    )
   }
   testthat::local_mocked_bindings(osrmTable = fake, .package = "osrm")
   m <- travel_matrix(pts, method = "osrm", block = 3)
@@ -75,14 +78,20 @@ test_that("the OSRM connector assembles blocks, sets units and reports snapping"
   expect_equal(unclass(md)[1, 2], 0.6)
   expect_warning(travel_matrix(pts, method = "osrm", detour = 1.2, block = 10), "ignored")
   # unreachable pair
-  fake_na <- function(src, dst = src, ...) { d <- matrix(1, nrow(src), nrow(dst)); d[1, ] <- NA; list(durations = d, sources = data.frame(snap = 0)) }
+  fake_na <- function(src, dst = src, ...) {
+    d <- matrix(1, nrow(src), nrow(dst))
+    d[1, ] <- NA
+    list(durations = d, sources = data.frame(snap = 0))
+  }
   testthat::local_mocked_bindings(osrmTable = fake_na, .package = "osrm")
   expect_error(travel_matrix(pts, method = "osrm", block = 10), "no route")
   expect_error(travel_matrix(pts[, c("unit", "lat")], method = "osrm"), "lon")
 })
 
 test_that("the OSRM demo server answers a tiny query", {
-  skip_on_cran(); skip_if_not_installed("osrm"); skip_if_offline()
+  skip_on_cran()
+  skip_if_not_installed("osrm")
+  skip_if_offline()
   pts <- data.frame(unit = c("a", "b"), lat = c(-8.0476, -8.0631), lon = c(-34.8770, -34.8711))
   m <- tryCatch(travel_matrix(pts, method = "osrm"), error = function(e) NULL)
   skip_if(is.null(m), "OSRM demo server not reachable")

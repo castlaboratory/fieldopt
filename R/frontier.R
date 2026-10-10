@@ -42,13 +42,19 @@
 #' @export
 #' @examples
 #' set.seed(3)
-#' frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
-#'                     x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
+#' frame <- data.frame(
+#'   unit = c("depot", paste0("s", 1:40)),
+#'   x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))
+#' )
 #' frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40))
-#' model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
-#'                           interviews_per_unit = 4)
-#' cost_variance_frontier(frame, depot = "depot", cost_model = model, n_grid = c(8, 16),
-#'                        y = "crop", method = "euclidean", n_rep = 3, iterations = 20)
+#' model <- field_cost_model(
+#'   per_travel = 2, per_unit = 30, per_interview = 10,
+#'   interviews_per_unit = 4
+#' )
+#' cost_variance_frontier(frame,
+#'   depot = "depot", cost_model = model, n_grid = c(8, 16),
+#'   y = "crop", method = "euclidean", n_rep = 3, iterations = 20
+#' )
 cost_variance_frontier <- function(frame, depot, cost_model, n_grid, y = NULL, size = NULL, strata = NULL,
                                    selection = c("lpm", "systematic", "srs"), replicates = 1, matrix = NULL,
                                    method = c("haversine", "euclidean", "osrm"), max_length = Inf, max_stops = Inf,
@@ -66,29 +72,51 @@ cost_variance_frontier <- function(frame, depot, cost_model, n_grid, y = NULL, s
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   if (!setequal(rownames(matrix), frame$unit)) cli::cli_abort("{.arg matrix} must have one row per unit of {.arg frame}, with the same names.")
   units_frame <- frame[frame$unit != depot, ]
-  coords <- switch(attr(matrix, "method"), euclidean = c("x", "y"), haversine = , osrm = c("lat", "lon"), NULL)
+  coords <- switch(attr(matrix, "method"),
+    euclidean = c("x", "y"),
+    haversine = ,
+    osrm = c("lat", "lon"),
+    NULL
+  )
   rows <- lapply(seq_along(n_grid), function(k) {
     n <- n_grid[[k]]
     cost <- travel <- nr <- var <- cv <- numeric(n_rep)
     for (r in seq_len(n_rep)) {
-      s <- select_units(units_frame, n = n, size = size, coords = coords, strata = strata, method = selection,
-                        replicates = replicates, seed = seed * 1000 + k * 10 + r)
+      s <- select_units(units_frame,
+        n = n, size = size, coords = coords, strata = strata, method = selection,
+        replicates = replicates, seed = seed * 1000 + k * 10 + r
+      )
       sel <- s$unit[s$sampled]
-      rt <- route_fieldwork(matrix, units = sel, depot = depot, max_length = max_length, max_stops = max_stops,
-                            iterations = iterations, seed = seed + r, cost_model = cost_model)
-      cost[r] <- rt$cost[["total"]]; travel[r] <- rt$total; nr[r] <- rt$n_routes
-      if (!is.null(y)) { dv <- design_variance(s, y = y); var[r] <- dv$variance; cv[r] <- dv$cv }
+      rt <- route_fieldwork(matrix,
+        units = sel, depot = depot, max_length = max_length, max_stops = max_stops,
+        iterations = iterations, seed = seed + r, cost_model = cost_model
+      )
+      cost[r] <- rt$cost[["total"]]
+      travel[r] <- rt$total
+      nr[r] <- rt$n_routes
+      if (!is.null(y)) {
+        dv <- design_variance(s, y = y)
+        var[r] <- dv$variance
+        cv[r] <- dv$cv
+      }
     }
     n_total <- sum(attr(s, "n"))
-    out <- tibble::tibble(n = n_total, cost_mean = mean(cost), cost_sd = stats::sd(cost),
-                          cost_per_unit = mean(cost) / n_total, travel_mean = mean(travel), routes_mean = mean(nr))
-    if (!is.null(y)) { out$variance_mean <- mean(var); out$cv_mean <- mean(cv) }
+    out <- tibble::tibble(
+      n = n_total, cost_mean = mean(cost), cost_sd = stats::sd(cost),
+      cost_per_unit = mean(cost) / n_total, travel_mean = mean(travel), routes_mean = mean(nr)
+    )
+    if (!is.null(y)) {
+      out$variance_mean <- mean(var)
+      out$cv_mean <- mean(cv)
+    }
     out$n_rep <- n_rep
     if (!is.null(strata)) out$allocation <- list(attr(s, "n"))
     out
   })
-  structure(do.call(rbind, rows), class = c("fieldopt_frontier", "tbl_df", "tbl", "data.frame"),
-            currency = cost_model$currency, selection = selection, replicates = replicates)
+  structure(do.call(rbind, rows),
+    class = c("fieldopt_frontier", "tbl_df", "tbl", "data.frame"),
+    currency = cost_model$currency, selection = selection, replicates = replicates
+  )
 }
 
 #' Plot the cost-variance frontier
@@ -102,13 +130,15 @@ autoplot.fieldopt_frontier <- function(object, ...) {
   d <- tibble::as_tibble(unclass(object))
   if ("variance_mean" %in% names(d)) {
     ggplot2::ggplot(d, ggplot2::aes(x = .data$variance_mean, y = .data$cost_mean, label = .data$n)) +
-      ggplot2::geom_path(colour = "grey50") + ggplot2::geom_point(size = 2) +
+      ggplot2::geom_path(colour = "grey50") +
+      ggplot2::geom_point(size = 2) +
       ggplot2::geom_text(vjust = -0.8, size = 3) +
       ggplot2::labs(x = "variance of the estimated total", y = paste0("mean field cost (", attr(object, "currency"), ")")) +
       ggplot2::theme_minimal()
   } else {
     ggplot2::ggplot(d, ggplot2::aes(x = .data$n, y = .data$cost_mean)) +
-      ggplot2::geom_line(colour = "grey50") + ggplot2::geom_point(size = 2) +
+      ggplot2::geom_line(colour = "grey50") +
+      ggplot2::geom_point(size = 2) +
       ggplot2::labs(x = "sample size", y = paste0("mean field cost (", attr(object, "currency"), ")")) +
       ggplot2::theme_minimal()
   }

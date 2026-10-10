@@ -74,7 +74,9 @@ test_that("stratified variances are computed within strata", {
   # hand computation of the stratified SRS variance of the total
   v <- 0
   for (lev in c("low", "mid", "high")) {
-    idx <- sr$intensity == lev; N_h <- sum(idx); n_h <- sum(sr$sampled[idx])
+    idx <- sr$intensity == lev
+    N_h <- sum(idx)
+    n_h <- sum(sr$sampled[idx])
     v <- v + N_h^2 * (1 - n_h / N_h) * var(sr$crop[idx & sr$sampled]) / n_h
   }
   expect_equal(d$variance, v)

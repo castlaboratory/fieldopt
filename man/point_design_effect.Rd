@@ -81,10 +81,12 @@ drives the design effect at the cell level.
 }
 \examples{
 set.seed(4)
-cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
+cells <- expand.grid(x = 1:10, y = 1:10)
+cells$unit <- paste0("c", 1:100)
 areas <- rbind(
   data.frame(establishment = paste0(cells$unit, "-1"), unit = cells$unit, area = 0.5),
-  data.frame(establishment = paste0(cells$unit, "-2"), unit = cells$unit, area = 0.2))
+  data.frame(establishment = paste0(cells$unit, "-2"), unit = cells$unit, area = 0.2)
+)
 areas$y <- round(rgamma(nrow(areas), 3, 3 / (10 * areas$area)), 1)
 point_design_effect(cells, areas, n = 15, points_per_cell = 6, cell_size = 1, n_sim = 20)
 }

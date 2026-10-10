@@ -54,7 +54,9 @@ the sample is; take it from \code{\link[=cost_variance_frontier]{cost_variance_f
 \code{n} and iterate.
 }
 \examples{
-two_stage_allocation(n_primary = 5000, m_secondary = 20, s2_between = 4, s2_within = 25,
-                     c1 = 300, c2 = 20, budget = 1e5)
+two_stage_allocation(
+  n_primary = 5000, m_secondary = 20, s2_between = 4, s2_within = 25,
+  c1 = 300, c2 = 20, budget = 1e5
+)
 two_stage_allocation(5000, 20, 4, 25, c1 = 300, c2 = 20, target_cv = 0.03, mean = 12)
 }

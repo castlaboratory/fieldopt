@@ -56,11 +56,15 @@
 #' set.seed(1)
 #' cells <- expand.grid(x = 1:20, y = 1:20)
 #' cells$unit <- paste0("c", seq_len(nrow(cells)))
-#' cells$intensity <- cut(cells$x + rnorm(400, sd = 3), c(-Inf, 7, 14, Inf),
-#'                        c("low", "mid", "high"))
+#' cells$intensity <- cut(
+#'   cells$x + rnorm(400, sd = 3), c(-Inf, 7, 14, Inf),
+#'   c("low", "mid", "high")
+#' )
 #' cells$size <- c(low = 1, mid = 2, high = 4)[cells$intensity]
-#' s <- select_units(cells, n = c(low = 10, mid = 15, high = 25), size = "size",
-#'                   strata = "intensity")
+#' s <- select_units(cells,
+#'   n = c(low = 10, mid = 15, high = 25), size = "size",
+#'   strata = "intensity"
+#' )
 #' table(s$intensity, s$sampled)
 #' r <- select_units(cells, n = 40, method = "systematic", replicates = 4)
 #' dim(attr(r, "replicates"))
@@ -74,19 +78,27 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
   if (is.null(coords)) coords <- if (all(c("lat", "lon") %in% names(frame))) c("lat", "lon") else if (all(c("x", "y") %in% names(frame))) c("x", "y") else cli::cli_abort("{.arg frame} needs coordinate columns ({.field lat}/{.field lon} or {.field x}/{.field y}) or {.arg coords}.")
   if (!all(coords %in% names(frame))) cli::cli_abort("Coordinate column{?s} {.field {setdiff(coords, names(frame))}} not found.")
   if (method == "systematic" && length(coords) != 2L) cli::cli_abort("{.val systematic} needs exactly two coordinate columns.")
-  X <- as.matrix(frame[, coords]); storage.mode(X) <- "double"
+  X <- as.matrix(frame[, coords])
+  storage.mode(X) <- "double"
   if (anyNA(X)) cli::cli_abort("Coordinates must not be missing.")
   N <- nrow(frame)
   if (!"unit" %in% names(frame)) frame$unit <- paste0("u", seq_len(N))
   if (anyDuplicated(frame$unit)) cli::cli_abort("Unit names in {.field unit} must be distinct.")
   if (!is.null(balance)) {
-    miss <- setdiff(balance, names(frame)); if (length(miss)) cli::cli_abort("Balancing column{?s} {.field {miss}} not found.")
-    B <- as.matrix(frame[, balance]); storage.mode(B) <- "double"
+    miss <- setdiff(balance, names(frame))
+    if (length(miss)) cli::cli_abort("Balancing column{?s} {.field {miss}} not found.")
+    B <- as.matrix(frame[, balance])
+    storage.mode(B) <- "double"
     if (anyNA(B)) cli::cli_abort("Balancing variables must not be missing.")
   }
   check_seed(seed)
   if (method == "srs" && !is.null(size)) cli::cli_abort(c("{.val srs} selects with equal probabilities.", i = "Drop {.arg size}, or use {.val lpm} or {.val systematic} for selection proportional to size."))
-  sz <- if (is.null(size)) rep(1, N) else { if (!size %in% names(frame)) cli::cli_abort("Size column {.field {size}} not found."); as.numeric(frame[[size]]) }
+  sz <- if (is.null(size)) {
+    rep(1, N)
+  } else {
+    if (!size %in% names(frame)) cli::cli_abort("Size column {.field {size}} not found.")
+    as.numeric(frame[[size]])
+  }
   if (anyNA(sz) || any(sz < 0)) cli::cli_abort("Sizes must be non-negative without missing values.")
   if (!is.numeric(replicates) || length(replicates) != 1L || replicates < 1 || replicates != round(replicates)) cli::cli_abort("{.arg replicates} must be a whole number of at least 1.")
   if (method != "systematic" && replicates > 1) cli::cli_abort("{.arg replicates} applies to {.val systematic} sampling only.")
@@ -114,7 +126,8 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
   if (replicates > 1 && any(n_h < replicates)) cli::cli_abort("Every stratum needs at least {.arg replicates} = {replicates} sampled units.")
   too_big <- n_h > N_h
   if (any(too_big)) cli::cli_abort("Sample size exceeds the number of units in strat{?um/a} {.val {names(n_h)[too_big]}}.")
-  pi <- numeric(N); sampled <- logical(N)
+  pi <- numeric(N)
+  sampled <- logical(N)
   rep_mat <- if (replicates > 1) matrix(FALSE, N, replicates) else NULL
   pi_rep <- if (replicates > 1) numeric(N) else NULL
   for (k in seq_along(n_h)) {
@@ -133,7 +146,7 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
       sampled[idx[with_seed(seed_k, sample.int(length(idx), nk))]] <- TRUE
     } else if (method == "cube") {
       pi[idx] <- p
-      X_b <- cbind(p, B[idx, , drop = FALSE])  # the probabilities first: they fix the sample size
+      X_b <- cbind(p, B[idx, , drop = FALSE]) # the probabilities first: they fix the sample size
       sampled[idx] <- cube_rs(as.numeric(t(X_b)), ncol(X_b), p, seed_k)
     } else {
       ord <- hilbert_order_rs(as.numeric(t(X[idx, , drop = FALSE])), 16L)
@@ -148,10 +161,13 @@ select_units <- function(frame, n, size = NULL, coords = NULL, strata = NULL,
       sampled[idx] <- rowSums(m) > 0
     }
   }
-  frame$pi <- pi; frame$sampled <- sampled
+  frame$pi <- pi
+  frame$sampled <- sampled
   if (!is.null(rep_mat)) frame$n_replicates <- rowSums(rep_mat)
-  structure(frame, class = c("fieldopt_sample", class(frame)), n = n_h, coords = coords, strata = strata,
-            method = method, seed = seed, size = size, replicates = rep_mat, pi_replicate = pi_rep)
+  structure(frame,
+    class = c("fieldopt_sample", class(frame)), n = n_h, coords = coords, strata = strata,
+    method = method, seed = seed, size = size, replicates = rep_mat, pi_replicate = pi_rep
+  )
 }
 
 # Largest-remainder rounding of a positive allocation to integers with a floor.
@@ -165,7 +181,13 @@ largest_remainder <- function(x, floor_min = 1) {
   } else if (rem < 0) {
     o <- order(x - floor(x))
     k <- 0
-    for (i in o) { if (k == -rem) break; if (base[i] > floor_min) { base[i] <- base[i] - 1; k <- k + 1 } }
+    for (i in o) {
+      if (k == -rem) break
+      if (base[i] > floor_min) {
+        base[i] <- base[i] - 1
+        k <- k + 1
+      }
+    }
   }
   stats::setNames(as.integer(base), names(x))
 }
@@ -203,10 +225,12 @@ print.fieldopt_sample <- function(x, ...) {
 #'   `density` (expected points per unit area of the cell).
 #' @export
 #' @examples
-#' cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
+#' cells <- expand.grid(x = 1:10, y = 1:10)
+#' cells$unit <- paste0("c", 1:100)
 #' s <- select_units(cells, n = 12, seed = 2)
 #' p <- select_points(s, points_per_cell = 9, cell_size = 1, layout = "systematic")
-#' nrow(p); head(p)
+#' nrow(p)
+#' head(p)
 select_points <- function(sample, points_per_cell, cell_size, layout = c("random", "systematic"), seed = 1) {
   layout <- rlang::arg_match(layout)
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
@@ -224,26 +248,34 @@ select_points <- function(sample, points_per_cell, cell_size, layout = c("random
     lev <- as.character(sel[[st]])
     if (!all(lev %in% names(points_per_cell))) cli::cli_abort("{.arg points_per_cell} must name every stratum.")
     as.numeric(points_per_cell[lev])
-  } else rep(as.numeric(points_per_cell), nrow(sel))
+  } else {
+    rep(as.numeric(points_per_cell), nrow(sel))
+  }
   if (anyNA(m) || any(m < 1) || any(m != round(m))) cli::cli_abort("Points per cell must be whole numbers of at least 1.")
   check_seed(seed)
   rows <- with_seed(seed, lapply(seq_len(nrow(sel)), function(i) {
     k <- m[i]
     if (layout == "random") {
-      ua <- stats::runif(k); ub <- stats::runif(k)
+      ua <- stats::runif(k)
+      ub <- stats::runif(k)
     } else {
-      k1 <- max(which(k %% seq_len(floor(sqrt(k))) == 0)); k2 <- k %/% k1
+      k1 <- max(which(k %% seq_len(floor(sqrt(k))) == 0))
+      k2 <- k %/% k1
       g <- expand.grid(i = seq_len(k2) - 1, j = seq_len(k1) - 1)
-      ua <- (g$i + stats::runif(1)) / k2; ub <- (g$j + stats::runif(1)) / k1
+      ua <- (g$i + stats::runif(1)) / k2
+      ub <- (g$j + stats::runif(1)) / k1
     }
-    tibble::tibble(unit = sel$unit[i], point = seq_len(k),
-                   a = sel[[co[1]]][i] + (ua - 0.5) * cell_size[1],
-                   b = sel[[co[2]]][i] + (ub - 0.5) * cell_size[2],
-                   pi_cell = sel$pi[i], points_in_cell = k,
-                   density = sel$pi[i] * k / prod(cell_size))
+    tibble::tibble(
+      unit = sel$unit[i], point = seq_len(k),
+      a = sel[[co[1]]][i] + (ua - 0.5) * cell_size[1],
+      b = sel[[co[2]]][i] + (ub - 0.5) * cell_size[2],
+      pi_cell = sel$pi[i], points_in_cell = k,
+      density = sel$pi[i] * k / prod(cell_size)
+    )
   }))
   out <- do.call(rbind, rows)
-  names(out)[names(out) == "a"] <- co[1]; names(out)[names(out) == "b"] <- co[2]
+  names(out)[names(out) == "a"] <- co[1]
+  names(out)[names(out) == "b"] <- co[2]
   structure(out, class = c("fieldopt_points", class(out)), cell_size = cell_size, coords = co, layout = layout)
 }
 
@@ -266,18 +298,24 @@ print.fieldopt_points <- function(x, ...) {
 #' cells$h <- ifelse(cells$x <= 6, "west", "east")
 #' autoplot(select_units(cells, n = 20, strata = "h", seed = 3))
 autoplot.fieldopt_sample <- function(object, ...) {
-  co <- attr(object, "coords"); st <- attr(object, "strata")
+  co <- attr(object, "coords")
+  st <- attr(object, "strata")
   geo <- identical(co, c("lat", "lon"))
-  d <- tibble::tibble(a = if (geo) object[[co[2]]] else object[[co[1]]], b = if (geo) object[[co[1]]] else object[[co[2]]],
-                      sampled = factor(ifelse(object$sampled, "sampled", "not sampled"), c("sampled", "not sampled")),
-                      stratum = if (is.null(st)) factor("all") else factor(object[[st]]))
+  d <- tibble::tibble(
+    a = if (geo) object[[co[2]]] else object[[co[1]]], b = if (geo) object[[co[1]]] else object[[co[2]]],
+    sampled = factor(ifelse(object$sampled, "sampled", "not sampled"), c("sampled", "not sampled")),
+    stratum = if (is.null(st)) factor("all") else factor(object[[st]])
+  )
   p <- ggplot2::ggplot(d, ggplot2::aes(x = .data$a, y = .data$b)) +
     ggplot2::geom_point(data = d[!object$sampled, ], ggplot2::aes(colour = .data$stratum), size = 1, alpha = 0.35) +
     ggplot2::geom_point(data = d[object$sampled, ], ggplot2::aes(colour = .data$stratum), size = 2.4) +
-    ggplot2::labs(x = if (geo) "longitude" else co[1], y = if (geo) "latitude" else co[2], colour = "stratum",
-                  subtitle = paste0(sum(object$sampled), " of ", nrow(object), " units by ", attr(object, "method"))) +
+    ggplot2::labs(
+      x = if (geo) "longitude" else co[1], y = if (geo) "latitude" else co[2], colour = "stratum",
+      subtitle = paste0(sum(object$sampled), " of ", nrow(object), " units by ", attr(object, "method"))
+    ) +
     (if (geo) ggplot2::coord_quickmap() else ggplot2::coord_equal()) +
-    ggplot2::theme_minimal() + ggplot2::theme(legend.position = if (is.null(st)) "none" else "bottom")
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = if (is.null(st)) "none" else "bottom")
   p
 }
 
@@ -312,7 +350,9 @@ expected_hits <- function(areas, sample, points_per_cell, cell_size) {
     lev <- as.character(sample[[st]])
     if (!all(lev %in% names(points_per_cell))) cli::cli_abort("{.arg points_per_cell} must name every stratum.")
     as.numeric(points_per_cell[lev])
-  } else rep(as.numeric(points_per_cell), nrow(sample))
+  } else {
+    rep(as.numeric(points_per_cell), nrow(sample))
+  }
   if (anyNA(m) || any(m < 1)) cli::cli_abort("Points per cell must be positive.")
   dens <- stats::setNames(sample$pi * m / prod(cell_size), sample$unit)
   miss <- setdiff(unique(areas$unit), names(dens))
@@ -352,11 +392,12 @@ point_estimator <- function(hits, sample) {
   if (length(bad)) cli::cli_abort("Hits refer to unsampled cell{?s} {.val {bad}}.")
   contrib <- as.numeric(hits$y) / as.numeric(hits$expected_hits)
   u <- tapply(contrib, factor(hits$unit, levels = sample$unit), sum)
-  u[is.na(u)] <- 0  # sampled cells without hits
+  u[is.na(u)] <- 0 # sampled cells without hits
   # cell totals z such that sum(z / pi) over sampled cells equals the estimate
   z <- as.numeric(u) * sample$pi
   out <- ht_variance(sample, z, total = sum(as.numeric(u)))
-  out$n_hits <- nrow(hits); out$n_establishments <- length(unique(hits$establishment))
+  out$n_hits <- nrow(hits)
+  out$n_establishments <- length(unique(hits$establishment))
   out
 }
 
@@ -388,14 +429,23 @@ point_estimator <- function(hits, sample) {
 segment_estimator <- function(tracts, sample, type = c("closed", "open", "weighted")) {
   type <- rlang::arg_match(type)
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
-  need <- switch(type, closed = c("unit", "y_tract"), open = c("unit", "y_total", "headquarters"), weighted = c("unit", "y_total", "share"))
+  need <- switch(type,
+    closed = c("unit", "y_tract"),
+    open = c("unit", "y_total", "headquarters"),
+    weighted = c("unit", "y_total", "share")
+  )
   for (col in need) if (!col %in% names(tracts)) cli::cli_abort("{.arg tracts} needs a column {.field {col}} for type {.val {type}}.")
   bad <- unique(tracts$unit[!tracts$unit %in% sample$unit[sample$sampled]])
   if (length(bad)) cli::cli_abort("Tracts refer to unsampled segment{?s} {.val {bad}}.")
   v <- switch(type,
     closed = as.numeric(tracts$y_tract),
     open = as.numeric(tracts$y_total) * as.numeric(as.logical(tracts$headquarters)),
-    weighted = { sh <- as.numeric(tracts$share); if (any(sh < 0 | sh > 1, na.rm = TRUE)) cli::cli_abort("{.field share} must lie in [0, 1]."); as.numeric(tracts$y_total) * sh })
+    weighted = {
+      sh <- as.numeric(tracts$share)
+      if (any(sh < 0 | sh > 1, na.rm = TRUE)) cli::cli_abort("{.field share} must lie in [0, 1].")
+      as.numeric(tracts$y_total) * sh
+    }
+  )
   if (anyNA(v)) cli::cli_abort("Missing values in the tract data.")
   z <- tapply(v, factor(tracts$unit, levels = sample$unit), sum)
   z[is.na(z)] <- 0
@@ -414,12 +464,14 @@ segment_estimator <- function(tracts, sample, type = c("closed", "open", "weight
 ht_variance <- function(sample, z, total = NULL) {
   s <- sample$sampled
   z[!s] <- 0
-  X <- as.matrix(sample[, attr(sample, "coords")]); storage.mode(X) <- "double"
+  X <- as.matrix(sample[, attr(sample, "coords")])
+  storage.mode(X) <- "double"
   rep_mat <- attr(sample, "replicates")
   strata <- attr(sample, "strata")
   h <- if (is.null(strata)) factor(rep("all", nrow(sample))) else factor(sample[[strata]])
   if (!is.null(rep_mat)) {
-    r <- ncol(rep_mat); pr <- attr(sample, "pi_replicate")
+    r <- ncol(rep_mat)
+    pr <- attr(sample, "pi_replicate")
     est_k <- vapply(seq_len(r), function(k) sum(z[rep_mat[, k]] / pr[rep_mat[, k]]), numeric(1))
     if (is.null(total)) total <- mean(est_k)
     v <- stats::var(est_k) / r
@@ -427,23 +479,28 @@ ht_variance <- function(sample, z, total = NULL) {
   } else {
     if (is.null(total)) total <- ht_total_rs(z, sample$pi, s)
     design <- attr(sample, "method")
-    v <- 0; method <- NULL
+    v <- 0
+    method <- NULL
     for (lev in levels(h)) {
       idx <- which(h == lev)
       if (sum(s[idx]) < 2L) cli::cli_abort("At least two sampled units are needed in every stratum to estimate the variance (stratum {.val {lev}}).")
       equal <- length(unique(sample$pi[idx][s[idx]])) == 1L
       if (identical(design, "srs") && equal) {
-        v <- v + srs_variance_rs(z[idx], s[idx], length(idx)); method <- c(method, "srs")
+        v <- v + srs_variance_rs(z[idx], s[idx], length(idx))
+        method <- c(method, "srs")
       } else {
-        v <- v + local_mean_variance_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), z[idx], sample$pi[idx], s[idx]); method <- c(method, "local-mean")
+        v <- v + local_mean_variance_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), z[idx], sample$pi[idx], s[idx])
+        method <- c(method, "local-mean")
       }
     }
     method <- paste(unique(method), collapse = "+")
     if (nlevels(h) > 1) method <- paste0("stratified ", method)
   }
   v_srs <- srs_variance_rs(z, s, nrow(sample))
-  tibble::tibble(total = total, variance = v, se = sqrt(v), cv = if (total != 0) sqrt(v) / abs(total) else NA_real_,
-                 variance_srs = v_srs, n = sum(s), N = nrow(sample), variance_method = method)
+  tibble::tibble(
+    total = total, variance = v, se = sqrt(v), cv = if (total != 0) sqrt(v) / abs(total) else NA_real_,
+    variance_srs = v_srs, n = sum(s), N = nrow(sample), variance_method = method
+  )
 }
 
 #' Design-based estimate of a total with its variance
@@ -479,7 +536,8 @@ ht_variance <- function(sample, z, total = NULL) {
 design_variance <- function(sample, y) {
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
   if (!y %in% names(sample)) cli::cli_abort("Column {.field {y}} not found.")
-  yy <- as.numeric(sample[[y]]); s <- sample$sampled
+  yy <- as.numeric(sample[[y]])
+  s <- sample$sampled
   if (anyNA(yy[s])) cli::cli_abort("{.field {y}} is missing for some sampled units.")
   ht_variance(sample, yy)
 }
@@ -502,8 +560,10 @@ design_variance <- function(sample, y) {
 #'   `fieldopt_allocation`.
 #' @export
 #' @examples
-#' strata <- data.frame(stratum = c("list", "area"), size = c(2000, 800),
-#'                      sd = c(12, 30), cost = c(40, 180))
+#' strata <- data.frame(
+#'   stratum = c("list", "area"), size = c(2000, 800),
+#'   sd = c(12, 30), cost = c(40, 180)
+#' )
 #' frame_allocation(strata, target_variance = 4e6)
 #' frame_allocation(strata, budget = 20000)
 frame_allocation <- function(strata, target_variance = NULL, budget = NULL) {
@@ -515,8 +575,10 @@ frame_allocation <- function(strata, target_variance = NULL, budget = NULL) {
   res <- allocate_rs(as.integer(strata$size), as.numeric(strata$sd), as.numeric(strata$cost), as.numeric(target), mode)
   strata$n <- res$n
   if (!"stratum" %in% names(strata)) strata$stratum <- paste0("h", seq_len(nrow(strata)))
-  structure(strata, class = c("fieldopt_allocation", class(strata)), cost = res$cost, variance = res$variance,
-            bounded = res$bounded, mode = mode, target = target)
+  structure(strata,
+    class = c("fieldopt_allocation", class(strata)), cost = res$cost, variance = res$variance,
+    bounded = res$bounded, mode = mode, target = target
+  )
 }
 
 #' @export
@@ -549,14 +611,17 @@ print.fieldopt_allocation <- function(x, ...) {
 #' spatial_balance(select_units(cells, n = 10, method = "srs", seed = 1))
 spatial_balance <- function(sample, by_stratum = FALSE) {
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
-  X <- as.matrix(sample[, attr(sample, "coords")]); storage.mode(X) <- "double"
+  X <- as.matrix(sample[, attr(sample, "coords")])
+  storage.mode(X) <- "double"
   st <- attr(sample, "strata")
   h <- if (is.null(st)) factor(rep("all", nrow(sample))) else factor(sample[[st]])
   parts <- vapply(levels(h), function(lev) {
     idx <- which(h == lev)
     spatial_balance_rs(as.numeric(t(X[idx, , drop = FALSE])), ncol(X), sample$pi[idx], sample$sampled[idx])
   }, numeric(1))
-  if (by_stratum) return(parts)
+  if (by_stratum) {
+    return(parts)
+  }
   n_h <- vapply(levels(h), function(lev) sum(sample$sampled[h == lev]), numeric(1))
   sum(parts * n_h) / sum(n_h)
 }
@@ -577,7 +642,8 @@ spatial_balance <- function(sample, by_stratum = FALSE) {
 #'   and `variance_ht` (the variance of the plain Horvitz-Thompson estimate).
 #' @export
 #' @examples
-#' cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144)
+#' cells <- expand.grid(x = 1:12, y = 1:12)
+#' cells$unit <- paste0("c", 1:144)
 #' cells$farmland <- runif(144, 20, 100)
 #' cells$crop <- 0.4 * cells$farmland + rnorm(144, sd = 3)
 #' s <- select_units(cells, n = 24, seed = 2)
@@ -585,22 +651,27 @@ spatial_balance <- function(sample, by_stratum = FALSE) {
 ratio_estimator <- function(sample, y, x, x_total = NULL) {
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
   for (col in c(y, x)) if (!col %in% names(sample)) cli::cli_abort("Column {.field {col}} not found.")
-  yy <- as.numeric(sample[[y]]); xx <- as.numeric(sample[[x]]); s <- sample$sampled
+  yy <- as.numeric(sample[[y]])
+  xx <- as.numeric(sample[[x]])
+  s <- sample$sampled
   if (anyNA(yy[s]) || anyNA(xx[s])) cli::cli_abort("{.field {y}} and {.field {x}} must not be missing for sampled units.")
   if (is.null(x_total)) {
     if (anyNA(xx)) cli::cli_abort("{.field {x}} is needed for the whole frame when {.arg x_total} is not given.")
     x_total <- sum(xx)
   }
-  y_ht <- ht_total_rs(yy, sample$pi, s); x_ht <- ht_total_rs(xx, sample$pi, s)
+  y_ht <- ht_total_rs(yy, sample$pi, s)
+  x_ht <- ht_total_rs(xx, sample$pi, s)
   if (x_ht <= 0) cli::cli_abort("The estimated total of {.field {x}} must be positive.")
   R <- y_ht / x_ht
   res <- ht_variance(sample, yy - R * xx, total = 0)
   v <- (x_total / x_ht)^2 * res$variance
   total <- x_total * R
   ht <- ht_variance(sample, yy)
-  tibble::tibble(total = total, variance = v, se = sqrt(v), cv = if (total != 0) sqrt(v) / abs(total) else NA_real_,
-                 ratio = R, x_total = x_total, variance_ht = ht$variance, variance_srs = res$variance_srs * (x_total / x_ht)^2,
-                 n = res$n, N = res$N, variance_method = res$variance_method)
+  tibble::tibble(
+    total = total, variance = v, se = sqrt(v), cv = if (total != 0) sqrt(v) / abs(total) else NA_real_,
+    ratio = R, x_total = x_total, variance_ht = ht$variance, variance_srs = res$variance_srs * (x_total / x_ht)^2,
+    n = res$n, N = res$N, variance_method = res$variance_method
+  )
 }
 
 #' The sampled units of a sample
@@ -614,7 +685,9 @@ ratio_estimator <- function(sample, y, x, x_total = NULL) {
 #' @export
 #' @examples
 #' cells <- expand.grid(x = 1:6, y = 1:6)
-#' cells |> select_units(n = 5, seed = 1) |> sampled()
+#' cells |>
+#'   select_units(n = 5, seed = 1) |>
+#'   sampled()
 sampled <- function(sample) {
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
   tibble::as_tibble(unclass(sample))[sample$sampled, ]

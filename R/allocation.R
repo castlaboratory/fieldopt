@@ -25,10 +25,14 @@
 #'   Section, ASA*, 194-199.
 #' @export
 #' @examples
-#' strata <- data.frame(stratum = c("high", "mid", "low"), size = c(300, 800, 2000),
-#'                      cost = c(250, 180, 150), sd_corn = c(40, 25, 8), sd_cattle = c(15, 30, 12))
-#' multivariate_allocation(strata, sd = c("sd_corn", "sd_cattle"),
-#'                         target_cv = c(0.05, 0.08), totals = c(90000, 60000))
+#' strata <- data.frame(
+#'   stratum = c("high", "mid", "low"), size = c(300, 800, 2000),
+#'   cost = c(250, 180, 150), sd_corn = c(40, 25, 8), sd_cattle = c(15, 30, 12)
+#' )
+#' multivariate_allocation(strata,
+#'   sd = c("sd_corn", "sd_cattle"),
+#'   target_cv = c(0.05, 0.08), totals = c(90000, 60000)
+#' )
 multivariate_allocation <- function(strata, sd, target_variance = NULL, target_cv = NULL, totals = NULL) {
   strata <- tibble::as_tibble(strata)
   for (col in c("size", "cost", sd)) if (!col %in% names(strata)) cli::cli_abort("{.arg strata} needs a column {.field {col}}.")
@@ -38,14 +42,17 @@ multivariate_allocation <- function(strata, sd, target_variance = NULL, target_c
     target_variance <- (target_cv * totals)^2
   }
   if (length(target_variance) != length(sd)) cli::cli_abort("One target per variable in {.arg sd} is needed.")
-  S <- as.matrix(strata[, sd]); storage.mode(S) <- "double"
+  S <- as.matrix(strata[, sd])
+  storage.mode(S) <- "double"
   res <- allocate_multi_rs(as.integer(strata$size), as.numeric(strata$cost), as.numeric(t(S)), as.numeric(target_variance))
   strata$n <- res$n
   if (!"stratum" %in% names(strata)) strata$stratum <- paste0("h", seq_len(nrow(strata)))
   names(res$attained) <- names(res$multipliers) <- sd
   targets <- stats::setNames(as.numeric(target_variance), sd)
-  structure(strata, class = c("fieldopt_multi_allocation", class(strata)), cost = res$cost, targets = targets,
-            attained = res$attained, multipliers = res$multipliers, bounded = res$bounded)
+  structure(strata,
+    class = c("fieldopt_multi_allocation", class(strata)), cost = res$cost, targets = targets,
+    attained = res$attained, multipliers = res$multipliers, bounded = res$bounded
+  )
 }
 
 #' @export
@@ -72,6 +79,8 @@ tidy.fieldopt_multi_allocation <- function(x, ...) {
 #' @method glance fieldopt_multi_allocation
 #' @export
 glance.fieldopt_multi_allocation <- function(x, ...) {
-  tibble::tibble(variable = names(attr(x, "targets")), target = as.numeric(attr(x, "targets")), attained = as.numeric(attr(x, "attained")),
-                 multiplier = as.numeric(attr(x, "multipliers")), n = sum(x$n), cost = attr(x, "cost"), bounded = attr(x, "bounded"))
+  tibble::tibble(
+    variable = names(attr(x, "targets")), target = as.numeric(attr(x, "targets")), attained = as.numeric(attr(x, "attained")),
+    multiplier = as.numeric(attr(x, "multipliers")), n = sum(x$n), cost = attr(x, "cost"), bounded = attr(x, "bounded")
+  )
 }

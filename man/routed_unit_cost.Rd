@@ -70,10 +70,16 @@ denser and cheaper to reach per unit.
 }
 \examples{
 set.seed(1)
-frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
-                    x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
-model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
-                          interviews_per_unit = 4)
-routed_unit_cost(frame, "depot", model, n = 12, method = "euclidean", n_rep = 3,
-                 iterations = 20)
+frame <- data.frame(
+  unit = c("depot", paste0("s", 1:40)),
+  x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))
+)
+model <- field_cost_model(
+  per_travel = 2, per_unit = 30, per_interview = 10,
+  interviews_per_unit = 4
+)
+routed_unit_cost(frame, "depot", model,
+  n = 12, method = "euclidean", n_rep = 3,
+  iterations = 20
+)
 }

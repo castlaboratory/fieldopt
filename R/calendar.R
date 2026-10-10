@@ -33,11 +33,15 @@
 #' @export
 #' @examples
 #' set.seed(5)
-#' pts <- data.frame(unit = c("base1", "base2", paste0("s", 1:30)),
-#'                   x = c(2, 8, runif(30, 0, 10)), y = c(2, 8, runif(30, 0, 10)))
+#' pts <- data.frame(
+#'   unit = c("base1", "base2", paste0("s", 1:30)),
+#'   x = c(2, 8, runif(30, 0, 10)), y = c(2, 8, runif(30, 0, 10))
+#' )
 #' m <- travel_matrix(pts, method = "euclidean")
-#' sch <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 1),
-#'                           days = 5, max_stops = 4, iterations = 30)
+#' sch <- schedule_fieldwork(m,
+#'   units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 1),
+#'   days = 5, max_stops = 4, iterations = 30
+#' )
 #' if (requireNamespace("highs", quietly = TRUE)) {
 #'   off <- data.frame(team = "base1-1", day = 1, available = FALSE)
 #'   schedule_calendar(sch, availability = off)
@@ -46,14 +50,20 @@ schedule_calendar <- function(schedule, availability = NULL, fixed = NULL, befor
                               time_limit = 10) {
   rlang::check_installed("highs", reason = "to solve the calendar as an integer programme.")
   if (!inherits(schedule, "fieldopt_schedule")) cli::cli_abort("{.arg schedule} must come from {.fn schedule_fieldwork}.")
-  days <- schedule$days; teams <- schedule$teams; bases <- names(teams)
+  days <- schedule$days
+  teams <- schedule$teams
+  bases <- names(teams)
   # the routes: one row per route with its base, duration and units
   rows <- do.call(rbind, lapply(bases, function(b) {
     r <- schedule$routes[[b]]
-    if (is.null(r)) return(NULL)
-    tibble::tibble(base = b, route = seq_len(r$n_routes), duration = r$durations, travel = r$lengths,
-                   stops = as.integer(table(factor(r$routes$route, levels = seq_len(r$n_routes)))),
-                   units = lapply(seq_len(r$n_routes), function(k) r$routes$unit[r$routes$route == k]))
+    if (is.null(r)) {
+      return(NULL)
+    }
+    tibble::tibble(
+      base = b, route = seq_len(r$n_routes), duration = r$durations, travel = r$lengths,
+      stops = as.integer(table(factor(r$routes$route, levels = seq_len(r$n_routes)))),
+      units = lapply(seq_len(r$n_routes), function(k) r$routes$unit[r$routes$route == k])
+    )
   }))
   if (is.null(rows) || !nrow(rows)) cli::cli_abort("The schedule has no routes.")
   R <- nrow(rows)
@@ -63,17 +73,26 @@ schedule_calendar <- function(schedule, availability = NULL, fixed = NULL, befor
   avail <- matrix(TRUE, Tn, days, dimnames = list(team_tbl$team, NULL))
   if (!is.null(availability)) {
     for (col in c("team", "day", "available")) if (!col %in% names(availability)) cli::cli_abort("{.arg availability} needs columns {.field team}, {.field day} and {.field available}.")
-    bad <- setdiff(availability$team, team_tbl$team); if (length(bad)) cli::cli_abort("Unknown team{?s} {.val {bad}}.")
+    bad <- setdiff(availability$team, team_tbl$team)
+    if (length(bad)) cli::cli_abort("Unknown team{?s} {.val {bad}}.")
     for (i in seq_len(nrow(availability))) {
       d <- availability$day[i]
       if (d >= 1 && d <= days) avail[availability$team[i], d] <- isTRUE(availability$available[i])
     }
   }
-  limit <- if (is.null(daily_limit)) NULL else { if (!is.numeric(daily_limit) || daily_limit <= 0) cli::cli_abort("{.arg daily_limit} must be positive."); daily_limit }
+  limit <- if (is.null(daily_limit)) {
+    NULL
+  } else {
+    if (!is.numeric(daily_limit) || daily_limit <= 0) cli::cli_abort("{.arg daily_limit} must be positive.")
+    daily_limit
+  }
   # variables: x[r, t, d] for teams of the route's base and available team-days; then the makespan M
   var <- do.call(rbind, lapply(seq_len(R), function(r) {
     ts <- which(team_tbl$base == rows$base[r])
-    do.call(rbind, lapply(ts, function(t) { ds <- which(avail[t, ]); if (!length(ds)) NULL else data.frame(r = r, t = t, d = ds) }))
+    do.call(rbind, lapply(ts, function(t) {
+      ds <- which(avail[t, ])
+      if (!length(ds)) NULL else data.frame(r = r, t = t, d = ds)
+    }))
   }))
   if (is.null(var) || !nrow(var)) cli::cli_abort("No available team-day for the routes.")
   # fixed assignments: drop variables that contradict them
@@ -82,35 +101,61 @@ schedule_calendar <- function(schedule, availability = NULL, fixed = NULL, befor
     for (i in seq_len(nrow(fixed))) {
       r <- which(rows$base == fixed$base[i] & rows$route == fixed$route[i])
       if (!length(r)) cli::cli_abort("Route {fixed$route[i]} of base {.val {fixed$base[i]}} not found.")
-      if ("team" %in% names(fixed) && !is.na(fixed$team[i])) { t <- match(fixed$team[i], team_tbl$team); if (is.na(t)) cli::cli_abort("Unknown team {.val {fixed$team[i]}}."); var <- var[!(var$r == r & var$t != t), ] }
+      if ("team" %in% names(fixed) && !is.na(fixed$team[i])) {
+        t <- match(fixed$team[i], team_tbl$team)
+        if (is.na(t)) cli::cli_abort("Unknown team {.val {fixed$team[i]}}.")
+        var <- var[!(var$r == r & var$t != t), ]
+      }
       if ("day" %in% names(fixed) && !is.na(fixed$day[i])) var <- var[!(var$r == r & var$d != fixed$day[i]), ]
     }
   }
-  nx <- nrow(var); nvar <- nx + 1L  # last variable: makespan
-  obj <- c(var$d, R * days)  # days are the secondary objective; the makespan dominates
-  cons <- list(); lhs <- c(); rhs <- c()
-  add <- function(idx, val, lo, hi) { cons[[length(cons) + 1]] <<- cbind(idx, val); lhs <<- c(lhs, lo); rhs <<- c(rhs, hi) }
-  for (r in seq_len(R)) { idx <- which(var$r == r); if (!length(idx)) cli::cli_abort("Route {rows$route[r]} of base {.val {rows$base[r]}} has no admissible team-day."); add(idx, rep(1, length(idx)), 1, 1) }
-  for (t in seq_len(Tn)) for (d in seq_len(days)) {
-    idx <- which(var$t == t & var$d == d)
-    if (!length(idx)) next
-    if (is.null(limit)) add(idx, rep(1, length(idx)), -Inf, 1) else add(idx, rows$duration[var$r[idx]], -Inf, limit)
+  nx <- nrow(var)
+  nvar <- nx + 1L # last variable: makespan
+  obj <- c(var$d, R * days) # days are the secondary objective; the makespan dominates
+  cons <- list()
+  lhs <- c()
+  rhs <- c()
+  add <- function(idx, val, lo, hi) {
+    cons[[length(cons) + 1]] <<- cbind(idx, val)
+    lhs <<- c(lhs, lo)
+    rhs <<- c(rhs, hi)
   }
-  for (r in seq_len(R)) { idx <- which(var$r == r); add(c(idx, nvar), c(var$d[idx], -1), -Inf, 0) }  # day(r) <= M
+  for (r in seq_len(R)) {
+    idx <- which(var$r == r)
+    if (!length(idx)) cli::cli_abort("Route {rows$route[r]} of base {.val {rows$base[r]}} has no admissible team-day.")
+    add(idx, rep(1, length(idx)), 1, 1)
+  }
+  for (t in seq_len(Tn)) {
+    for (d in seq_len(days)) {
+      idx <- which(var$t == t & var$d == d)
+      if (!length(idx)) next
+      if (is.null(limit)) add(idx, rep(1, length(idx)), -Inf, 1) else add(idx, rows$duration[var$r[idx]], -Inf, limit)
+    }
+  }
+  for (r in seq_len(R)) {
+    idx <- which(var$r == r)
+    add(c(idx, nvar), c(var$d[idx], -1), -Inf, 0)
+  } # day(r) <= M
   if (!is.null(before)) {
     for (col in c("base", "route", "base_after", "route_after")) if (!col %in% names(before)) cli::cli_abort("{.arg before} needs columns {.field base}, {.field route}, {.field base_after}, {.field route_after}.")
     for (i in seq_len(nrow(before))) {
-      a <- which(rows$base == before$base[i] & rows$route == before$route[i]); b <- which(rows$base == before$base_after[i] & rows$route == before$route_after[i])
+      a <- which(rows$base == before$base[i] & rows$route == before$route[i])
+      b <- which(rows$base == before$base_after[i] & rows$route == before$route_after[i])
       if (!length(a) || !length(b)) cli::cli_abort("Routes of {.arg before} not found.")
-      ia <- which(var$r == a); ib <- which(var$r == b)
-      add(c(ia, ib), c(var$d[ia], -var$d[ib]), -Inf, -1)  # day(a) - day(b) <= -1
+      ia <- which(var$r == a)
+      ib <- which(var$r == b)
+      add(c(ia, ib), c(var$d[ia], -var$d[ib]), -Inf, -1) # day(a) - day(b) <= -1
     }
   }
   nr <- length(cons)
-  ii <- unlist(lapply(seq_len(nr), function(k) rep(k, nrow(cons[[k]])))); jj <- unlist(lapply(cons, function(c) c[, 1])); vv <- unlist(lapply(cons, function(c) c[, 2]))
+  ii <- unlist(lapply(seq_len(nr), function(k) rep(k, nrow(cons[[k]]))))
+  jj <- unlist(lapply(cons, function(c) c[, 1]))
+  vv <- unlist(lapply(cons, function(c) c[, 2]))
   A <- Matrix::sparseMatrix(i = ii, j = jj, x = vv, dims = c(nr, nvar))
-  sol <- highs::highs_solve(L = obj, lower = c(rep(0, nx), 1), upper = c(rep(1, nx), days), A = A, lhs = lhs, rhs = rhs,
-                            types = c(rep("I", nx), "C"), control = list(time_limit = time_limit, log_to_console = FALSE))
+  sol <- highs::highs_solve(
+    L = obj, lower = c(rep(0, nx), 1), upper = c(rep(1, nx), days), A = A, lhs = lhs, rhs = rhs,
+    types = c(rep("I", nx), "C"), control = list(time_limit = time_limit, log_to_console = FALSE)
+  )
   status <- sol$status_message
   if (is.null(sol$primal_solution) || !length(sol$primal_solution) || !grepl("Optimal|Feasible|Time limit", status)) {
     cli::cli_abort(c("No calendar satisfies the constraints within {days} day{?s}.", i = "Solver status: {status}. Add days or teams, or relax the constraints."))
@@ -120,16 +165,24 @@ schedule_calendar <- function(schedule, availability = NULL, fixed = NULL, befor
   chosen <- var[x > 0.5, ]
   cal <- do.call(rbind, lapply(seq_len(nrow(chosen)), function(k) {
     r <- chosen$r[k]
-    tibble::tibble(base = rows$base[r], team = team_tbl$team[chosen$t[k]], day = chosen$d[k], route = rows$route[r], stops = rows$stops[r],
-                   travel = rows$travel[r], duration = rows$duration[r], units = rows$units[r])
+    tibble::tibble(
+      base = rows$base[r], team = team_tbl$team[chosen$t[k]], day = chosen$d[k], route = rows$route[r], stops = rows$stops[r],
+      travel = rows$travel[r], duration = rows$duration[r], units = rows$units[r]
+    )
   }))
   cal <- cal[order(cal$base, cal$team, cal$day, cal$route), ]
   summary <- do.call(rbind, lapply(bases, function(b) {
     cb <- cal[cal$base == b, ]
-    tibble::tibble(base = b, units = length(unlist(cb$units)), teams = unname(teams[b]), routes = nrow(cb),
-                   days_needed = if (nrow(cb)) max(cb$day) else 0L, days_available = days, fits = TRUE)
+    tibble::tibble(
+      base = b, units = length(unlist(cb$units)), teams = unname(teams[b]), routes = nrow(cb),
+      days_needed = if (nrow(cb)) max(cb$day) else 0L, days_available = days, fits = TRUE
+    )
   }))
-  schedule$calendar <- cal; schedule$summary <- summary; schedule$fits <- TRUE
-  schedule$solver <- "highs"; schedule$objective <- sol$objective_value; schedule$status <- status
+  schedule$calendar <- cal
+  schedule$summary <- summary
+  schedule$fits <- TRUE
+  schedule$solver <- "highs"
+  schedule$objective <- sol$objective_value
+  schedule$status <- status
   schedule
 }

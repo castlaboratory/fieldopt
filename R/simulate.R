@@ -34,10 +34,12 @@
 #' @export
 #' @examples
 #' set.seed(4)
-#' cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
+#' cells <- expand.grid(x = 1:10, y = 1:10)
+#' cells$unit <- paste0("c", 1:100)
 #' areas <- rbind(
 #'   data.frame(establishment = paste0(cells$unit, "-1"), unit = cells$unit, area = 0.5),
-#'   data.frame(establishment = paste0(cells$unit, "-2"), unit = cells$unit, area = 0.2))
+#'   data.frame(establishment = paste0(cells$unit, "-2"), unit = cells$unit, area = 0.2)
+#' )
 #' areas$y <- round(rgamma(nrow(areas), 3, 3 / (10 * areas$area)), 1)
 #' point_design_effect(cells, areas, n = 15, points_per_cell = 6, cell_size = 1, n_sim = 20)
 point_design_effect <- function(cells, areas, n, points_per_cell, cell_size, size = NULL, strata = NULL,
@@ -62,23 +64,37 @@ point_design_effect <- function(cells, areas, n, points_per_cell, cell_size, siz
     eh <- expected_hits(areas, s, points_per_cell = points_per_cell, cell_size = cell_size)
     hit_e <- with_seed(seed * 10000 + b, vapply(seq_len(nrow(p)), function(i) {
       a <- by_cell[[p$unit[i]]]
-      if (is.null(a)) return(NA_character_)
+      if (is.null(a)) {
+        return(NA_character_)
+      }
       pr <- a$area / cell_area
       k <- sample.int(nrow(a) + 1L, 1L, prob = c(pr, 1 - sum(pr)))
       if (k > nrow(a)) NA_character_ else a$establishment[k]
     }, character(1)))
     ok <- !is.na(hit_e)
-    if (sum(ok) == 0) { est[b] <- 0; var_est[b] <- NA; interviews[b] <- 0; next }
+    if (sum(ok) == 0) {
+      est[b] <- 0
+      var_est[b] <- NA
+      interviews[b] <- 0
+      next
+    }
     hits <- data.frame(unit = p$unit[ok], establishment = hit_e[ok])
     hits$y <- y_e[hits$establishment]
     hits$expected_hits <- eh$expected_hits[match(hits$establishment, eh$establishment)]
     pe <- point_estimator(hits, s)
-    est[b] <- pe$total; var_est[b] <- pe$variance; interviews[b] <- pe$n_establishments
+    est[b] <- pe$total
+    var_est[b] <- pe$variance
+    interviews[b] <- pe$n_establishments
   }
-  v <- stats::var(est); n_int <- mean(interviews)
+  v <- stats::var(est)
+  n_int <- mean(interviews)
   v_srs <- N_e^2 * (1 - n_int / N_e) * stats::var(as.numeric(y_e)) / n_int
-  structure(tibble::tibble(n_sim = n_sim, total = truth, mean_estimate = mean(est), bias = mean(est) - truth,
-                           variance = v, cv = sqrt(v) / truth, mean_variance_estimate = mean(var_est, na.rm = TRUE),
-                           interviews = n_int, variance_srs = v_srs, deff = v / v_srs),
-            class = c("fieldopt_point_deff", "tbl_df", "tbl", "data.frame"), estimates = est)
+  structure(
+    tibble::tibble(
+      n_sim = n_sim, total = truth, mean_estimate = mean(est), bias = mean(est) - truth,
+      variance = v, cv = sqrt(v) / truth, mean_variance_estimate = mean(var_est, na.rm = TRUE),
+      interviews = n_int, variance_srs = v_srs, deff = v / v_srs
+    ),
+    class = c("fieldopt_point_deff", "tbl_df", "tbl", "data.frame"), estimates = est
+  )
 }

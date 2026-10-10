@@ -19,12 +19,15 @@
 #' @examples
 #' if (requireNamespace("sf", quietly = TRUE)) {
 #'   sq <- sf::st_sfc(sf::st_polygon(list(rbind(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)))),
-#'                    crs = 4326)
+#'     crs = 4326
+#'   )
 #'   cells <- sf::st_sf(crop = 3, geometry = sf::st_make_grid(sq, n = 3))
 #'   as_frame(cells)
 #' }
 as_frame <- function(x, unit = NULL) {
-  if (!inherits(x, "sf")) return(tibble::as_tibble(x))
+  if (!inherits(x, "sf")) {
+    return(tibble::as_tibble(x))
+  }
   rlang::check_installed("sf", reason = "to read spatial frames.")
   geom <- sf::st_geometry(x)
   if (is.na(sf::st_crs(geom))) cli::cli_abort("{.arg x} needs a coordinate reference system.")
@@ -37,7 +40,8 @@ as_frame <- function(x, unit = NULL) {
   } else if (!"unit" %in% names(d)) d$unit <- paste0("u", seq_len(nrow(d)))
   pts <- if (is_poly) suppressWarnings(sf::st_centroid(geom)) else geom
   ll <- sf::st_coordinates(sf::st_transform(pts, 4326))
-  d$lat <- ll[, 2]; d$lon <- ll[, 1]
+  d$lat <- ll[, 2]
+  d$lon <- ll[, 1]
   if (is_poly) d$area <- as.numeric(sf::st_area(geom)) / 1e6
   d[, c("unit", "lat", "lon", if (is_poly) "area", setdiff(names(d), c("unit", "lat", "lon", "area")))]
 }
@@ -57,7 +61,8 @@ as_frame <- function(x, unit = NULL) {
 #' @examples
 #' if (requireNamespace("sf", quietly = TRUE)) {
 #'   sq <- sf::st_sfc(sf::st_polygon(list(rbind(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)))),
-#'                    crs = 4326)
+#'     crs = 4326
+#'   )
 #'   cells <- sf::st_sf(geometry = sf::st_make_grid(sq, n = 4))
 #'   s <- select_units(as_frame(cells), n = 4, seed = 1)
 #'   as_sf(s, cells)

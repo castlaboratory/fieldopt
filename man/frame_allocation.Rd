@@ -28,8 +28,10 @@ total, or minimum variance for a budget. For two frames with an overlap
 use \code{\link[=dual_frame_allocation]{dual_frame_allocation()}} instead.
 }
 \examples{
-strata <- data.frame(stratum = c("list", "area"), size = c(2000, 800),
-                     sd = c(12, 30), cost = c(40, 180))
+strata <- data.frame(
+  stratum = c("list", "area"), size = c(2000, 800),
+  sd = c(12, 30), cost = c(40, 180)
+)
 frame_allocation(strata, target_variance = 4e6)
 frame_allocation(strata, budget = 20000)
 }

@@ -63,3 +63,4 @@ src/*.so
 src/*.dll
 src/Makevars
 src/Makevars.win
+tests/testthat/_problems/

@@ -30,7 +30,10 @@ leave from and return to. Here the frame is synthetic: forty segments in a
 library(fieldopt)
 library(dplyr, warn.conflicts = FALSE)
 set.seed(2026)
-frame <- tibble(unit = c("depot", paste0("s", 1:40)), x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))) |>
+frame <- tibble(
+  unit = c("depot", paste0("s", 1:40)),
+  x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))
+) |>
   mutate(crop = if_else(unit == "depot", NA_real_, 20 + 3 * x + rnorm(n(), sd = 2)))
 frame
 ```
@@ -60,8 +63,10 @@ travel, a fixed cost per visited unit (access, setting up) and a cost per
 interview.
 
 ```{r cost}
-model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
-                          interviews_per_unit = 4, currency = "BRL")
+model <- field_cost_model(
+  per_travel = 2, per_unit = 30, per_interview = 10,
+  interviews_per_unit = 4, currency = "BRL"
+)
 model
 ```
 
@@ -75,8 +80,12 @@ units over the territory, which is exactly what makes the field work longer.
 Making that tension explicit is the point of the package.
 
 ```{r select}
-s <- frame |> filter(unit != "depot") |> select_units(n = 12)
-s |> sampled() |> select(unit, x, y, pi)
+s <- frame |>
+  filter(unit != "depot") |>
+  select_units(n = 12)
+s |>
+  sampled() |>
+  select(unit, x, y, pi)
 ```
 
 `route_fieldwork()` routes the field work from the depot through the selected
@@ -114,10 +123,13 @@ grid of sample sizes and returns the mean cost and the mean variance at each
 size: the frontier a survey planner faces.
 
 ```{r frontier}
-f <- cost_variance_frontier(frame, depot = "depot", cost_model = model,
-                            n_grid = c(6, 9, 12, 16, 20, 24), y = "crop",
-                            method = "euclidean", max_stops = 5,
-                            n_rep = 8, iterations = 60)
+f <- cost_variance_frontier(
+  frame,
+  depot = "depot", cost_model = model,
+  n_grid = c(6, 9, 12, 16, 20, 24), y = "crop",
+  method = "euclidean", max_stops = 5,
+  n_rep = 8, iterations = 60
+)
 f
 autoplot(f)
 ```

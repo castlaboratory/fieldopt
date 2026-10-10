@@ -42,8 +42,10 @@
 #'   surveys. *JASA*, 101(475), 1019--1030.
 #' @export
 #' @examples
-#' domains <- data.frame(domain = c("a", "ab", "b"), size = c(8000, 1500, 500),
-#'                       mean = c(5, 40, 60), sd = c(6, 30, 50))
+#' domains <- data.frame(
+#'   domain = c("a", "ab", "b"), size = c(8000, 1500, 500),
+#'   mean = c(5, 40, 60), sd = c(6, 30, 50)
+#' )
 #' dual_frame_allocation(domains, cost_a = 200, cost_b = 40, budget = 1e5)
 #' dual_frame_allocation(domains, cost_a = 200, cost_b = 40, theta = "screening", target_cv = 0.05)
 dual_frame_allocation <- function(domains, cost_a, cost_b, deff_a = 1, deff_b = 1, theta = NULL,
@@ -61,11 +63,26 @@ dual_frame_allocation <- function(domains, cost_a, cost_b, deff_a = 1, deff_b = 
   }
   mode <- if (is.null(budget)) "variance" else "budget"
   target <- if (mode == "variance") target_variance else budget
-  th <- if (is.null(theta)) -1 else if (identical(theta, "screening")) 0 else { if (!is.numeric(theta) || length(theta) != 1L || is.na(theta) || theta < 0 || theta > 1) cli::cli_abort("{.arg theta} must be a number in [0, 1], {.val screening} or NULL."); theta }
+  th <- if (is.null(theta)) {
+    -1
+  } else if (identical(theta, "screening")) {
+    0
+  } else {
+    if (!is.numeric(theta) || length(theta) != 1L || is.na(theta) || theta < 0 || theta > 1) cli::cli_abort("{.arg theta} must be a number in [0, 1], {.val screening} or NULL.")
+    theta
+  }
   res <- dual_frame_rs(as.integer(d$size), as.numeric(d$mean), as.numeric(d$sd), cost_a, cost_b, deff_a, deff_b, th, as.numeric(target), mode)
-  res$se <- sqrt(res$variance); res$cv <- if (total != 0) res$se / abs(total) else NA_real_; res$total <- total
-  res$domains <- tibble::as_tibble(d); res$cost_a <- cost_a; res$cost_b <- cost_b; res$deff_a <- deff_a; res$deff_b <- deff_b
-  res$mode <- mode; res$target <- target; res$theta_fixed <- !is.null(theta)
+  res$se <- sqrt(res$variance)
+  res$cv <- if (total != 0) res$se / abs(total) else NA_real_
+  res$total <- total
+  res$domains <- tibble::as_tibble(d)
+  res$cost_a <- cost_a
+  res$cost_b <- cost_b
+  res$deff_a <- deff_a
+  res$deff_b <- deff_b
+  res$mode <- mode
+  res$target <- target
+  res$theta_fixed <- !is.null(theta)
   structure(res, class = "fieldopt_dual_frame")
 }
 
@@ -109,8 +126,10 @@ print.fieldopt_dual_frame <- function(x, ...) {
 #'   is given), `bounded`.
 #' @export
 #' @examples
-#' two_stage_allocation(n_primary = 5000, m_secondary = 20, s2_between = 4, s2_within = 25,
-#'                      c1 = 300, c2 = 20, budget = 1e5)
+#' two_stage_allocation(
+#'   n_primary = 5000, m_secondary = 20, s2_between = 4, s2_within = 25,
+#'   c1 = 300, c2 = 20, budget = 1e5
+#' )
 #' two_stage_allocation(5000, 20, 4, 25, c1 = 300, c2 = 20, target_cv = 0.03, mean = 12)
 two_stage_allocation <- function(n_primary, m_secondary, s2_between, s2_within, c1, c2,
                                  target_variance = NULL, target_cv = NULL, budget = NULL, mean = NULL) {
@@ -126,7 +145,8 @@ two_stage_allocation <- function(n_primary, m_secondary, s2_between, s2_within, 
   res <- two_stage_rs(as.integer(n_primary), as.numeric(m_secondary), s2_between, s2_within, c1, c2, as.numeric(target), mode)
   res$se_total <- sqrt(res$variance_total)
   res$cv <- if (!is.null(mean) && mean != 0) res$se_total / abs(mean * n_primary * m_secondary) else NA_real_
-  res$mode <- mode; res$inputs <- list(n_primary = n_primary, m_secondary = m_secondary, s2_between = s2_between, s2_within = s2_within, c1 = c1, c2 = c2)
+  res$mode <- mode
+  res$inputs <- list(n_primary = n_primary, m_secondary = m_secondary, s2_between = s2_between, s2_within = s2_within, c1 = c1, c2 = c2)
   structure(res, class = "fieldopt_two_stage")
 }
 
@@ -182,15 +202,19 @@ cov_ht <- function(sample, z1, z2) {
 #' @export
 #' @examples
 #' set.seed(7)
-#' cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144)
+#' cells <- expand.grid(x = 1:12, y = 1:12)
+#' cells$unit <- paste0("c", 1:144)
 #' cells$domain <- ifelse(runif(144) < 0.2, "ab", "a")
 #' cells$y <- ifelse(cells$domain == "ab", 80, 10) + rnorm(144, sd = 3)
 #' # the list holds the overlap units (same values) plus units of its own
 #' ab <- cells[cells$domain == "ab", ]
-#' list <- data.frame(unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:11)),
-#'                    x = runif(nrow(ab) + 11), y = c(ab$y, 120 + rnorm(11, sd = 5)),
-#'                    domain = rep(c("ab", "b"), c(nrow(ab), 11)))
-#' list$lon <- runif(nrow(list)); list$lat <- runif(nrow(list))
+#' list <- data.frame(
+#'   unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:11)),
+#'   x = runif(nrow(ab) + 11), y = c(ab$y, 120 + rnorm(11, sd = 5)),
+#'   domain = rep(c("ab", "b"), c(nrow(ab), 11))
+#' )
+#' list$lon <- runif(nrow(list))
+#' list$lat <- runif(nrow(list))
 #' sa <- select_units(cells, n = 30, seed = 1)
 #' sb <- select_units(list, n = 15, coords = c("lat", "lon"), method = "srs", seed = 2)
 #' dual_frame_estimator(sa, sb, y = "y", domain = "domain")
@@ -203,53 +227,81 @@ dual_frame_estimator <- function(sample_a, sample_b, y, domain = "domain", theta
     if (!inherits(s, "fieldopt_sample")) cli::cli_abort("{.arg sample_a} and {.arg sample_b} must come from {.fn select_units}.")
     for (col in c(y, domain)) if (!col %in% names(s)) cli::cli_abort("Column {.field {col}} not found.")
   }
-  dom_a <- as.character(sample_a[[domain]]); dom_b <- as.character(sample_b[[domain]])
-  sa <- sample_a$sampled; sb <- sample_b$sampled
+  dom_a <- as.character(sample_a[[domain]])
+  dom_b <- as.character(sample_b[[domain]])
+  sa <- sample_a$sampled
+  sb <- sample_b$sampled
   if (!all(dom_a[sa] %in% c("a", "ab"))) cli::cli_abort("Domains in frame A must be {.val a} or {.val ab}.")
   if (!all(dom_b[sb] %in% c("b", "ab"))) cli::cli_abort("Domains in frame B must be {.val b} or {.val ab}.")
-  ya <- as.numeric(sample_a[[y]]); yb <- as.numeric(sample_b[[y]])
+  ya <- as.numeric(sample_a[[y]])
+  yb <- as.numeric(sample_b[[y]])
   if (anyNA(ya[sa]) || anyNA(yb[sb])) cli::cli_abort("{.field {y}} is missing for some sampled units.")
-  ya[!sa] <- 0; yb[!sb] <- 0
-  dom_a[!sa] <- ""; dom_b[!sb] <- ""
-  z_a <- ya * (dom_a == "a"); z_aba <- ya * (dom_a == "ab")
-  z_b <- yb * (dom_b == "b"); z_abb <- yb * (dom_b == "ab")
+  ya[!sa] <- 0
+  yb[!sb] <- 0
+  dom_a[!sa] <- ""
+  dom_b[!sb] <- ""
+  z_a <- ya * (dom_a == "a")
+  z_aba <- ya * (dom_a == "ab")
+  z_b <- yb * (dom_b == "b")
+  z_abb <- yb * (dom_b == "ab")
   tot <- function(s, z) ht_total_rs(z, s$pi, s$sampled)
-  y_a <- tot(sample_a, z_a); y_aba <- tot(sample_a, z_aba); y_b <- tot(sample_b, z_b); y_abb <- tot(sample_b, z_abb)
-  v_a <- ht_variance(sample_a, z_a)$variance; v_aba <- ht_variance(sample_a, z_aba)$variance; c_a <- cov_ht(sample_a, z_a, z_aba)
-  v_b <- ht_variance(sample_b, z_b)$variance; v_abb <- ht_variance(sample_b, z_abb)$variance; c_b <- cov_ht(sample_b, z_b, z_abb)
+  y_a <- tot(sample_a, z_a)
+  y_aba <- tot(sample_a, z_aba)
+  y_b <- tot(sample_b, z_b)
+  y_abb <- tot(sample_b, z_abb)
+  v_a <- ht_variance(sample_a, z_a)$variance
+  v_aba <- ht_variance(sample_a, z_aba)$variance
+  c_a <- cov_ht(sample_a, z_a, z_aba)
+  v_b <- ht_variance(sample_b, z_b)$variance
+  v_abb <- ht_variance(sample_b, z_abb)$variance
+  c_b <- cov_ht(sample_b, z_b, z_abb)
   out <- tibble::tibble(total = NA_real_, variance = NA_real_, se = NA_real_, cv = NA_real_, estimator = estimator)
   if (estimator == "hartley") {
     th <- if (is.null(theta)) {
       den <- v_aba + v_abb
       if (den <= 0) 0.5 else min(1, max(0, (v_abb + c_b - c_a) / den))
-    } else if (identical(theta, "screening")) 0 else {
+    } else if (identical(theta, "screening")) {
+      0
+    } else {
       if (!is.numeric(theta) || length(theta) != 1L || is.na(theta) || theta < 0 || theta > 1) cli::cli_abort("{.arg theta} must be a number in [0, 1], {.val screening} or NULL.")
       theta
     }
     out$total <- y_a + th * y_aba + (1 - th) * y_abb + y_b
     out$variance <- v_a + 2 * th * c_a + th^2 * v_aba + v_b + 2 * (1 - th) * c_b + (1 - th)^2 * v_abb
-    out$theta <- th; out$theta_fixed <- !is.null(theta)
+    out$theta <- th
+    out$theta_fixed <- !is.null(theta)
   } else {
-    ia <- as.numeric(dom_a == "ab"); ib <- as.numeric(dom_b == "ab")
-    n_aba <- tot(sample_a, ia); n_abb <- tot(sample_b, ib)
+    ia <- as.numeric(dom_a == "ab")
+    ib <- as.numeric(dom_b == "ab")
+    n_aba <- tot(sample_a, ia)
+    n_abb <- tot(sample_b, ib)
     # base = Y_a + Y_b + Y_ab(B); D1 = Y_ab(A) - Y_ab(B); D2 = N_ab(A) - N_ab(B)
     base <- y_a + y_b + y_abb
-    d1 <- y_aba - y_abb; d2 <- n_aba - n_abb
+    d1 <- y_aba - y_abb
+    d2 <- n_aba - n_abb
     v_base <- v_a + ht_variance(sample_b, z_b + z_abb)$variance
-    v_na <- ht_variance(sample_a, ia)$variance; v_nb <- ht_variance(sample_b, ib)$variance
+    v_na <- ht_variance(sample_a, ia)$variance
+    v_nb <- ht_variance(sample_b, ib)$variance
     s11 <- v_aba + v_abb
     s22 <- v_na + v_nb
     s12 <- cov_ht(sample_a, z_aba, ia) + cov_ht(sample_b, z_abb, ib)
     s1b <- c_a - cov_ht(sample_b, z_abb, z_b + z_abb)
     s2b <- cov_ht(sample_a, ia, z_a) - cov_ht(sample_b, ib, z_b + z_abb)
-    S <- matrix(c(s11, s12, s12, s22), 2); r <- c(s1b, s2b)
+    S <- matrix(c(s11, s12, s12, s22), 2)
+    r <- c(s1b, s2b)
     beta <- tryCatch(-solve(S, r), error = function(e) c(-s1b / max(s11, 1e-12), 0))
     out$total <- base + beta[1] * d1 + beta[2] * d2
     out$variance <- max(v_base + 2 * sum(beta * r) + as.numeric(t(beta) %*% S %*% beta), 0)
-    out$beta_1 <- beta[1]; out$beta_2 <- beta[2]
+    out$beta_1 <- beta[1]
+    out$beta_2 <- beta[2]
   }
-  out$se <- sqrt(out$variance); out$cv <- if (out$total != 0) out$se / abs(out$total) else NA_real_
-  out$y_a <- y_a; out$y_ab_a <- y_aba; out$y_ab_b <- y_abb; out$y_b <- y_b
-  out$n_a <- sum(sa); out$n_b <- sum(sb)
+  out$se <- sqrt(out$variance)
+  out$cv <- if (out$total != 0) out$se / abs(out$total) else NA_real_
+  out$y_a <- y_a
+  out$y_ab_a <- y_aba
+  out$y_ab_b <- y_abb
+  out$y_b <- y_b
+  out$n_a <- sum(sa)
+  out$n_b <- sum(sb)
   out
 }

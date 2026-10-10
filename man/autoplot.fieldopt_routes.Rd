@@ -20,9 +20,12 @@ Plot the routes
 }
 \examples{
 set.seed(1)
-pts <- data.frame(unit = c("depot", paste0("s", 1:12)),
-                  x = c(0, runif(12, 0, 10)), y = c(0, runif(12, 0, 10)))
+pts <- data.frame(
+  unit = c("depot", paste0("s", 1:12)),
+  x = c(0, runif(12, 0, 10)), y = c(0, runif(12, 0, 10))
+)
 r <- route_fieldwork(travel_matrix(pts, method = "euclidean"), paste0("s", 1:12),
-                     depot = "depot", max_stops = 5, iterations = 50)
+  depot = "depot", max_stops = 5, iterations = 50
+)
 autoplot(r)
 }

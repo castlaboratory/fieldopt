@@ -44,8 +44,10 @@ a cell, \code{pi * points / area}, is what \code{\link[=expected_hits]{expected_
 \code{\link[=point_estimator]{point_estimator()}} need.
 }
 \examples{
-cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
+cells <- expand.grid(x = 1:10, y = 1:10)
+cells$unit <- paste0("c", 1:100)
 s <- select_units(cells, n = 12, seed = 2)
 p <- select_points(s, points_per_cell = 9, cell_size = 1, layout = "systematic")
-nrow(p); head(p)
+nrow(p)
+head(p)
 }

@@ -39,6 +39,8 @@ and variances covered, the selection method and the replicates.
 set.seed(1)
 pts <- data.frame(unit = c("depot", paste0("s", 1:8)), x = c(0, runif(8)), y = c(0, runif(8)))
 r <- route_fieldwork(travel_matrix(pts, method = "euclidean"), paste0("s", 1:8), "depot",
-                     max_stops = 4, iterations = 20)
-tidy(r); glance(r)
+  max_stops = 4, iterations = 20
+)
+tidy(r)
+glance(r)
 }

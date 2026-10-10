@@ -80,8 +80,13 @@ test_that("small instances are solved exactly and capacity is respected", {
   best <- Inf
   for (p in perms(paste0("s", 1:7))) {
     for (cut in list(c(3, 3, 1), c(3, 2, 2), c(2, 3, 2), c(2, 2, 3), c(3, 1, 3), c(1, 3, 3))) {
-      idx <- 0; tot <- 0
-      for (k in cut) { r_ <- p[idx + seq_len(k)]; idx <- idx + k; tot <- tot + mm["depot", r_[1]] + sum(mm[cbind(r_[-k], r_[-1])]) + mm[r_[k], "depot"] }
+      idx <- 0
+      tot <- 0
+      for (k in cut) {
+        r_ <- p[idx + seq_len(k)]
+        idx <- idx + k
+        tot <- tot + mm["depot", r_[1]] + sum(mm[cbind(r_[-k], r_[-1])]) + mm[r_[k], "depot"]
+      }
       best <- min(best, tot)
     }
   }
@@ -92,9 +97,10 @@ test_that("small instances are solved exactly and capacity is respected", {
   expect_true(all(table(rc$routes$route) <= 2))
   expect_error(route_fieldwork(m, paste0("s", 1:7), "depot", demand = 6, capacity = 5), "exceeds")
   # larger instance: the genetic search stays within the bound and finds the TSPLIB-like optimum of a grid
-  g <- expand.grid(x = 1:5, y = 1:4); g$unit <- c("depot", paste0("g", 2:20))
+  g <- expand.grid(x = 1:5, y = 1:4)
+  g$unit <- c("depot", paste0("g", 2:20))
   rg <- route_fieldwork(travel_matrix(g, method = "euclidean"), paste0("g", 2:20), "depot", iterations = 200)
-  expect_equal(rg$total, 20)  # a Hamiltonian cycle on a 5 x 4 lattice with unit steps
+  expect_equal(rg$total, 20) # a Hamiltonian cycle on a 5 x 4 lattice with unit steps
   expect_true(rg$optimal)
   # the certificate proves a random 30-unit tour optimal and is off when asked
   set.seed(8)
@@ -127,7 +133,9 @@ test_that("a time limit stops the search and the vrpr engine gives the same kind
   expect_setequal(v$routes$unit, paste0("s", 1:25))
   expect_true(all(table(v$routes$route) <= 6))
   expect_equal(v$durations, v$lengths + 0.5 * tabulate(v$routes$route, v$n_routes))
-  expect_true(is.na(v$lower_bound)); expect_true(is.na(v$gap)); expect_false(v$optimal)
+  expect_true(is.na(v$lower_bound))
+  expect_true(is.na(v$gap))
+  expect_false(v$optimal)
   expect_equal(v$cost[["total"]], 2 * v$total + 10 * v$n_routes)
   # both engines reach the same travel within a few percent on this instance
   f <- route_fieldwork(m, paste0("s", 1:25), "depot", max_stops = 6, service_time = 0.5, iterations = 500)

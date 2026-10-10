@@ -27,7 +27,8 @@
 #' @export
 #' @examples
 #' if (requireNamespace("survey", quietly = TRUE)) {
-#'   cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
+#'   cells <- expand.grid(x = 1:10, y = 1:10)
+#'   cells$unit <- paste0("c", 1:100)
 #'   cells$crop <- 10 + cells$x + rnorm(100)
 #'   s <- select_units(cells, n = 20, seed = 1)
 #'   d <- as_svydesign(s)
@@ -38,18 +39,22 @@ as_svydesign <- function(sample, variance = c("brewer", "srs")) {
   rlang::check_installed("survey", reason = "to build survey design objects.")
   variance <- rlang::arg_match(variance)
   if (!inherits(sample, "fieldopt_sample")) cli::cli_abort("{.arg sample} must come from {.fn select_units}.")
-  st <- attr(sample, "strata"); rep_mat <- attr(sample, "replicates")
+  st <- attr(sample, "strata")
+  rep_mat <- attr(sample, "replicates")
   s <- sample$sampled
   d <- tibble::as_tibble(unclass(sample))[s, ]
   d$.stratum <- if (is.null(st)) factor("all") else factor(d[[st]])
   if (!is.null(rep_mat)) {
-    r <- ncol(rep_mat); pr <- attr(sample, "pi_replicate")[s]
-    full <- rowSums(rep_mat[s, , drop = FALSE]) / (pr * r)       # average of the replicate weights
-    repw <- rep_mat[s, , drop = FALSE] / pr                        # 1 / (p / r) when in the replicate, 0 otherwise
+    r <- ncol(rep_mat)
+    pr <- attr(sample, "pi_replicate")[s]
+    full <- rowSums(rep_mat[s, , drop = FALSE]) / (pr * r) # average of the replicate weights
+    repw <- rep_mat[s, , drop = FALSE] / pr # 1 / (p / r) when in the replicate, 0 otherwise
     repw[!rep_mat[s, , drop = FALSE]] <- 0
     d$.weight <- full
-    return(survey::svrepdesign(data = as.data.frame(d), weights = ~.weight, repweights = repw, type = "other",
-                               scale = 1 / (r * (r - 1)), rscales = rep(1, r), combined.weights = TRUE))
+    return(survey::svrepdesign(
+      data = as.data.frame(d), weights = ~.weight, repweights = repw, type = "other",
+      scale = 1 / (r * (r - 1)), rscales = rep(1, r), combined.weights = TRUE
+    ))
   }
   d$.prob <- d$pi
   if (variance == "brewer") {
@@ -91,7 +96,8 @@ as_svydesign <- function(sample, variance = c("brewer", "srs")) {
 #'   of listed establishments inside, and `listed_units`, their names).
 #' @export
 #' @examples
-#' cells <- expand.grid(x = 1:5, y = 1:5); cells$unit <- paste0("c", 1:25)
+#' cells <- expand.grid(x = 1:5, y = 1:5)
+#' cells$unit <- paste0("c", 1:25)
 #' farms <- data.frame(unit = c("f1", "f2", "f3"), x = c(1.2, 3.4, 9), y = c(1.1, 2.6, 9))
 #' ov <- frame_overlap(farms, cells, cell_size = 1)
 #' ov$list
@@ -106,28 +112,40 @@ frame_overlap <- function(list, cells, cell_size = 1, coords = NULL, pairs = NUL
     hit <- sf::st_join(list, cells[, "unit"], join = sf::st_within, left = TRUE, suffix = c("", ".cell"))
     hit <- hit[!duplicated(hit$unit), ]
     cell <- as.character(hit$unit.cell)[match(list$unit, hit$unit)]
-    list_out <- tibble::as_tibble(sf::st_drop_geometry(list)); list_out$unit <- as.character(list$unit)
-    cells_out <- tibble::as_tibble(sf::st_drop_geometry(cells)); cells_out$unit <- as.character(cells$unit)
+    list_out <- tibble::as_tibble(sf::st_drop_geometry(list))
+    list_out$unit <- as.character(list$unit)
+    cells_out <- tibble::as_tibble(sf::st_drop_geometry(cells))
+    cells_out$unit <- as.character(cells$unit)
   } else {
-    list_out <- tibble::as_tibble(list); cells_out <- tibble::as_tibble(cells)
+    list_out <- tibble::as_tibble(list)
+    cells_out <- tibble::as_tibble(cells)
     if (!"unit" %in% names(cells_out)) cells_out$unit <- paste0("u", seq_len(nrow(cells_out)))
     if (!"unit" %in% names(list_out)) cli::cli_abort("{.arg list} needs a column {.field unit}.")
     if (is.null(coords)) coords <- if (all(c("lat", "lon") %in% names(cells_out))) c("lat", "lon") else c("x", "y")
-    for (col in coords) { if (!col %in% names(cells_out)) cli::cli_abort("Column {.field {col}} not found in {.arg cells}."); if (!col %in% names(list_out)) cli::cli_abort("Column {.field {col}} not found in {.arg list}.") }
+    for (col in coords) {
+      if (!col %in% names(cells_out)) cli::cli_abort("Column {.field {col}} not found in {.arg cells}.")
+      if (!col %in% names(list_out)) cli::cli_abort("Column {.field {col}} not found in {.arg list}.")
+    }
     if (!is.numeric(cell_size) || cell_size <= 0) cli::cli_abort("{.arg cell_size} must be positive.")
-    ca <- as.numeric(cells_out[[coords[1]]]); cb <- as.numeric(cells_out[[coords[2]]])
-    la <- as.numeric(list_out[[coords[1]]]); lb <- as.numeric(list_out[[coords[2]]])
+    ca <- as.numeric(cells_out[[coords[1]]])
+    cb <- as.numeric(cells_out[[coords[2]]])
+    la <- as.numeric(list_out[[coords[1]]])
+    lb <- as.numeric(list_out[[coords[2]]])
     cell <- vapply(seq_along(la), function(i) {
-      if (is.na(la[i]) || is.na(lb[i])) return(NA_character_)
+      if (is.na(la[i]) || is.na(lb[i])) {
+        return(NA_character_)
+      }
       d <- pmax(abs(ca - la[i]), abs(cb - lb[i]))
       k <- which.min(d)
       if (length(k) && d[k] <= cell_size / 2 + 1e-9) as.character(cells_out$unit[k]) else NA_character_
     }, character(1))
-    list_out$unit <- as.character(list_out$unit); cells_out$unit <- as.character(cells_out$unit)
+    list_out$unit <- as.character(list_out$unit)
+    cells_out$unit <- as.character(cells_out$unit)
   }
   if (!is.null(pairs)) {
     if (!all(c("unit", "cell") %in% names(pairs))) cli::cli_abort("{.arg pairs} needs columns {.field unit} and {.field cell}.")
-    bad <- setdiff(as.character(pairs$cell), cells_out$unit); if (length(bad)) cli::cli_abort("Unknown cell{?s} in {.arg pairs}: {.val {bad}}.")
+    bad <- setdiff(as.character(pairs$cell), cells_out$unit)
+    if (length(bad)) cli::cli_abort("Unknown cell{?s} in {.arg pairs}: {.val {bad}}.")
     idx <- match(as.character(pairs$unit), list_out$unit)
     if (anyNA(idx)) cli::cli_abort("Unknown list unit{?s} in {.arg pairs}: {.val {pairs$unit[is.na(idx)]}}.")
     cell[idx] <- as.character(pairs$cell)
@@ -181,7 +199,9 @@ read_areaframe <- function(path, sf = FALSE) {
   } else {
     rlang::check_installed("sf", reason = "to read spatial files.")
     x <- sf::st_read(path, quiet = TRUE)
-    if (sf) return(x)
+    if (sf) {
+      return(x)
+    }
     as_frame(x)
   }
 }

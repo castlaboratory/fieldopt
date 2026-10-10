@@ -60,8 +60,10 @@ routing, for example \code{cost_mean / n} of a \code{\link[=cost_variance_fronti
 sample size under consideration, and iterate once or twice.
 }
 \examples{
-domains <- data.frame(domain = c("a", "ab", "b"), size = c(8000, 1500, 500),
-                      mean = c(5, 40, 60), sd = c(6, 30, 50))
+domains <- data.frame(
+  domain = c("a", "ab", "b"), size = c(8000, 1500, 500),
+  mean = c(5, 40, 60), sd = c(6, 30, 50)
+)
 dual_frame_allocation(domains, cost_a = 200, cost_b = 40, budget = 1e5)
 dual_frame_allocation(domains, cost_a = 200, cost_b = 40, theta = "screening", target_cv = 0.05)
 }

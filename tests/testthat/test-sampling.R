@@ -41,13 +41,22 @@ test_that("the sample is spatially balanced", {
   adjacent <- function(sampled) {
     idx <- which(sampled)
     pairs <- 0
-    for (i in idx) for (j in idx) if (j > i) {
-      if (abs(fr$x[i] - fr$x[j]) + abs(fr$y[i] - fr$y[j]) == 1) pairs <- pairs + 1
+    for (i in idx) {
+      for (j in idx) {
+        if (j > i) {
+          if (abs(fr$x[i] - fr$x[j]) + abs(fr$y[i] - fr$y[j]) == 1) pairs <- pairs + 1
+        }
+      }
     }
     pairs
   }
   lpm <- mean(sapply(1:30, function(s) adjacent(select_units(fr, n = 25, seed = s)$sampled)))
-  srs <- mean(sapply(1:30, function(s) { set.seed(s); x <- logical(100); x[sample(100, 25)] <- TRUE; adjacent(x) }))
+  srs <- mean(sapply(1:30, function(s) {
+    set.seed(s)
+    x <- logical(100)
+    x[sample(100, 25)] <- TRUE
+    adjacent(x)
+  }))
   expect_lt(lpm, 0.5 * srs)
 })
 

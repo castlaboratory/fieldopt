@@ -82,11 +82,15 @@ the routing make that tension explicit.
 set.seed(1)
 cells <- expand.grid(x = 1:20, y = 1:20)
 cells$unit <- paste0("c", seq_len(nrow(cells)))
-cells$intensity <- cut(cells$x + rnorm(400, sd = 3), c(-Inf, 7, 14, Inf),
-                       c("low", "mid", "high"))
+cells$intensity <- cut(
+  cells$x + rnorm(400, sd = 3), c(-Inf, 7, 14, Inf),
+  c("low", "mid", "high")
+)
 cells$size <- c(low = 1, mid = 2, high = 4)[cells$intensity]
-s <- select_units(cells, n = c(low = 10, mid = 15, high = 25), size = "size",
-                  strata = "intensity")
+s <- select_units(cells,
+  n = c(low = 10, mid = 15, high = 25), size = "size",
+  strata = "intensity"
+)
 table(s$intensity, s$sampled)
 r <- select_units(cells, n = 40, method = "systematic", replicates = 4)
 dim(attr(r, "replicates"))

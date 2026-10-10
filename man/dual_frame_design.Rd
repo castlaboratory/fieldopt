@@ -98,12 +98,19 @@ list cost per unit.
 }
 \examples{
 set.seed(3)
-cells <- expand.grid(x = 1:15, y = 1:15); cells$unit <- paste0("c", seq_len(nrow(cells)))
+cells <- expand.grid(x = 1:15, y = 1:15)
+cells$unit <- paste0("c", seq_len(nrow(cells)))
 frame <- rbind(data.frame(unit = "depot", x = 8, y = 8), cells)
-model <- field_cost_model(per_travel = 3, per_unit = 40, per_interview = 20,
-                          interviews_per_unit = 3)
-domains <- data.frame(domain = c("a", "ab", "b"), size = c(600, 80, 20),
-                      mean = c(6, 30, 45), sd = c(5, 20, 35))
-dual_frame_design(frame, "depot", model, domains, cost_b = 45, deff_a = 1.5,
-                  target_cv = 0.05, method = "euclidean", n_rep = 2, iterations = 20)
+model <- field_cost_model(
+  per_travel = 3, per_unit = 40, per_interview = 20,
+  interviews_per_unit = 3
+)
+domains <- data.frame(
+  domain = c("a", "ab", "b"), size = c(600, 80, 20),
+  mean = c(6, 30, 45), sd = c(5, 20, 35)
+)
+dual_frame_design(frame, "depot", model, domains,
+  cost_b = 45, deff_a = 1.5,
+  target_cv = 0.05, method = "euclidean", n_rep = 2, iterations = 20
+)
 }

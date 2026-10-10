@@ -25,7 +25,8 @@ column to the geometries of the \code{sf} object the frame came from, for maps.
 \examples{
 if (requireNamespace("sf", quietly = TRUE)) {
   sq <- sf::st_sfc(sf::st_polygon(list(rbind(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)))),
-                   crs = 4326)
+    crs = 4326
+  )
   cells <- sf::st_sf(geometry = sf::st_make_grid(sq, n = 4))
   s <- select_units(as_frame(cells), n = 4, seed = 1)
   as_sf(s, cells)

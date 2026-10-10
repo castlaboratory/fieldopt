@@ -37,12 +37,14 @@ library(dplyr, warn.conflicts = FALSE)
 library(tidyr)
 set.seed(2027)
 cells <- expand_grid(x = seq(1, 59, by = 2), y = seq(1, 59, by = 2)) |>
-  mutate(unit = paste0("c", row_number()),
-         intensity = pmin(1, pmax(0, (x + y) / 120 + rnorm(n(), sd = 0.12))),
-         stratum = cut(intensity, c(-1, 0.35, 0.65, 2), labels = c("low", "mid", "high")),
-         size = 1 + 2 * intensity,                                    # the size measure: expected farmland
-         corn = 40 * intensity * size + rnorm(n(), sd = 4),            # planning values
-         cattle = 25 * (1 - intensity) * size + rnorm(n(), sd = 5))
+  mutate(
+    unit = paste0("c", row_number()),
+    intensity = pmin(1, pmax(0, (x + y) / 120 + rnorm(n(), sd = 0.12))),
+    stratum = cut(intensity, c(-1, 0.35, 0.65, 2), labels = c("low", "mid", "high")),
+    size = 1 + 2 * intensity, # the size measure: expected farmland
+    corn = 40 * intensity * size + rnorm(n(), sd = 4), # planning values
+    cattle = 25 * (1 - intensity) * size + rnorm(n(), sd = 5)
+  )
 bases <- tibble(unit = c("north", "south"), x = c(10, 50), y = c(50, 10))
 cells |> count(stratum)
 ```
@@ -59,8 +61,11 @@ strata <- cells |>
   group_by(stratum) |>
   summarise(size = n(), sd_corn = sd(corn), sd_cattle = sd(cattle)) |>
   mutate(cost = c(low = 150, mid = 180, high = 220)[as.character(stratum)])
-alloc <- multivariate_allocation(strata, sd = c("sd_corn", "sd_cattle"), target_cv = c(0.05, 0.08),
-                                 totals = c(sum(cells$corn), sum(cells$cattle)))
+alloc <- multivariate_allocation(
+  strata,
+  sd = c("sd_corn", "sd_cattle"), target_cv = c(0.05, 0.08),
+  totals = c(sum(cells$corn), sum(cells$cattle))
+)
 alloc
 glance(alloc)
 ```
@@ -71,7 +76,9 @@ A stratified, spatially balanced sample with the allocated sizes, nine
 points inside each cell, and the spatial balance as a check.
 
 ```{r selection, fig.height = 5}
-n_h <- alloc |> select(stratum, n) |> tibble::deframe()
+n_h <- alloc |>
+  select(stratum, n) |>
+  tibble::deframe()
 s <- cells |> select_units(n = n_h, size = "size", strata = "stratum", seed = 11)
 pts <- s |> select_points(points_per_cell = 9, cell_size = 2, layout = "systematic", seed = 3)
 tibble(cells = sum(s$sampled), points = nrow(pts), balance = round(spatial_balance(s), 3))
@@ -85,12 +92,17 @@ team-day is eight hours including travel. Two bases, two teams each, and the
 calendar says whether the work fits in the campaign.
 
 ```{r fieldwork}
-money <- field_cost_model(per_travel = 1.2, per_route = 600, per_unit = 40, per_interview = 25,
-                          interviews_per_unit = 3, currency = "BRL")
+money <- field_cost_model(
+  per_travel = 1.2, per_route = 600, per_unit = 40, per_interview = 25,
+  interviews_per_unit = 3, currency = "BRL"
+)
 sch <- s |>
-  travel_matrix(bases = bases, method = "euclidean", detour = 1.3, speed = 40) |>   # 40 units/h: minutes
-  schedule_fieldwork(units = s, teams = c(north = 2, south = 2), days = 12,
-                     max_length = 480, service_time = 180, cost_model = money, iterations = 100)
+  # 40 units per hour: the matrix is in minutes
+  travel_matrix(bases = bases, method = "euclidean", detour = 1.3, speed = 40) |>
+  schedule_fieldwork(
+    units = s, teams = c(north = 2, south = 2), days = 12,
+    max_length = 480, service_time = 180, cost_model = money, iterations = 100
+  )
 sch
 glance(sch)
 ```
@@ -111,19 +123,28 @@ listed establishments (to screen them out in the field, or to mix the two
 estimates), and `dual_frame_allocation()` sizes both samples.
 
 ```{r dualframe}
-big <- cells |> filter(intensity > 0.8) |> slice_sample(n = 60)
-list_frame <- big |> transmute(unit = paste0("L", row_number()), x = x + runif(n(), -0.9, 0.9),
-                               y = y + runif(n(), -0.9, 0.9), corn = corn * 1.5)
+big <- cells |>
+  filter(intensity > 0.8) |>
+  slice_sample(n = 60)
+list_frame <- big |> transmute(
+  unit = paste0("L", row_number()), x = x + runif(n(), -0.9, 0.9),
+  y = y + runif(n(), -0.9, 0.9), corn = corn * 1.5
+)
 ov <- frame_overlap(list_frame, cells, cell_size = 2)
 ov$list |> count(domain)
 n_overlap <- sum(ov$cells$listed > 0)
-domains <- tibble(domain = c("a", "ab", "b"),
-                  size = c(nrow(cells) - n_overlap, n_overlap, 10),
-                  mean = c(mean(cells$corn), 1.5 * mean(big$corn), 100),
-                  sd = c(sd(cells$corn), 1.5 * sd(big$corn), 40))
+domains <- tibble(
+  domain = c("a", "ab", "b"),
+  size = c(nrow(cells) - n_overlap, n_overlap, 10),
+  mean = c(mean(cells$corn), 1.5 * mean(big$corn), 100),
+  sd = c(sd(cells$corn), 1.5 * sd(big$corn), 40)
+)
 cost_a <- glance(sch)$cost / sum(s$sampled)
 dual_frame_allocation(domains, cost_a = cost_a, cost_b = 60, target_cv = 0.05)
-dual_frame_allocation(domains, cost_a = cost_a, cost_b = 60, target_cv = 0.05, theta = "screening")
+dual_frame_allocation(
+  domains,
+  cost_a = cost_a, cost_b = 60, target_cv = 0.05, theta = "screening"
+)
 ```
 
 ## 6. Estimation
@@ -133,7 +154,7 @@ design-based total with its variance, and the hand-over to the `survey`
 package for calibration and domain estimates.
 
 ```{r estimation}
-field <- s |> mutate(corn_obs = corn * (1 + rnorm(n(), sd = 0.05)))   # what the points measured
+field <- s |> mutate(corn_obs = corn * (1 + rnorm(n(), sd = 0.05))) # what the points measured
 design_variance(field, "corn_obs") |> select(total, se, cv, variance_method)
 tibble(true_total = sum(cells$corn))
 if (requireNamespace("survey", quietly = TRUE)) {

@@ -14,7 +14,7 @@ test_that("the integer programme reproduces the calendar and honours the constra
   expect_s3_class(c1, "fieldopt_schedule")
   expect_equal(c1$solver, "highs")
   expect_setequal(unlist(c1$calendar$units), paste0("s", 1:30))
-  expect_equal(c1$summary$days_needed, sch$summary$days_needed)  # one route per team-day: the greedy rule was already optimal
+  expect_equal(c1$summary$days_needed, sch$summary$days_needed) # one route per team-day: the greedy rule was already optimal
   expect_false(anyDuplicated(c1$calendar[, c("team", "day")]) > 0)
   # availability
   off <- data.frame(team = "base1-1", day = 1, available = FALSE)
@@ -24,7 +24,8 @@ test_that("the integer programme reproduces the calendar and honours the constra
   fx <- data.frame(base = "base2", route = 1, team = "base2-1", day = 3)
   c3 <- schedule_calendar(sch, fixed = fx)
   row <- c3$calendar[c3$calendar$base == "base2" & c3$calendar$route == 1, ]
-  expect_equal(row$team, "base2-1"); expect_equal(row$day, 3L)
+  expect_equal(row$team, "base2-1")
+  expect_equal(row$day, 3L)
   # precedence
   bf <- data.frame(base = "base1", route = 2, base_after = "base1", route_after = 1)
   c4 <- schedule_calendar(sch, before = bf)

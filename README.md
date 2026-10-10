@@ -92,15 +92,21 @@ library(fieldopt)
 library(dplyr)
 
 set.seed(1)
-frame <- tibble(unit = c("depot", paste0("s", 1:40)),
-                x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))) |>
+frame <- tibble(
+  unit = c("depot", paste0("s", 1:40)),
+  x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10))
+) |>
   mutate(crop = if_else(unit == "depot", NA_real_, 20 + 3 * x + rnorm(n())))
 
-model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
-                          interviews_per_unit = 4, currency = "BRL")
+model <- field_cost_model(
+  per_travel = 2, per_unit = 30, per_interview = 10,
+  interviews_per_unit = 4, currency = "BRL"
+)
 
 # one design: select, route, price, estimate
-s <- frame |> filter(unit != "depot") |> select_units(n = 12)
+s <- frame |>
+  filter(unit != "depot") |>
+  select_units(n = 12)
 r <- s |>
   travel_matrix(bases = frame |> filter(unit == "depot"), method = "euclidean") |>
   route_fieldwork(units = s, depot = "depot", max_stops = 5, cost_model = model)
@@ -108,9 +114,12 @@ r
 design_variance(s, y = "crop")
 
 # the frontier across sample sizes
-f <- cost_variance_frontier(frame, depot = "depot", cost_model = model,
-                            n_grid = c(8, 12, 16, 24), y = "crop",
-                            method = "euclidean", max_stops = 5, n_rep = 10)
+f <- cost_variance_frontier(
+  frame,
+  depot = "depot", cost_model = model,
+  n_grid = c(8, 12, 16, 24), y = "crop",
+  method = "euclidean", max_stops = 5, n_rep = 10
+)
 autoplot(f)
 ```
 

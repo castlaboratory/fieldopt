@@ -39,10 +39,14 @@ that must estimate several crops, or a crop and the number of farms, with
 stated precisions. The multipliers tell which constraints bind.
 }
 \examples{
-strata <- data.frame(stratum = c("high", "mid", "low"), size = c(300, 800, 2000),
-                     cost = c(250, 180, 150), sd_corn = c(40, 25, 8), sd_cattle = c(15, 30, 12))
-multivariate_allocation(strata, sd = c("sd_corn", "sd_cattle"),
-                        target_cv = c(0.05, 0.08), totals = c(90000, 60000))
+strata <- data.frame(
+  stratum = c("high", "mid", "low"), size = c(300, 800, 2000),
+  cost = c(250, 180, 150), sd_corn = c(40, 25, 8), sd_cattle = c(15, 30, 12)
+)
+multivariate_allocation(strata,
+  sd = c("sd_corn", "sd_cattle"),
+  target_cv = c(0.05, 0.08), totals = c(90000, 60000)
+)
 }
 \references{
 Bethel, J. (1989). Sample allocation in multivariate surveys.

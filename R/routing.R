@@ -63,11 +63,15 @@
 #' @export
 #' @examples
 #' set.seed(1)
-#' pts <- data.frame(unit = c("depot", paste0("s", 1:12)),
-#'                   x = c(0, runif(12, 0, 10)), y = c(0, runif(12, 0, 10)))
+#' pts <- data.frame(
+#'   unit = c("depot", paste0("s", 1:12)),
+#'   x = c(0, runif(12, 0, 10)), y = c(0, runif(12, 0, 10))
+#' )
 #' m <- travel_matrix(pts, method = "euclidean")
-#' r <- route_fieldwork(m, units = paste0("s", 1:12), depot = "depot", max_stops = 5,
-#'                      iterations = 50)
+#' r <- route_fieldwork(m,
+#'   units = paste0("s", 1:12), depot = "depot", max_stops = 5,
+#'   iterations = 50
+#' )
 #' r
 route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = Inf, service_time = 0,
                             demand = 0, capacity = Inf, iterations = 200, time_limit = NULL, certify = 1, alpha = 0.3, seed = 1,
@@ -79,10 +83,18 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
   nm <- rownames(matrix)
   if (inherits(units, "fieldopt_sample")) units <- units$unit[units$sampled]
   idx <- function(v, what) {
-    if (is.character(v)) { bad <- setdiff(v, nm); if (length(bad)) cli::cli_abort("Unknown {what} {.val {bad}}."); match(v, nm) }
-    else { v <- as.integer(v); if (any(is.na(v) | v < 1 | v > length(nm))) cli::cli_abort("{what} indices out of range."); v }
+    if (is.character(v)) {
+      bad <- setdiff(v, nm)
+      if (length(bad)) cli::cli_abort("Unknown {what} {.val {bad}}.")
+      match(v, nm)
+    } else {
+      v <- as.integer(v)
+      if (any(is.na(v) | v < 1 | v > length(nm))) cli::cli_abort("{what} indices out of range.")
+      v
+    }
   }
-  u <- idx(units, "units"); d <- idx(depot, "depot")
+  u <- idx(units, "units")
+  d <- idx(depot, "depot")
   if (length(d) != 1L) cli::cli_abort("{.arg depot} must be a single unit.")
   if (anyDuplicated(u)) cli::cli_abort("{.arg units} must be distinct.")
   if (d %in% u) cli::cli_abort("The depot cannot be among the units to visit.")
@@ -95,41 +107,53 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
   if (length(heavy)) cli::cli_abort("The demand of {.val {heavy}} exceeds {.arg capacity} = {capacity}.")
   if (is.finite(max_length)) {
     far <- nm[u][unclass(matrix)[d, u] + unclass(matrix)[u, d] + service[u] > max_length]
-    if (length(far)) cli::cli_abort(c("A route from {.val {nm[d]}} to {.val {far}} and back exceeds {.arg max_length} = {max_length}.",
-                                      i = "Raise {.arg max_length}, move the depot or drop {cli::qty(length(far))}{?this unit/these units}."))
+    if (length(far)) {
+      cli::cli_abort(c("A route from {.val {nm[d]}} to {.val {far}} and back exceeds {.arg max_length} = {max_length}.",
+        i = "Raise {.arg max_length}, move the depot or drop {cli::qty(length(far))}{?this unit/these units}."
+      ))
+    }
   }
   if (is.finite(max_stops) && max_stops < 1) cli::cli_abort("{.arg max_stops} must be at least 1.")
   if (engine == "vrpr") {
     if (!is.null(cost_model) && !inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
-    v <- route_with_vrpr(matrix, units = nm[u], bases = nm[d], vehicles = length(u), max_length = max_length, max_stops = max_stops,
-                         service = service, demand = dem, capacity = capacity,
-                         per_route = if (is.null(cost_model)) 0 else cost_model$per_route, per_travel = if (is.null(cost_model)) 1 else cost_model$per_travel,
-                         time_limit = if (is.null(time_limit)) 5 else time_limit, seed = seed)
+    v <- route_with_vrpr(matrix,
+      units = nm[u], bases = nm[d], vehicles = length(u), max_length = max_length, max_stops = max_stops,
+      service = service, demand = dem, capacity = capacity,
+      per_route = if (is.null(cost_model)) 0 else cost_model$per_route, per_travel = if (is.null(cost_model)) 1 else cost_model$per_travel,
+      time_limit = if (is.null(time_limit)) 5 else time_limit, seed = seed
+    )
     mm <- unclass(matrix)
     res <- list(routes = lapply(v$routes, function(r) match(r, nm) - 1L))
     res$lengths <- vapply(v$routes, function(r) mm[nm[d], r[1]] + sum(mm[cbind(r[-length(r)], r[-1])]) + mm[r[length(r)], nm[d]], numeric(1))
     res$durations <- res$lengths + vapply(v$routes, function(r) sum(service[match(r, nm)]), numeric(1))
     res$loads <- vapply(v$routes, function(r) sum(dem[match(r, nm)]), numeric(1))
-    res$total <- sum(res$lengths); res$lower_bound <- NA_real_; res$optimal <- FALSE; res$best_iteration <- NA_integer_
+    res$total <- sum(res$lengths)
+    res$lower_bound <- NA_real_
+    res$optimal <- FALSE
+    res$best_iteration <- NA_integer_
   } else {
     fixed <- if (!is.null(cost_model) && cost_model$per_route > 0 && cost_model$per_travel > 0) cost_model$per_route / cost_model$per_travel else 0
-    res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, -1, fixed, u - 1L, service, dem, as.numeric(max_length),
-                    as.numeric(max_stops), as.numeric(capacity), as.integer(iterations), if (is.null(time_limit)) Inf else as.numeric(time_limit),
-                    as.numeric(certify), alpha, seed)
+    res <- route_rs(
+      as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, -1, fixed, u - 1L, service, dem, as.numeric(max_length),
+      as.numeric(max_stops), as.numeric(capacity), as.integer(iterations), if (is.null(time_limit)) Inf else as.numeric(time_limit),
+      as.numeric(certify), alpha, seed
+    )
   }
   routes <- do.call(rbind, lapply(seq_along(res$routes), function(k) {
     r <- res$routes[[k]] + 1L
     tibble::tibble(route = k, stop = seq_along(r), unit = nm[r])
   }))
-  out <- list(routes = routes, lengths = res$lengths, durations = res$durations, loads = res$loads, total = res$total,
-              lower_bound = res$lower_bound, optimal = res$optimal,
-              gap = if (!is.na(res$lower_bound) && res$lower_bound > 0) (res$total - res$lower_bound) / res$lower_bound else NA_real_,
-              best_iteration = res$best_iteration,
-              n_routes = length(res$routes), depot = nm[d], units = nm[u],
-              limits = c(max_length = max_length, max_stops = max_stops, capacity = capacity), service_time = service, demand = dem,
-              options = list(iterations = iterations, time_limit = time_limit, alpha = alpha, seed = seed), engine = engine,
-              travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"),
-              matrix = matrix)
+  out <- list(
+    routes = routes, lengths = res$lengths, durations = res$durations, loads = res$loads, total = res$total,
+    lower_bound = res$lower_bound, optimal = res$optimal,
+    gap = if (!is.na(res$lower_bound) && res$lower_bound > 0) (res$total - res$lower_bound) / res$lower_bound else NA_real_,
+    best_iteration = res$best_iteration,
+    n_routes = length(res$routes), depot = nm[d], units = nm[u],
+    limits = c(max_length = max_length, max_stops = max_stops, capacity = capacity), service_time = service, demand = dem,
+    options = list(iterations = iterations, time_limit = time_limit, alpha = alpha, seed = seed), engine = engine,
+    travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"),
+    matrix = matrix
+  )
   if (!is.null(cost_model)) {
     if (!inherits(cost_model, "field_cost_model")) cli::cli_abort("{.arg cost_model} must come from {.fn field_cost_model}.")
     out$cost <- cost_of(cost_model, res$total, length(u), u, n_routes = length(res$routes))
@@ -141,12 +165,16 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
 # Service time as a vector over the rows of the matrix (names `nm`).
 service_vector <- function(service_time, nm, arg = "service_time") {
   if (!is.numeric(service_time) || anyNA(service_time) || any(service_time < 0)) cli::cli_abort("{.arg {arg}} must be non-negative numbers.")
-  if (length(service_time) == 1L) return(rep(as.numeric(service_time), length(nm)))
+  if (length(service_time) == 1L) {
+    return(rep(as.numeric(service_time), length(nm)))
+  }
   if (!is.null(names(service_time))) {
-    out <- rep(0, length(nm)); hit <- match(names(service_time), nm)
+    out <- rep(0, length(nm))
+    hit <- match(names(service_time), nm)
     bad <- names(service_time)[is.na(hit)]
     if (length(bad)) cli::cli_abort("Unknown {cli::qty(length(bad))}unit{?s} in {.arg {arg}}: {.val {bad}}.")
-    out[hit] <- as.numeric(service_time); return(out)
+    out[hit] <- as.numeric(service_time)
+    return(out)
   }
   if (length(service_time) != length(nm)) cli::cli_abort("{.arg {arg}} must be a single number, a vector named by unit, or one value per row of the matrix.")
   as.numeric(service_time)
@@ -175,10 +203,13 @@ print.fieldopt_routes <- function(x, ...) {
 #' @exportS3Method ggplot2::autoplot fieldopt_routes
 #' @examples
 #' set.seed(1)
-#' pts <- data.frame(unit = c("depot", paste0("s", 1:12)),
-#'                   x = c(0, runif(12, 0, 10)), y = c(0, runif(12, 0, 10)))
+#' pts <- data.frame(
+#'   unit = c("depot", paste0("s", 1:12)),
+#'   x = c(0, runif(12, 0, 10)), y = c(0, runif(12, 0, 10))
+#' )
 #' r <- route_fieldwork(travel_matrix(pts, method = "euclidean"), paste0("s", 1:12),
-#'                      depot = "depot", max_stops = 5, iterations = 50)
+#'   depot = "depot", max_stops = 5, iterations = 50
+#' )
 #' autoplot(r)
 autoplot.fieldopt_routes <- function(object, ...) {
   co <- object$coords
@@ -191,9 +222,10 @@ autoplot.fieldopt_routes <- function(object, ...) {
   pts <- co[co$unit %in% object$units, ]
   dep <- co[co$unit == object$depot, ]
   geo <- identical(object$method, "haversine")
-  if (geo) {  # coordinates are (lat, lon): plot longitude on x
+  if (geo) { # coordinates are (lat, lon): plot longitude on x
     segs <- data.frame(route = segs$route, x = segs$y, y = segs$x, xend = segs$yend, yend = segs$xend)
-    pts <- data.frame(a = pts$b, b = pts$a); dep <- data.frame(a = dep$b, b = dep$a)
+    pts <- data.frame(a = pts$b, b = pts$a)
+    dep <- data.frame(a = dep$b, b = dep$a)
   }
   ggplot2::ggplot() +
     ggplot2::geom_segment(data = segs, ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend, colour = .data$route), linewidth = 0.6) +
@@ -201,25 +233,30 @@ autoplot.fieldopt_routes <- function(object, ...) {
     ggplot2::geom_point(data = dep, ggplot2::aes(x = .data$a, y = .data$b), shape = 17, size = 3.5, colour = "#B4432B") +
     ggplot2::labs(x = if (geo) "longitude" else "x", y = if (geo) "latitude" else "y", colour = "route") +
     (if (geo) ggplot2::coord_quickmap() else ggplot2::coord_equal()) +
-    ggplot2::theme_minimal() + ggplot2::theme(legend.position = "bottom")
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = "bottom")
 }
 
 # Build a `fieldopt_routes` object from routes given as character vectors of
 # unit names (used by the schedule and by the vrpr engine).
 routes_object <- function(matrix, route_list, depot, service, demand, limits, cost_model = NULL, engine = "fieldopt",
                           lower_bound = NA_real_, optimal = FALSE, best_iteration = NA_integer_) {
-  nm <- rownames(matrix); mm <- unclass(matrix)
+  nm <- rownames(matrix)
+  mm <- unclass(matrix)
   lengths <- vapply(route_list, function(r) mm[depot, r[1]] + sum(mm[cbind(r[-length(r)], r[-1])]) + mm[r[length(r)], depot], numeric(1))
   durations <- lengths + vapply(route_list, function(r) sum(service[match(r, nm)]), numeric(1))
   loads <- vapply(route_list, function(r) sum(demand[match(r, nm)]), numeric(1))
-  units <- unlist(route_list); u <- match(units, nm)
+  units <- unlist(route_list)
+  u <- match(units, nm)
   routes <- do.call(rbind, lapply(seq_along(route_list), function(k) tibble::tibble(route = k, stop = seq_along(route_list[[k]]), unit = route_list[[k]])))
   total <- sum(lengths)
-  out <- list(routes = routes, lengths = lengths, durations = durations, loads = loads, total = total, lower_bound = lower_bound,
-              optimal = optimal, gap = if (!is.na(lower_bound) && lower_bound > 0) (total - lower_bound) / lower_bound else NA_real_,
-              best_iteration = best_iteration, n_routes = length(route_list), depot = depot, units = units, limits = limits,
-              service_time = service, demand = demand, options = list(), engine = engine,
-              travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"), matrix = matrix)
+  out <- list(
+    routes = routes, lengths = lengths, durations = durations, loads = loads, total = total, lower_bound = lower_bound,
+    optimal = optimal, gap = if (!is.na(lower_bound) && lower_bound > 0) (total - lower_bound) / lower_bound else NA_real_,
+    best_iteration = best_iteration, n_routes = length(route_list), depot = depot, units = units, limits = limits,
+    service_time = service, demand = demand, options = list(), engine = engine,
+    travel_unit = attr(matrix, "unit"), coords = attr(matrix, "coords"), method = attr(matrix, "method"), matrix = matrix
+  )
   if (!is.null(cost_model)) {
     out$cost <- cost_of(cost_model, total, length(u), u, n_routes = length(route_list))
     out$cost_model <- cost_model

@@ -42,8 +42,11 @@ A tibble.
 with the totals.
 }
 \examples{
-strata <- data.frame(stratum = c("list", "area"), size = c(2000, 800),
-                     sd = c(12, 30), cost = c(40, 180))
+strata <- data.frame(
+  stratum = c("list", "area"), size = c(2000, 800),
+  sd = c(12, 30), cost = c(40, 180)
+)
 a <- frame_allocation(strata, budget = 20000)
-tidy(a); glance(a)
+tidy(a)
+glance(a)
 }

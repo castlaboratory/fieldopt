@@ -26,8 +26,10 @@ test_that("service time counts towards the route limit and routes are priced per
 test_that("schedules assign units to bases, teams and days", {
   m <- travel_matrix(tools_points(), method = "euclidean")
   cm <- field_cost_model(per_travel = 2, per_route = 100)
-  sch <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 1), days = 4, max_stops = 4,
-                            service_time = 1, iterations = 20, cost_model = cm)
+  sch <- schedule_fieldwork(m,
+    units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 1), days = 4, max_stops = 4,
+    service_time = 1, iterations = 20, cost_model = cm
+  )
   expect_s3_class(sch, "fieldopt_schedule")
   expect_equal(sort(unlist(sch$calendar$units)), sort(paste0("s", 1:30)))
   expect_true(all(sch$calendar$stops <= 4))
@@ -51,8 +53,10 @@ test_that("schedules assign units to bases, teams and days", {
   expect_lte(tight$summary$routes[tight$summary$base == "base2"], 2)
   # a fixed cost per route reduces the number of routes when the limits allow
   cheap <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 2), days = 5, max_stops = 8, iterations = 50)
-  dear <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 2), days = 5, max_stops = 8, iterations = 50,
-                             cost_model = field_cost_model(per_travel = 1, per_route = 1000))
+  dear <- schedule_fieldwork(m,
+    units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 2), days = 5, max_stops = 8, iterations = 50,
+    cost_model = field_cost_model(per_travel = 1, per_route = 1000)
+  )
   expect_lte(nrow(dear$calendar), nrow(cheap$calendar))
   short <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 1, base2 = 1), days = 1, max_stops = 4, iterations = 20)
   expect_false(short$fits)
@@ -64,8 +68,10 @@ test_that("schedules assign units to bases, teams and days", {
   one <- schedule_fieldwork(m, paste0("s", 1:30), teams = 2, bases = "base1", days = 10, max_stops = 5, iterations = 10)
   expect_equal(unique(one$assignment$base), "base1")
   # regions: solved separately and combined
-  pts <- tools_points(); reg <- data.frame(unit = pts$unit, region = ifelse(pts$x < 5, "west", "east"))
-  reg$region[reg$unit == "base1"] <- "west"; reg$region[reg$unit == "base2"] <- "east"
+  pts <- tools_points()
+  reg <- data.frame(unit = pts$unit, region = ifelse(pts$x < 5, "west", "east"))
+  reg$region[reg$unit == "base1"] <- "west"
+  reg$region[reg$unit == "base2"] <- "east"
   by_reg <- schedule_fieldwork(m, units = paste0("s", 1:30), teams = c(base1 = 2, base2 = 2), days = 6, max_stops = 4, iterations = 20, region = reg)
   expect_setequal(unlist(by_reg$calendar$units), paste0("s", 1:30))
   expect_setequal(by_reg$regions, c("west", "east"))
@@ -75,7 +81,9 @@ test_that("schedules assign units to bases, teams and days", {
 })
 
 test_that("cube samples are balanced and spatial balance ranks designs", {
-  cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144); cells$z <- 1 + (seq_len(144) %% 7)
+  cells <- expand.grid(x = 1:12, y = 1:12)
+  cells$unit <- paste0("c", 1:144)
+  cells$z <- 1 + (seq_len(144) %% 7)
   err_cube <- err_srs <- numeric(30)
   for (k in 1:30) {
     sc <- select_units(cells, n = 24, method = "cube", balance = "z", seed = k)
@@ -100,8 +108,10 @@ test_that("cube samples are balanced and spatial balance ranks designs", {
 
 test_that("the ratio estimator uses the auxiliary", {
   set.seed(3)
-  cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144)
-  cells$farmland <- runif(144, 20, 100); cells$crop <- 0.4 * cells$farmland + rnorm(144, sd = 2)
+  cells <- expand.grid(x = 1:12, y = 1:12)
+  cells$unit <- paste0("c", 1:144)
+  cells$farmland <- runif(144, 20, 100)
+  cells$crop <- 0.4 * cells$farmland + rnorm(144, sd = 2)
   ests <- vapply(1:40, function(k) ratio_estimator(select_units(cells, n = 24, seed = k), "crop", "farmland")$total, numeric(1))
   expect_lt(abs(mean(ests) - sum(cells$crop)) / sum(cells$crop), 0.02)
   r <- ratio_estimator(select_units(cells, n = 24, seed = 1), "crop", "farmland")
@@ -115,16 +125,22 @@ test_that("the ratio estimator uses the auxiliary", {
 
 test_that("dual-frame estimators are unbiased and screening drops the overlap of frame A", {
   set.seed(7)
-  cells <- expand.grid(x = 1:12, y = 1:12); cells$unit <- paste0("c", 1:144)
-  cells$domain <- ifelse(runif(144) < 0.2, "ab", "a"); cells$yv <- ifelse(cells$domain == "ab", 80, 10) + rnorm(144, sd = 3)
+  cells <- expand.grid(x = 1:12, y = 1:12)
+  cells$unit <- paste0("c", 1:144)
+  cells$domain <- ifelse(runif(144) < 0.2, "ab", "a")
+  cells$yv <- ifelse(cells$domain == "ab", 80, 10) + rnorm(144, sd = 3)
   # the list holds the same overlap units (same values) plus units of its own
   ab <- cells[cells$domain == "ab", ]
-  lst <- data.frame(unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:11)), x = runif(nrow(ab) + 11), y = runif(nrow(ab) + 11),
-                    domain = rep(c("ab", "b"), c(nrow(ab), 11)), yv = c(ab$yv, 120 + rnorm(11, sd = 5)))
+  lst <- data.frame(
+    unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:11)), x = runif(nrow(ab) + 11), y = runif(nrow(ab) + 11),
+    domain = rep(c("ab", "b"), c(nrow(ab), 11)), yv = c(ab$yv, 120 + rnorm(11, sd = 5))
+  )
   truth <- sum(cells$yv) + sum(lst$yv[lst$domain == "b"])
   est <- t(vapply(1:60, function(k) {
-    sa <- select_units(cells, n = 30, seed = k); sb <- select_units(lst, n = 15, method = "srs", seed = k)
-    h <- dual_frame_estimator(sa, sb, "yv", "domain"); f <- dual_frame_estimator(sa, sb, "yv", "domain", estimator = "fuller-burmeister")
+    sa <- select_units(cells, n = 30, seed = k)
+    sb <- select_units(lst, n = 15, method = "srs", seed = k)
+    h <- dual_frame_estimator(sa, sb, "yv", "domain")
+    f <- dual_frame_estimator(sa, sb, "yv", "domain", estimator = "fuller-burmeister")
     s <- dual_frame_estimator(sa, sb, "yv", "domain", theta = "screening")
     c(h$total, f$total, s$total, h$variance, h$theta)
   }, numeric(5)))
@@ -132,21 +148,26 @@ test_that("dual-frame estimators are unbiased and screening drops the overlap of
   # the variance estimate is of the order of the empirical variance
   expect_lt(abs(log(mean(est[, 4]) / stats::var(est[, 1]))), log(2.5))
   expect_true(all(est[, 5] >= 0 & est[, 5] <= 1))
-  sa <- select_units(cells, n = 30, seed = 1); sb <- select_units(lst, n = 15, method = "srs", seed = 1)
+  sa <- select_units(cells, n = 30, seed = 1)
+  sb <- select_units(lst, n = 15, method = "srs", seed = 1)
   s <- dual_frame_estimator(sa, sb, "yv", "domain", theta = "screening")
   expect_equal(s$total, s$y_a + s$y_ab_b + s$y_b)
-  expect_equal(s$theta, 0); expect_true(s$theta_fixed)
+  expect_equal(s$theta, 0)
+  expect_true(s$theta_fixed)
   h5 <- dual_frame_estimator(sa, sb, "yv", "domain", theta = 0.5)
   expect_equal(h5$total, h5$y_a + 0.5 * h5$y_ab_a + 0.5 * h5$y_ab_b + h5$y_b)
   expect_error(dual_frame_estimator(sa, sb, "yv", "domain", theta = 2), "\\[0, 1\\]")
-  bad <- sb; bad$domain[bad$sampled][1] <- "a"
+  bad <- sb
+  bad$domain[bad$sampled][1] <- "a"
   expect_error(dual_frame_estimator(sa, bad, "yv", "domain"), "frame B")
   expect_error(dual_frame_estimator(sa, sb, "nope", "domain"), "not found")
 })
 
 test_that("multivariate allocation meets every target at minimum cost", {
-  strata <- data.frame(stratum = c("high", "mid", "low"), size = c(300, 800, 2000), cost = c(250, 180, 150),
-                       sd_corn = c(40, 25, 8), sd_cattle = c(15, 30, 12))
+  strata <- data.frame(
+    stratum = c("high", "mid", "low"), size = c(300, 800, 2000), cost = c(250, 180, 150),
+    sd_corn = c(40, 25, 8), sd_cattle = c(15, 30, 12)
+  )
   ma <- multivariate_allocation(strata, sd = c("sd_corn", "sd_cattle"), target_cv = c(0.05, 0.08), totals = c(90000, 60000))
   expect_s3_class(ma, "fieldopt_multi_allocation")
   tv <- (c(0.05, 0.08) * c(90000, 60000))^2
@@ -183,13 +204,15 @@ test_that("spatial frames go in and out", {
   expect_identical(as_frame(data.frame(a = 1)), tibble::tibble(a = 1))
   p <- sf::st_sf(id = c("p", "q"), geometry = sf::st_sfc(sf::st_point(c(-35, -8)), sf::st_point(c(-34, -7)), crs = 4326))
   fp <- as_frame(p, unit = "id")
-  expect_equal(fp$unit, c("p", "q")); expect_false("area" %in% names(fp))
+  expect_equal(fp$unit, c("p", "q"))
+  expect_false("area" %in% names(fp))
   expect_error(as_sf(data.frame(x = 1), g), "unit")
   expect_error(as_frame(sf::st_set_crs(g, NA)), "reference system")
 })
 
 test_that("samples flow through travel_matrix, route_fieldwork and schedule_fieldwork", {
-  cells <- expand.grid(x = 1:8, y = 1:8); cells$unit <- paste0("c", 1:64)
+  cells <- expand.grid(x = 1:8, y = 1:8)
+  cells$unit <- paste0("c", 1:64)
   towns <- data.frame(unit = c("t1", "t2"), x = c(0, 9), y = c(0, 9))
   s <- cells |> select_units(n = 10, seed = 2)
   expect_equal(nrow(sampled(s)), 10)
@@ -198,14 +221,17 @@ test_that("samples flow through travel_matrix, route_fieldwork and schedule_fiel
   expect_equal(attr(m, "method"), "euclidean")
   m_min <- s |> travel_matrix(bases = towns, method = "euclidean", speed = 60)
   expect_equal(attr(m_min, "unit"), "min")
-  expect_equal(unclass(m_min)[1, 3], unclass(m)[1, 3])   # 60 units per hour: one unit is one minute
+  expect_equal(unclass(m_min)[1, 3], unclass(m)[1, 3]) # 60 units per hour: one unit is one minute
   r <- m |> route_fieldwork(units = s, depot = "t1", iterations = 20)
   expect_setequal(r$units, s$unit[s$sampled])
   sch <- m |> schedule_fieldwork(units = s, teams = c(t1 = 1, t2 = 1), days = 6, max_stops = 3, iterations = 20)
   expect_setequal(unlist(sch$calendar$units), s$unit[s$sampled])
   geo <- data.frame(unit = paste0("g", 1:5), lat = -8 + (1:5) / 10, lon = -35 + (1:5) / 10)
-  g <- geo |> select_units(n = 3, seed = 1) |> travel_matrix(speed = 50)
-  expect_equal(nrow(g), 3); expect_equal(attr(g, "unit"), "min")
+  g <- geo |>
+    select_units(n = 3, seed = 1) |>
+    travel_matrix(speed = 50)
+  expect_equal(nrow(g), 3)
+  expect_equal(attr(g, "unit"), "min")
   expect_error(travel_matrix(cells, bases = data.frame(x = 1, y = 1), method = "euclidean"), "unit")
   expect_error(travel_matrix(cells, method = "euclidean", speed = -1), "speed")
   expect_error(sampled(cells), "select_units")

@@ -38,7 +38,8 @@ adds.
 }
 \examples{
 if (requireNamespace("survey", quietly = TRUE)) {
-  cells <- expand.grid(x = 1:10, y = 1:10); cells$unit <- paste0("c", 1:100)
+  cells <- expand.grid(x = 1:10, y = 1:10)
+  cells$unit <- paste0("c", 1:100)
   cells$crop <- 10 + cells$x + rnorm(100)
   s <- select_units(cells, n = 20, seed = 1)
   d <- as_svydesign(s)
