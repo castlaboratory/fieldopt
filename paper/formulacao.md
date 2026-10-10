@@ -127,6 +127,16 @@ the budget `G_p(n) + c_2 n m*(n) = B` (or from the variance target). Under (3.1)
 `G'(n)` falls with `n`, so `m*` is smaller and `n` larger than the classical solution
 evaluated at the average routed cost.
 
+*Prior art (literature review of 2026-10-10, `paper/literature.md`).* This is not
+new. Hansen, Hurwitz and Madow (1953, Vol. II, §6.11) use the two-stage cost
+`n c_1 + n m c_2 + √n c_3`, with `c_3 √n` the between-cluster travel of uniformly
+spread clusters, and solve for `m` iteratively (as reported by Kalsbeek, Mendoza
+and Budescu 1983, eq. 1.5); (5.1) is their optimum written with a general `G`.
+Cochran (1977, §5.5) cites Beardwood et al. for a `t_h √n_h` travel term and
+keeps only the linear cost. The contribution here is to *measure* `G_p(n)` by
+routing the sampled units (depots, daily limits, fleets, per-route costs) rather
+than assuming a geometry, and to quantify what the guessed constant costs miss.
+
 Three procedures are therefore distinct: (A) the classical allocation with a guessed
 constant `c_1`; (B) the fixed-point loop that re-estimates `c̄_1(n)` by routing and
 re-allocates, the current `two_stage_design()`; (B') the same loop with `G'(n)`; and
@@ -240,10 +250,16 @@ passes: balance is worth its travel for spatially structured variables.
 - Both: whether the daily limit restores linearity (§3), which decides how much of the
   paper is about shape and how much about level.
 
-## 11. Literature to position against (to verify before writing)
+## 11. Literature to position against
 
-Each entry must be read and its claim checked before it is cited; the list is a plan,
-not a bibliography.
+Reviewed on 2026-10-10: `paper/literature.md` holds the matrix, the verdict on
+each claim of this note and the reading list. Summary: the `√n` travel model and
+the iterative two-stage optimum are classical (HHM 1953; Cochran 1977 §5.5;
+Kalsbeek et al. 1983), as are stratified allocations with a `√n_h` travel term
+(Ghufran et al. 2012); not found in the literature are the routed measurement of
+`G(n)` on real frames, the size of the error of guessed unit costs, the routed
+price of spatial balance and the equal-budget comparison (E1), and dual-frame
+allocation with routed cost. The original plan of this section follows.
 
 - Beardwood, Halton and Hammersley (1959), the tour-length law; Steele (1997) for the
   modern statement and constants.

@@ -115,9 +115,10 @@ fit_budget <- function(budget, alloc_at, real_cost) {
 #' `c0 + a n + b sqrt(n)` (Beardwood, Halton and Hammersley). This function
 #' measures `G(n)` by routing samples at a few sizes around the current
 #' allocation, fits that curve, and re-allocates with the **marginal** cost
-#' `G'(n)` in place of `c1`; with a nonlinear cost the optimal number of
+#' `G'(n)` in place of `c1`; with a non-linear cost the optimal number of
 #' secondary units is Cochran's formula with the marginal, not the average,
-#' cost per primary unit. Under a budget the number of primary units then
+#' cost per primary unit, as in Hansen, Hurwitz and Madow's travel-cost model.
+#' Under a budget the number of primary units then
 #' comes from the fitted curve, so the design spends the budget at its real
 #' routed cost. It stops when `n` no longer changes (or after `max_iter`
 #' rounds; a two-cycle stops with the better of the two designs).
@@ -141,8 +142,10 @@ fit_budget <- function(budget, alloc_at, real_cost) {
 #'   `cost_mean`, `cost_sd`), `cost_coef` (`c0`, `a`, `b`), `history` (one
 #'   row per round: `round`, `c1`, `c1_average`, `n`, `m`, `cost`,
 #'   `variance_total`) and `converged`.
-#' @references Cochran, W. G. (1977). *Sampling Techniques*, 3rd ed., Section
-#'   10.6. Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The
+#' @references Hansen, M. H., Hurwitz, W. N. and Madow, W. G. (1953). *Sample
+#'   Survey Methods and Theory*, Vol. II, Section 6.11 (two-stage optimum with a
+#'   travel cost proportional to `sqrt(n)`). Cochran, W. G. (1977). *Sampling
+#'   Techniques*, 3rd ed., Section 10.6. Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The
 #'   shortest path through many points. *Proc. Cambridge Phil. Soc.*, 55,
 #'   299-327.
 #' @export

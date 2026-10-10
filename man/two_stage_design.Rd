@@ -90,9 +90,10 @@ visits, so the routed cost \code{G(n)} of visiting \code{n} units grows like
 \verb{c0 + a n + b sqrt(n)} (Beardwood, Halton and Hammersley). This function
 measures \code{G(n)} by routing samples at a few sizes around the current
 allocation, fits that curve, and re-allocates with the \strong{marginal} cost
-\verb{G'(n)} in place of \code{c1}; with a nonlinear cost the optimal number of
+\verb{G'(n)} in place of \code{c1}; with a non-linear cost the optimal number of
 secondary units is Cochran's formula with the marginal, not the average,
-cost per primary unit. Under a budget the number of primary units then
+cost per primary unit, as in Hansen, Hurwitz and Madow's travel-cost model.
+Under a budget the number of primary units then
 comes from the fitted curve, so the design spends the budget at its real
 routed cost. It stops when \code{n} no longer changes (or after \code{max_iter}
 rounds; a two-cycle stops with the better of the two designs).
@@ -120,8 +121,10 @@ two_stage_design(frame, "depot", model,
 )
 }
 \references{
-Cochran, W. G. (1977). \emph{Sampling Techniques}, 3rd ed., Section
-10.6. Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The
+Hansen, M. H., Hurwitz, W. N. and Madow, W. G. (1953). \emph{Sample
+Survey Methods and Theory}, Vol. II, Section 6.11 (two-stage optimum with a
+travel cost proportional to \code{sqrt(n)}). Cochran, W. G. (1977). \emph{Sampling
+Techniques}, 3rd ed., Section 10.6. Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The
 shortest path through many points. \emph{Proc. Cambridge Phil. Soc.}, 55,
 299-327.
 }
