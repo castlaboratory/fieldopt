@@ -143,8 +143,8 @@ fit_budget <- function(budget, alloc_at, real_cost) {
 #'   row per round: `round`, `c1`, `c1_average`, `n`, `m`, `cost`,
 #'   `variance_total`) and `converged`.
 #' @references Hansen, M. H., Hurwitz, W. N. and Madow, W. G. (1953). *Sample
-#'   Survey Methods and Theory*, Vol. II, Section 6.11 (two-stage optimum with a
-#'   travel cost proportional to `sqrt(n)`). Cochran, W. G. (1977). *Sampling
+#'   Survey Methods and Theory*, Vol. II, Chapter 6, Section 11 (two-stage
+#'   optimum with a travel cost proportional to `sqrt(m)`). Cochran, W. G. (1977). *Sampling
 #'   Techniques*, 3rd ed., Section 10.6. Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The
 #'   shortest path through many points. *Proc. Cambridge Phil. Soc.*, 55,
 #'   299-327.

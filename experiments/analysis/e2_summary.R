@@ -288,7 +288,7 @@ txt <- c(
   "3. **The marginal-cost loop closes the gap**: excess cost at most 0.2% (two-stage) and 1.1% (dual",
   "   frame), excess variance at most 2 to 4%. Cochran's m* = sqrt(c1 S2² / (c2 S1²)) holds with c1",
   "   replaced by the marginal routed cost G'(n), and under a budget the level of n must come from the",
-  "   true cost curve. This is Hansen, Hurwitz and Madow's (1953, Vol. II, section 6.11) optimum for a",
+  "   true cost curve. This is Hansen, Hurwitz and Madow's (1953, Vol. II, ch. 6 sec. 11) optimum for a",
   "   cost with a sqrt(n) travel term (see paper/literature.md); what is new is measuring G(n) by routing.",
   "4. **The travel law is Beardwood-Halton-Hammersley in every frame**, also with daily routes: the",
   "   exponent of n is 0.43 to 0.51 and, for single tours, beta is 0.95 on the real grid and 0.83 to 0.88",

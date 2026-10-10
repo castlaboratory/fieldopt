@@ -122,8 +122,8 @@ two_stage_design(frame, "depot", model,
 }
 \references{
 Hansen, M. H., Hurwitz, W. N. and Madow, W. G. (1953). \emph{Sample
-Survey Methods and Theory}, Vol. II, Section 6.11 (two-stage optimum with a
-travel cost proportional to \code{sqrt(n)}). Cochran, W. G. (1977). \emph{Sampling
+Survey Methods and Theory}, Vol. II, Chapter 6, Section 11 (two-stage
+optimum with a travel cost proportional to \code{sqrt(m)}). Cochran, W. G. (1977). \emph{Sampling
 Techniques}, 3rd ed., Section 10.6. Beardwood, J., Halton, J. H. and Hammersley, J. M. (1959). The
 shortest path through many points. \emph{Proc. Cambridge Phil. Soc.}, 55,
 299-327.

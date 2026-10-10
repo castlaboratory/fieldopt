@@ -128,10 +128,14 @@ the budget `G_p(n) + c_2 n m*(n) = B` (or from the variance target). Under (3.1)
 evaluated at the average routed cost.
 
 *Prior art (literature review of 2026-10-10, `paper/literature.md`).* This is not
-new. Hansen, Hurwitz and Madow (1953, Vol. II, §6.11) use the two-stage cost
-`n c_1 + n m c_2 + √n c_3`, with `c_3 √n` the between-cluster travel of uniformly
-spread clusters, and solve for `m` iteratively (as reported by Kalsbeek, Mendoza
-and Budescu 1983, eq. 1.5); (5.1) is their optimum written with a general `G`.
+new. Hansen, Hurwitz and Madow (1953, Vol. II, ch. 6 §11, pp. 173–175; read)
+use the two-stage cost `C = C_0 √m + C_1 m + C_2 m n̄`, with `C_0 √m` the travel
+among `m` randomly placed primary units (after Mahalanobis, Marks 1948 and Ghosh
+1949); their eq. 11.9 puts `(C_0 / 2√m) + C_1`, the marginal cost, where the linear
+model has `C_1`, and the optimum is found by iteration (convergence proved by
+Tepping and Skalak). Ch. 7 §7b does the same for strata with their own travel
+constants. (5.1) is their optimum written with a general `G`; our fitted
+`G(n) = c_0 + a n + b √n` is their cost with `b = C_0`.
 Cochran (1977, §5.5) cites Beardwood et al. for a `t_h √n_h` travel term and
 keeps only the linear cost. The contribution here is to *measure* `G_p(n)` by
 routing the sampled units (depots, daily limits, fleets, per-route costs) rather
