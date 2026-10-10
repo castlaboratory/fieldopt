@@ -40,8 +40,10 @@ Imports:
     tibble
 Suggests: 
     dplyr,
+    highs,
     knitr,
     osrm,
+    Matrix,
     rmarkdown,
     sf,
     testthat (>= 3.0.0),

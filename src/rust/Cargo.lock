@@ -43,9 +43,9 @@ dependencies = [
 
 [[package]]
 name = "fieldopt-core"
-version = "0.8.1"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d7765716c35e7e45f99a5a7d164cf4808823bad5bc7773b6939b3e9c315f99d"
+checksum = "f1928a55bc100d9e481ec03b870298a08aa7be26e9e9c676f59777b485bd08a6"
 
 [[package]]
 name = "lazy_static"

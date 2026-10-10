@@ -15,12 +15,12 @@
 <text x="311.0" y="116.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">visits, interviews</text>
 <rect x="412" y="62" width="170" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
 <text x="497.0" y="80.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">route_fieldwork()</text>
-<text x="497.0" y="101.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">exact or genetic search,</text>
-<text x="497.0" y="116.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">limits, bound</text>
+<text x="497.0" y="101.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">exact, genetic search,</text>
+<text x="497.0" y="116.5" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">optimality certificate</text>
 <rect x="598" y="62" width="162" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
 <text x="679.0" y="80.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1A202C">schedule_fieldwork()</text>
-<text x="679.0" y="101.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">bases, teams, days:</text>
-<text x="679.0" y="116.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">the calendar</text>
+<text x="679.0" y="101.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">bases, teams, days;</text>
+<text x="679.0" y="116.2" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">ILP: schedule_calendar()</text>
 <rect x="40" y="142" width="170" height="64" rx="8" fill="#E8F3EA" stroke="#2E6B3A" stroke-width="1.6"/>
 <text x="125.0" y="160.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1A202C">select_units()</text>
 <text x="125.0" y="181.6" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#2D3748">strata; LPM, systematic</text>
@@ -97,7 +97,7 @@
 <text x="99.0" y="715.4" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#2D3748">haversine, euclidean</text>
 <rect x="164" y="676" width="118" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
 <text x="223.0" y="696.4" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">routing</text>
-<text x="223.0" y="715.4" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#2D3748">exact, HGS, bounds</text>
+<text x="223.0" y="715.4" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#2D3748">HGS, exact, certify</text>
 <rect x="288" y="676" width="118" height="52" rx="8" fill="#FDEEEA" stroke="#B4432B" stroke-width="1.6"/>
 <text x="347.0" y="696.4" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#1A202C">sampling</text>
 <text x="347.0" y="715.4" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#2D3748">LPM2, systematic</text>

@@ -29,7 +29,7 @@ reference:
 - title: Travel and cost
   contents: [travel_matrix, field_cost_model, as_frame, as_sf]
 - title: Routing the field work
-  contents: [route_fieldwork, schedule_fieldwork, autoplot.fieldopt_routes, autoplot.fieldopt_schedule, routes-methods]
+  contents: [route_fieldwork, schedule_fieldwork, schedule_calendar, autoplot.fieldopt_routes, autoplot.fieldopt_schedule, routes-methods]
 - title: Selecting units and points
   contents: [select_units, select_points, spatial_balance, autoplot.fieldopt_sample]
 - title: Estimating

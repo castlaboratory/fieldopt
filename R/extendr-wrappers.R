@@ -15,7 +15,7 @@ travel_matrix_rs <- function(a, b, method) .Call(wrap__travel_matrix_rs, a, b, m
 #' limit); `fixed_cost` is the cost of a route in travel units; `service` and `demand` have
 #' one entry per node (or none).
 #' @noRd
-route_rs <- function(matrix, n, depots, routes_available, fixed_cost, units, service, demand, max_length, max_stops, capacity, iterations, time_limit, alpha, seed) .Call(wrap__route_rs, matrix, n, depots, routes_available, fixed_cost, units, service, demand, max_length, max_stops, capacity, iterations, time_limit, alpha, seed)
+route_rs <- function(matrix, n, depots, routes_available, fixed_cost, units, service, demand, max_length, max_stops, capacity, iterations, time_limit, certify, alpha, seed) .Call(wrap__route_rs, matrix, n, depots, routes_available, fixed_cost, units, service, demand, max_length, max_stops, capacity, iterations, time_limit, certify, alpha, seed)
 
 #' Size-proportional inclusion probabilities summing to `n`.
 #' @noRd

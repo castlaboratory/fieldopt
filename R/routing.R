@@ -10,8 +10,11 @@
 #' (2004) under the limits, and a local search with granular neighbourhoods
 #' (2-opt, Or-opt, relocate, swap, 2-opt*). The `gap` to a lower bound is
 #' reported: the Held-Karp bound for a single tour on a symmetric matrix
-#' (usually within a few percent of the optimum), a loose bound otherwise;
-#' `optimal` says when the solution is proven optimal.
+#' (usually within a few percent of the optimum), a loose bound otherwise.
+#' For a single tour, a branch-and-bound on Held-Karp 1-trees then tries to
+#' close the gap within `certify` seconds; `optimal` says when the solution
+#' is proven optimal (most tours of up to about 100 units are, within a few
+#' seconds).
 #'
 #' @param matrix A [travel_matrix()].
 #' @param units Names (or indices in the matrix) of the units to visit.
@@ -30,6 +33,10 @@
 #'   instance is solved exactly or when `time_limit` is given).
 #' @param time_limit Seconds of search instead of `iterations` (`NULL` for
 #'   none); the only stopping rule of the `"vrpr"` engine (default 5 s).
+#' @param certify Seconds allowed to the branch-and-bound on Held-Karp
+#'   1-trees that tries to prove a single tour optimal (symmetric matrix, no
+#'   limits forcing several routes); `0` switches it off. It also improves the
+#'   tour when it finds a better one.
 #' @param engine `"fieldopt"` (the built-in solver) or `"vrpr"`, the PyVRP
 #'   solver through the `vrpr` package (in Suggests), with the same inputs and
 #'   outputs, except that it takes one of `max_stops` and `capacity` and gives
@@ -62,9 +69,10 @@
 #'                      iterations = 50)
 #' r
 route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = Inf, service_time = 0,
-                            demand = 0, capacity = Inf, iterations = 200, time_limit = NULL, alpha = 0.3, seed = 1,
+                            demand = 0, capacity = Inf, iterations = 200, time_limit = NULL, certify = 1, alpha = 0.3, seed = 1,
                             cost_model = NULL, engine = c("fieldopt", "vrpr")) {
   engine <- rlang::arg_match(engine)
+  if (!is.numeric(certify) || length(certify) != 1L || is.na(certify) || certify < 0) cli::cli_abort("{.arg certify} must be a single non-negative number of seconds.")
   if (!is.null(time_limit) && (!is.numeric(time_limit) || length(time_limit) != 1L || is.na(time_limit) || time_limit <= 0)) cli::cli_abort("{.arg time_limit} must be a positive number of seconds.")
   if (!inherits(matrix, "fieldopt_matrix")) cli::cli_abort("{.arg matrix} must come from {.fn travel_matrix}.")
   nm <- rownames(matrix)
@@ -104,7 +112,8 @@ route_fieldwork <- function(matrix, units, depot, max_length = Inf, max_stops = 
   } else {
     fixed <- if (!is.null(cost_model) && cost_model$per_route > 0 && cost_model$per_travel > 0) cost_model$per_route / cost_model$per_travel else 0
     res <- route_rs(as.numeric(t(unclass(matrix))), nrow(matrix), d - 1L, -1, fixed, u - 1L, service, dem, as.numeric(max_length),
-                    as.numeric(max_stops), as.numeric(capacity), as.integer(iterations), if (is.null(time_limit)) Inf else as.numeric(time_limit), alpha, seed)
+                    as.numeric(max_stops), as.numeric(capacity), as.integer(iterations), if (is.null(time_limit)) Inf else as.numeric(time_limit),
+                    as.numeric(certify), alpha, seed)
   }
   routes <- do.call(rbind, lapply(seq_along(res$routes), function(k) {
     r <- res$routes[[k]] + 1L

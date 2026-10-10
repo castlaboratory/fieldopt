@@ -96,6 +96,17 @@ test_that("small instances are solved exactly and capacity is respected", {
   rg <- route_fieldwork(travel_matrix(g, method = "euclidean"), paste0("g", 2:20), "depot", iterations = 200)
   expect_equal(rg$total, 20)  # a Hamiltonian cycle on a 5 x 4 lattice with unit steps
   expect_true(rg$optimal)
+  # the certificate proves a random 30-unit tour optimal and is off when asked
+  set.seed(8)
+  p30 <- data.frame(unit = c("depot", paste0("s", 1:30)), x = c(5, runif(30, 0, 10)), y = c(5, runif(30, 0, 10)))
+  m30 <- travel_matrix(p30, method = "euclidean")
+  r30 <- route_fieldwork(m30, paste0("s", 1:30), "depot", iterations = 300, certify = 5)
+  expect_true(r30$optimal)
+  expect_equal(r30$lower_bound, r30$total)
+  r30b <- route_fieldwork(m30, paste0("s", 1:30), "depot", iterations = 300, certify = 0)
+  expect_lte(r30b$lower_bound, r30b$total)
+  expect_gte(r30b$total, r30$total - 1e-9)
+  expect_error(route_fieldwork(m30, paste0("s", 1:30), "depot", certify = -1), "certify")
 })
 
 

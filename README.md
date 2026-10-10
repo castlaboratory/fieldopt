@@ -32,7 +32,9 @@ inside them) and a list frame needs.
 - `schedule_fieldwork()` solves the multi-depot problem of several bases
   with their teams and days (assignment, routes and the number of team-days
   at once) and distributes the routes over the teams and the days available:
-  a calendar that says whether the field work fits.
+  a calendar that says whether the field work fits; `schedule_calendar()`
+  redoes that distribution as an integer programme (through `highs`) with
+  team availability, fixed assignments, precedences and shared team-days.
 - `select_units()` draws a probability sample of segments or cells, within
   strata, by the local pivotal method (spatially balanced), by spatially
   ordered systematic sampling along a Hilbert curve with interpenetrating

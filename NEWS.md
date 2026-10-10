@@ -6,6 +6,15 @@
   `route_fieldwork()` charges `per_route` in its objective too. On the 23
   Cordeau multi-depot instances the solver reaches or beats the best known
   solution on 11 and stays within 1.6% on the rest, in 1 to 26 seconds.
+* `schedule_calendar()` redistributes the routes of a schedule over teams and
+  days as an integer programme solved with the `highs` package (in Suggests):
+  team availability by day, routes fixed to a team or a day, precedences, and
+  a daily limit that lets short routes share a team-day; it minimises the last
+  working day.
+* `route_fieldwork(certify = )` runs a branch-and-bound on Held-Karp 1-trees
+  that proves single tours optimal (engine `fieldopt-core` 0.9.0): most tours
+  of up to a hundred units are certified within a few seconds, and `optimal`
+  is no longer limited to instances of 13 units.
 * The routing solver was rebuilt (engine `fieldopt-core` 0.5.0): instances of
   up to 13 units are solved exactly; larger ones by a hybrid genetic search
   with the optimal split of giant tours and a granular local search with

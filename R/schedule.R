@@ -77,7 +77,7 @@ schedule_fieldwork <- function(matrix, units, teams, days, bases = NULL, max_len
       fixed <- if (per_route > 0 && per_travel > 0) per_route / per_travel else 0
       res <- route_rs(as.numeric(t(m)), nrow(m), bi - 1L, as.numeric(vehicles), fixed, ui - 1L, service, rep(0, length(nm)),
                       as.numeric(max_length), as.numeric(max_stops), Inf, as.integer(iterations),
-                      if (is.null(time_limit)) Inf else as.numeric(time_limit), alpha, seed)
+                      if (is.null(time_limit)) Inf else as.numeric(time_limit), 0, alpha, seed)
       list(routes = lapply(res$routes, function(r) nm[r + 1L]), base = nm[res$route_depots + 1L])
     }
   }
