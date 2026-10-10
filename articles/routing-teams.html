@@ -17,7 +17,8 @@
 <link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Routing for one or several teams">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Routing for one or several teams">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -332,71 +333,71 @@ rather than by the gap.</p>
 Euclidean distances, as the libraries define them (script in the
 <code>fieldopt-core</code> repository,
 <code>examples/benchmark.rs</code>; one core of a laptop):</p>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
+<col width="32%">
+<col width="8%">
+<col width="12%">
 <col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
+<col width="8%">
+<col width="9%">
 <col width="14%">
 </colgroup>
 <thead><tr class="header">
 <th>Set</th>
-<th>Instances</th>
-<th>Offspring</th>
-<th>Optimal</th>
-<th>Mean gap</th>
-<th>Largest gap</th>
-<th>Time per instance</th>
+<th align="right">Instances</th>
+<th align="right">Offspring</th>
+<th align="right">Optimal</th>
+<th align="right">Mean gap</th>
+<th align="right">Largest gap</th>
+<th align="right">Time per instance</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td>TSPLIB (eil51, berlin52, st70, eil76, rat99, kroA100, eil101)</td>
-<td>7</td>
-<td>2000</td>
-<td>7 of 7</td>
-<td>0.00%</td>
-<td>0.00%</td>
-<td>0.6 to 1.8 s</td>
+<td align="right">7</td>
+<td align="right">2000</td>
+<td align="right">7 of 7</td>
+<td align="right">0.00%</td>
+<td align="right">0.00%</td>
+<td align="right">0.6 to 1.8 s</td>
 </tr>
 <tr class="even">
 <td>Augerat set A (CVRP, 31 to 79 customers, capacity)</td>
-<td>27</td>
-<td>2000</td>
-<td>24 of 27</td>
-<td>0.01%</td>
-<td>0.15%</td>
-<td>0.7 to 4 s</td>
+<td align="right">27</td>
+<td align="right">2000</td>
+<td align="right">24 of 27</td>
+<td align="right">0.01%</td>
+<td align="right">0.15%</td>
+<td align="right">0.7 to 4 s</td>
 </tr>
 <tr class="odd">
 <td>Augerat set A</td>
-<td>27</td>
-<td>200 (default)</td>
-<td>14 of 27</td>
-<td>0.20%</td>
-<td>1.14%</td>
-<td>under 0.4 s</td>
+<td align="right">27</td>
+<td align="right">200 (default)</td>
+<td align="right">14 of 27</td>
+<td align="right">0.20%</td>
+<td align="right">1.14%</td>
+<td align="right">under 0.4 s</td>
 </tr>
 <tr class="even">
 <td>Augerat set A</td>
-<td>27</td>
-<td><code>time_limit = 5</code></td>
-<td>24 of 27</td>
-<td>0.01%</td>
-<td>0.15%</td>
-<td>5 s</td>
+<td align="right">27</td>
+<td align="right"><code>time_limit = 5</code></td>
+<td align="right">24 of 27</td>
+<td align="right">0.01%</td>
+<td align="right">0.15%</td>
+<td align="right">5 s</td>
 </tr>
 <tr class="odd">
 <td>Cordeau multi-depot (p01 to p23: 50 to 360 customers, 2 to 6 depots,
 route limits per depot, duration limits)</td>
-<td>23</td>
-<td>2000</td>
-<td>11 of 23 at or below the best known</td>
-<td>0.29%</td>
-<td>1.5%</td>
-<td>1 to 26 s</td>
+<td align="right">23</td>
+<td align="right">2000</td>
+<td align="right">11 of 23 at or below the best known</td>
+<td align="right">0.29%</td>
+<td align="right">1.5%</td>
+<td align="right">1 to 26 s</td>
 </tr>
 </tbody>
 </table>

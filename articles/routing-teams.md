@@ -274,7 +274,7 @@ Euclidean distances, as the libraries define them (script in the
 laptop):
 
 | Set | Instances | Offspring | Optimal | Mean gap | Largest gap | Time per instance |
-|----|----|----|----|----|----|----|
+|----|---:|---:|---:|---:|---:|---:|
 | TSPLIB (eil51, berlin52, st70, eil76, rat99, kroA100, eil101) | 7 | 2000 | 7 of 7 | 0.00% | 0.00% | 0.6 to 1.8 s |
 | Augerat set A (CVRP, 31 to 79 customers, capacity) | 27 | 2000 | 24 of 27 | 0.01% | 0.15% | 0.7 to 4 s |
 | Augerat set A | 27 | 200 (default) | 14 of 27 | 0.20% | 1.14% | under 0.4 s |

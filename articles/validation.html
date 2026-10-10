@@ -17,7 +17,8 @@
 <link href="../deps/JetBrains_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Validation and benchmarks">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Validation and benchmarks">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -104,52 +105,72 @@ Figure of the chunk unnamed-chunk-2
 </p>
 </div>
 <p>Instances with rounded Euclidean distances, as the libraries define
-them, one core of a laptop, one seed:</p>
-<table class="table">
+them, one core of a laptop, one seed; “proven” means the certificate
+closed the gap within ten seconds:</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
+<col width="28%">
+<col width="8%">
+<col width="15%">
+<col width="17%">
+<col width="8%">
+<col width="9%">
+<col width="12%">
 </colgroup>
 <thead><tr class="header">
 <th>Set</th>
-<th>Instances</th>
+<th align="right">Instances</th>
 <th>Setting</th>
-<th>Result</th>
+<th align="right">Optimal</th>
+<th align="right">Mean gap</th>
+<th align="right">Largest gap</th>
+<th align="right">Time per instance</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td>TSPLIB (eil51 to eil101, 51 to 101 nodes)</td>
-<td>7</td>
+<td align="right">7</td>
 <td>2000 offspring</td>
-<td>7 of 7 optimal; 6 of 7 proven optimal within 10 s by the
-certificate</td>
+<td align="right">7 of 7 (6 proven)</td>
+<td align="right">0.00%</td>
+<td align="right">0.00%</td>
+<td align="right">0.7 to 4.7 s</td>
 </tr>
 <tr class="even">
 <td>Augerat set A (CVRP, 31 to 79 customers)</td>
-<td>27</td>
+<td align="right">27</td>
 <td>200 offspring (default)</td>
-<td>14 of 27 optimal, mean gap 0.20%, largest 1.14%, under 0.4 s</td>
+<td align="right">14 of 27</td>
+<td align="right">0.20%</td>
+<td align="right">1.14%</td>
+<td align="right">under 0.4 s</td>
 </tr>
 <tr class="odd">
 <td>Augerat set A</td>
-<td>27</td>
+<td align="right">27</td>
 <td>2000 offspring</td>
-<td>24 of 27 optimal, mean gap 0.01%, largest 0.15%, 0.7 to 4 s</td>
+<td align="right">24 of 27</td>
+<td align="right">0.01%</td>
+<td align="right">0.15%</td>
+<td align="right">0.7 to 4 s</td>
 </tr>
 <tr class="even">
 <td>Cordeau MDVRP (50 to 360 customers, 2 to 6 depots)</td>
-<td>23</td>
+<td align="right">23</td>
 <td>2000 offspring</td>
-<td>11 of 23 at or below the best known, mean gap 0.29%, largest 1.5%, 1
-to 26 s</td>
+<td align="right">11 of 23 at or below the best known</td>
+<td align="right">0.29%</td>
+<td align="right">1.5%</td>
+<td align="right">1 to 26 s</td>
 </tr>
 <tr class="odd">
 <td>Cordeau MDVRP</td>
-<td>23</td>
+<td align="right">23</td>
 <td>20 s each</td>
-<td>13 of 23 at or below the best known, mean gap 0.26%</td>
+<td align="right">13 of 23 at or below the best known</td>
+<td align="right">0.26%</td>
+<td align="right">1.9%</td>
+<td align="right">20 s</td>
 </tr>
 </tbody>
 </table>
