@@ -132,12 +132,13 @@ autoplot(f)
 ![Architecture of fieldopt: R package, extendr bindings and the
 fieldopt-core Rust crate](reference/figures/architecture.svg)
 
-![Workflow of fieldopt: frame, travel matrix, selection, routing, cost
-and variance, and the frontier](reference/figures/workflow.svg)
+![Workflow of fieldopt: frame, travel matrix, selection, routing and the
+schedule, cost and variance, and the
+frontier](reference/figures/workflow.svg)
 
 ![Area-frame workflow of fieldopt: cells, points, hits, multiplicity
-estimator, design effect, routed cost and the dual-frame
-allocation](reference/figures/area-frame.svg)
+estimator, design effect, routed cost, the dual-frame allocation and the
+dual-frame estimate](reference/figures/area-frame.svg)
 
 ## Related work
 
