@@ -52,36 +52,43 @@ estimators.
 ``` r
 
 set.seed(4)
-cells <- expand.grid(x = 1:15, y = 1:15); cells$unit <- paste0("c", 1:225)
-areas <- do.call(rbind, lapply(cells$unit, function(u) data.frame(unit = u, establishment = paste0(u, "-", 1:3),
-                                                                 area = 0.3, y = rlnorm(3, 2, 0.5))))
+cells <- expand_grid(x = 1:15, y = 1:15) |> mutate(unit = paste0("c", row_number()))
+areas <- expand_grid(unit = cells$unit, k = 1:3) |>
+  transmute(unit, establishment = paste0(unit, "-", k), area = 0.3, y = rlnorm(n(), 2, 0.5))
 deff <- point_design_effect(cells, areas, n = 25, points_per_cell = 6, cell_size = 1, n_sim = 60, seed = 2)
-deff[, c("bias", "variance", "mean_variance_estimate", "deff")]
+deff |> select(bias, variance, mean_variance_estimate, deff)
 #> # A tibble: 1 × 4
-#>    bias variance mean_variance_estimate  deff
-#>   <dbl>    <dbl>                  <dbl> <dbl>
-#> 1  56.1  158401.                170292.  1.47
+#>     bias variance mean_variance_estimate   deff
+#>    <dbl>    <dbl>                  <dbl>  <dbl>
+#> 1 56.127  158401.                170292. 1.4716
 ```
 
 ``` r
 
 set.seed(7)
-cells$domain <- ifelse(runif(225) < 0.2, "ab", "a"); cells$yv <- ifelse(cells$domain == "ab", 80, 10) + rnorm(225, sd = 3)
-ab <- cells[cells$domain == "ab", ]
-lst <- data.frame(unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:12)), x = runif(nrow(ab) + 12), y = runif(nrow(ab) + 12),
-                  domain = rep(c("ab", "b"), c(nrow(ab), 12)), yv = c(ab$yv, 120 + rnorm(12, sd = 5)))
+cells <- cells |>
+  mutate(domain = if_else(runif(n()) < 0.2, "ab", "a"), yv = if_else(domain == "ab", 80, 10) + rnorm(n(), sd = 3))
+overlap <- cells |> filter(domain == "ab")
+lst <- bind_rows(overlap |> transmute(unit = paste0("l", row_number()), domain, yv),
+                 tibble(unit = paste0("b", 1:12), domain = "b", yv = 120 + rnorm(12, sd = 5))) |>
+  mutate(x = runif(n()), y = runif(n()))
 truth <- sum(cells$yv) + sum(lst$yv[lst$domain == "b"])
-est <- t(sapply(1:40, function(k) {
-  sa <- select_units(cells, n = 30, seed = k); sb <- select_units(lst, n = 15, method = "srs", seed = k)
-  c(hartley = dual_frame_estimator(sa, sb, "yv", "domain")$total,
-    fb = dual_frame_estimator(sa, sb, "yv", "domain", estimator = "fuller-burmeister")$total)
-}))
-round(c(truth = truth, colMeans(est)))
-#>   truth hartley      fb 
-#>    6187    6224    6249
-round(100 * (colMeans(est) - truth) / truth, 2)   # relative bias in percent
-#> hartley      fb 
-#>    0.59    1.00
+est <- map(1:40, \(k) {
+  sa <- cells |> select_units(n = 30, seed = k)
+  sb <- lst |> select_units(n = 15, method = "srs", seed = k)
+  tibble(hartley = dual_frame_estimator(sa, sb, "yv", "domain")$total,
+         fb = dual_frame_estimator(sa, sb, "yv", "domain", estimator = "fuller-burmeister")$total)
+}) |> list_rbind()
+est |> summarise(across(everything(), mean)) |> mutate(truth = truth, .before = 1)
+#> # A tibble: 1 × 3
+#>    truth hartley     fb
+#>    <dbl>   <dbl>  <dbl>
+#> 1 6182.1  6217.7 6242.3
+est |> summarise(across(everything(), \(e) round(100 * (mean(e) - truth) / truth, 2)))   # relative bias in percent
+#> # A tibble: 1 × 2
+#>   hartley    fb
+#>     <dbl> <dbl>
+#> 1    0.58  0.97
 ```
 
 Further checks live in the test suite: the Hartley allocation against a

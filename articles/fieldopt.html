@@ -107,18 +107,25 @@ forty segments in a 10 x 10 km square, with a crop area that trends from
 west to east.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://castlaboratory.github.io/fieldopt/">fieldopt</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span>, warn.conflicts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2026</span><span class="op">)</span></span>
-<span><span class="va">frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>unit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"depot"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"s"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">40</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                    x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">frame</span><span class="op">$</span><span class="va">crop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">20</span> <span class="op">+</span> <span class="fl">3</span> <span class="op">*</span> <span class="va">frame</span><span class="op">$</span><span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">frame</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    unit        x         y     crop</span></span>
-<span><span class="co">#&gt; 1 depot 5.000000 5.0000000       NA</span></span>
-<span><span class="co">#&gt; 2    s1 6.986735 3.7120180 38.64570</span></span>
-<span><span class="co">#&gt; 3    s2 5.565305 8.7477840 38.25191</span></span>
-<span><span class="co">#&gt; 4    s3 1.401400 4.3459731 21.79576</span></span>
-<span><span class="co">#&gt; 5    s4 2.857233 4.4013678 29.18513</span></span>
-<span><span class="co">#&gt; 6    s5 5.553690 0.8195683 34.99375</span></span></code></pre></div>
+<span><span class="va">frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>unit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"depot"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"s"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">40</span><span class="op">)</span><span class="op">)</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>crop <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">unit</span> <span class="op">==</span> <span class="st">"depot"</span>, <span class="cn">NA_real_</span>, <span class="fl">20</span> <span class="op">+</span> <span class="fl">3</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">frame</span></span>
+<span><span class="co">#&gt; # A tibble: 41 × 4</span></span>
+<span><span class="co">#&gt;    unit      x     y  crop</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 depot 5     5      NA  </span></span>
+<span><span class="co">#&gt;  2 s1    6.99  3.71   42.5</span></span>
+<span><span class="co">#&gt;  3 s2    5.57  8.75   34.3</span></span>
+<span><span class="co">#&gt;  4 s3    1.40  4.35   24.8</span></span>
+<span><span class="co">#&gt;  5 s4    2.86  4.40   26.9</span></span>
+<span><span class="co">#&gt;  6 s5    5.55  0.820  39.5</span></span>
+<span><span class="co">#&gt;  7 s6    0.251 0.346  22.2</span></span>
+<span><span class="co">#&gt;  8 s7    4.66  9.29   33.2</span></span>
+<span><span class="co">#&gt;  9 s8    8.61  2.95   47.4</span></span>
+<span><span class="co">#&gt; 10 s9    2.53  5.19   28.4</span></span>
+<span><span class="co">#&gt; # ℹ 31 more rows</span></span></code></pre></div>
 <p>A real frame usually starts as a spatial object:
 <code><a href="../reference/as_frame.html">as_frame()</a></code> turns an <code>sf</code> layer of segments or
 points into this data frame (centroids in latitude and longitude, the
@@ -161,8 +168,8 @@ structured variables; it also spreads the units over the territory,
 which is exactly what makes the field work longer. Making that tension
 explicit is the point of the package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">frame</span><span class="op">[</span><span class="va">frame</span><span class="op">$</span><span class="va">unit</span> <span class="op">!=</span> <span class="st">"depot"</span>, <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
-<span><span class="va">s</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/sampled.html">sampled</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span>select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">unit</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">pi</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="va">frame</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">unit</span> <span class="op">!=</span> <span class="st">"depot"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/select_units.html">select_units</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span><span class="va">s</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/sampled.html">sampled</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">unit</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">pi</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 12 × 4</span></span>
 <span><span class="co">#&gt;    unit       x     y    pi</span></span>
 <span><span class="co">#&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
@@ -188,7 +195,7 @@ proof of optimality, so that the quality of the solution is visible. The
 sample can be piped straight into the routing.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="va">s</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/travel_matrix.html">travel_matrix</a></span><span class="op">(</span>bases <span class="op">=</span> <span class="va">frame</span><span class="op">[</span><span class="va">frame</span><span class="op">$</span><span class="va">unit</span> <span class="op">==</span> <span class="st">"depot"</span>, <span class="op">]</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/travel_matrix.html">travel_matrix</a></span><span class="op">(</span>bases <span class="op">=</span> <span class="va">frame</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">unit</span> <span class="op">==</span> <span class="st">"depot"</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/route_fieldwork.html">route_fieldwork</a></span><span class="op">(</span>units <span class="op">=</span> <span class="va">s</span>, depot <span class="op">=</span> <span class="st">"depot"</span>, max_stops <span class="op">=</span> <span class="fl">5</span>, cost_model <span class="op">=</span> <span class="va">model</span><span class="op">)</span></span>
 <span><span class="va">r</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -214,9 +221,9 @@ shown for comparison.</p>
 <span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
 <span><span class="co">#&gt;   total variance    se     cv variance_srs     n     N variance_method</span></span>
 <span><span class="co">#&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;        &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;          </span></span>
-<span><span class="co">#&gt; 1 1218.    3295.  57.4 0.0471        6196.    12    40 local-mean</span></span>
+<span><span class="co">#&gt; 1 1254.    3158.  56.2 0.0448        5874.    12    40 local-mean</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">frame</span><span class="op">$</span><span class="va">crop</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1241.481</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1241.484</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="the-cost-variance-frontier">The cost-variance frontier<a class="anchor" aria-label="anchor" href="#the-cost-variance-frontier"></a>
@@ -235,12 +242,12 @@ planner faces.</p>
 <span><span class="co">#&gt; # A tibble: 6 × 9</span></span>
 <span><span class="co">#&gt;       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean</span></span>
 <span><span class="co">#&gt; * &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1     6      475.   6.08           79.2        27.6           2        20214.</span></span>
-<span><span class="co">#&gt; 2     9      701.   4.64           77.9        35.5           2         6631.</span></span>
-<span><span class="co">#&gt; 3    12      925.   8.47           77.1        42.7           3         3205.</span></span>
-<span><span class="co">#&gt; 4    16     1218.   6.22           76.1        48.9           4         1632.</span></span>
-<span><span class="co">#&gt; 5    20     1517.   0.949          75.9        58.7           4          947.</span></span>
-<span><span class="co">#&gt; 6    24     1810.   3.69           75.4        65.1           5          554.</span></span>
+<span><span class="co">#&gt; 1     6      475.   6.08           79.2        27.6           2        20203.</span></span>
+<span><span class="co">#&gt; 2     9      701.   4.64           77.9        35.5           2         5820.</span></span>
+<span><span class="co">#&gt; 3    12      925.   8.47           77.1        42.7           3         2958.</span></span>
+<span><span class="co">#&gt; 4    16     1218.   6.22           76.1        48.9           4         1198.</span></span>
+<span><span class="co">#&gt; 5    20     1517.   0.949          75.9        58.7           4          726.</span></span>
+<span><span class="co">#&gt; 6    24     1810.   3.69           75.4        65.1           5          488.</span></span>
 <span><span class="co">#&gt; # ℹ 2 more variables: cv_mean &lt;dbl&gt;, n_rep &lt;dbl&gt;</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span></code></pre></div>
 <div class="float">

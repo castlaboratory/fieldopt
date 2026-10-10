@@ -17,17 +17,23 @@ large producers alongside.
 ``` r
 
 library(fieldopt)
+library(dplyr, warn.conflicts = FALSE)
+library(tidyr)
 set.seed(2026)
 side <- 30
-cells <- expand.grid(x = seq_len(side), y = seq_len(side))
-cells$unit <- paste0("c", seq_len(nrow(cells)))
-use <- 0.5 * cells$x / side + 0.3 * sin(cells$y / 4) + rnorm(nrow(cells), sd = 0.15)
-cells$intensity <- cut(use, c(-Inf, 0.25, 0.5, Inf), c("low", "mid", "high"))
-cells$size <- c(low = 1, mid = 2, high = 4)[as.character(cells$intensity)]
-table(cells$intensity)
-#> 
-#>  low  mid high 
-#>  399  275  226
+cells <- expand_grid(x = seq_len(side), y = seq_len(side)) |>
+  mutate(unit = paste0("c", row_number()),
+         use = 0.5 * x / side + 0.3 * sin(y / 4) + rnorm(n(), sd = 0.15),
+         intensity = cut(use, c(-Inf, 0.25, 0.5, Inf), c("low", "mid", "high")),
+         size = c(low = 1, mid = 2, high = 4)[as.character(intensity)]) |>
+  select(-use)
+cells |> count(intensity)
+#> # A tibble: 3 × 2
+#>   intensity     n
+#>   <fct>     <int>
+#> 1 low         380
+#> 2 mid         284
+#> 3 high        236
 ```
 
 Each cell holds a few establishments; the agricultural area of an
@@ -37,13 +43,14 @@ value per establishment that follows the intensity.
 
 ``` r
 
-areas <- rbind(
-  data.frame(establishment = paste0(cells$unit, "-1"), unit = cells$unit, area = 0.4),
-  data.frame(establishment = paste0(cells$unit, "-2"), unit = cells$unit, area = 0.2))
-areas$y <- round(rgamma(nrow(areas), shape = 4, rate = 4 / (20 * areas$area * cells$size[match(areas$unit, cells$unit)])), 1)
+areas <- bind_rows(cells |> transmute(unit, establishment = paste0(unit, "-1"), area = 0.4),
+                   cells |> transmute(unit, establishment = paste0(unit, "-2"), area = 0.2)) |>
+  left_join(cells |> select(unit, size), by = "unit") |>
+  mutate(y = round(rgamma(n(), shape = 4, rate = 4 / (20 * area * size)), 1)) |>
+  select(-size)
 truth <- sum(areas$y)
 truth
-#> [1] 22075.4
+#> [1] 22447.9
 ```
 
 ## Stratified selection of cells and points inside them
@@ -64,16 +71,16 @@ cells_s
 #> # A tibble: 900 × 7
 #>        x     y unit  intensity  size     pi sampled
 #>  * <int> <int> <chr> <fct>     <dbl>  <dbl> <lgl>  
-#>  1     1     1 c1    low           1 0.0501 FALSE  
-#>  2     2     1 c2    low           1 0.0501 FALSE  
-#>  3     3     1 c3    low           1 0.0501 FALSE  
-#>  4     4     1 c4    low           1 0.0501 FALSE  
-#>  5     5     1 c5    low           1 0.0501 FALSE  
-#>  6     6     1 c6    low           1 0.0501 FALSE  
-#>  7     7     1 c7    low           1 0.0501 FALSE  
-#>  8     8     1 c8    low           1 0.0501 FALSE  
-#>  9     9     1 c9    low           1 0.0501 FALSE  
-#> 10    10     1 c10   low           1 0.0501 FALSE  
+#>  1     1     1 c1    low           1 0.0526 FALSE  
+#>  2     1     2 c2    low           1 0.0526 FALSE  
+#>  3     1     3 c3    low           1 0.0526 FALSE  
+#>  4     1     4 c4    mid           2 0.123  FALSE  
+#>  5     1     5 c5    low           1 0.0526 FALSE  
+#>  6     1     6 c6    low           1 0.0526 FALSE  
+#>  7     1     7 c7    low           1 0.0526 FALSE  
+#>  8     1     8 c8    low           1 0.0526 FALSE  
+#>  9     1     9 c9    mid           2 0.123  TRUE   
+#> 10     1    10 c10   low           1 0.0526 FALSE  
 #> # ℹ 890 more rows
 ppc <- c(low = 3, mid = 6, high = 9)
 points <- select_points(cells_s, points_per_cell = ppc, cell_size = 1, layout = "systematic", seed = 7)
@@ -89,13 +96,14 @@ probability 0.2, and otherwise falls on non-agricultural land.
 ``` r
 
 set.seed(8)
-u <- runif(nrow(points))
-which_e <- ifelse(u < 0.4, "-1", ifelse(u < 0.6, "-2", NA))
-hits <- data.frame(unit = points$unit, establishment = paste0(points$unit, which_e))[!is.na(which_e), ]
-hits$y <- areas$y[match(hits$establishment, areas$establishment)]
-nrow(hits); length(unique(hits$establishment))
-#> [1] 401
-#> [1] 168
+hits <- points |>
+  mutate(u = runif(n()), which = case_when(u < 0.4 ~ "-1", u < 0.6 ~ "-2")) |>
+  filter(!is.na(which)) |>
+  transmute(unit, establishment = paste0(unit, which)) |>
+  left_join(areas |> select(establishment, y), by = "establishment")
+c(hits = nrow(hits), establishments = n_distinct(hits$establishment))
+#>           hits establishments 
+#>            401            164
 ```
 
 ## The multiplicity estimator
@@ -108,15 +116,15 @@ probabilities and their point densities.
 ``` r
 
 eh <- expected_hits(areas, cells_s, points_per_cell = ppc, cell_size = 1)
-hits$expected_hits <- eh$expected_hits[match(hits$establishment, eh$establishment)]
+hits <- hits |> left_join(eh |> select(establishment, expected_hits), by = "establishment")
 point_estimator(hits, cells_s)
 #> # A tibble: 1 × 10
 #>    total variance    se     cv variance_srs     n     N variance_method   n_hits
 #>    <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>              <int>
-#> 1 22091. 1191097. 1091. 0.0494     3381540.   100   900 stratified local…    401
+#> 1 22034. 1211899. 1101. 0.0500     3243984.   100   900 stratified local…    401
 #> # ℹ 1 more variable: n_establishments <int>
 truth
-#> [1] 22075.4
+#> [1] 22447.9
 ```
 
 The variance uses the cell design (local-mean estimator on the cell
@@ -126,13 +134,13 @@ replicate-based variance instead:
 
 ``` r
 
-cells_r <- select_units(cells, n = n_h, strata = "intensity", method = "systematic", replicates = 4, seed = 7)
-cells_r$crop <- tapply(areas$y, areas$unit, sum)[cells_r$unit]
+cells <- cells |> left_join(areas |> group_by(unit) |> summarise(crop = sum(y)), by = "unit")
+cells_r <- cells |> select_units(n = n_h, strata = "intensity", method = "systematic", replicates = 4, seed = 7)
 design_variance(cells_r, "crop")
 #> # A tibble: 1 × 8
 #>    total variance    se     cv variance_srs     n     N variance_method
 #>    <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>          
-#> 1 21651.  345846.  588. 0.0272     3296859.    91   900 replicates
+#> 1 22562.  517031.  719. 0.0319     2488872.    92   900 replicates
 ```
 
 ## What the field work costs
@@ -144,7 +152,7 @@ how spread they are, which is why it is computed rather than assumed.
 
 ``` r
 
-frame <- rbind(data.frame(unit = "depot", x = side / 2, y = side / 2), cells[, c("unit", "x", "y")])
+frame <- bind_rows(tibble(unit = "depot", x = side / 2, y = side / 2), cells |> select(unit, x, y))
 model <- field_cost_model(per_travel = 2.5, per_unit = 60, per_interview = 25,
                           interviews_per_unit = 4, currency = "BRL")
 routed_unit_cost(frame, "depot", model, n = sum(n_h), method = "euclidean",
@@ -152,7 +160,7 @@ routed_unit_cost(frame, "depot", model, n = sum(n_h), method = "euclidean",
 #> # A tibble: 1 × 6
 #>       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep
 #>   <dbl>         <dbl>           <dbl>     <dbl>       <dbl> <dbl>
-#> 1   100          167.            2.66    16665.           1     3
+#> 1   100          167.            2.66    16666.           1     3
 ```
 
 ## The design effect of point sampling
@@ -172,7 +180,7 @@ deff
 #> # A tibble: 1 × 10
 #>   n_sim  total mean_estimate  bias variance     cv mean_variance_estimate
 #> * <dbl>  <dbl>         <dbl> <dbl>    <dbl>  <dbl>                  <dbl>
-#> 1    60 22075.        22189.  114. 1120913. 0.0480               1416757.
+#> 1    60 22448.        22355. -93.1 1554792. 0.0555               1359453.
 #> # ℹ 3 more variables: interviews <dbl>, variance_srs <dbl>, deff <dbl>
 ```
 
@@ -193,22 +201,21 @@ iterates until the number of cells settles.
 
 ``` r
 
-cell_tot <- tapply(areas$y, areas$unit, sum)
 ts <- two_stage_design(frame, "depot", model, m_secondary = 9,
-                       s2_between = var(cell_tot / 9), s2_within = var(areas$y) * 2,
-                       target_cv = 0.05, mean = mean(cell_tot) / 9,
+                       s2_between = var(cells$crop / 9), s2_within = var(areas$y) * 2,
+                       target_cv = 0.05, mean = mean(cells$crop) / 9,
                        method = "euclidean", n_rep = 3, iterations = 60)
 ts
 #> 
 #> ── Two-stage allocation ────────────────────────────────────────────────────────
-#> n = 170 primary units with m = 9 secondary units each (optimal m 9): cost
-#> 49310, variance of the total 1218000 (SE 1104, CV 5%).
+#> n = 158 primary units with m = 9 secondary units each (optimal m 9): cost
+#> 45860, variance of the total 1256000 (SE 1121, CV 4.99%).
 ts$history
 #> # A tibble: 2 × 6
 #>   round    c1     n     m   cost variance_total
 #>   <int> <dbl> <int> <int>  <dbl>          <dbl>
-#> 1     1  90.1   170     9 53568.       1218047.
-#> 2     2  65.0   170     9 49308.       1218047.
+#> 1     1  90.1   158     9 49786.       1255934.
+#> 2     2  65.3   158     9 45861.       1255934.
 ```
 
 ## Dual-frame allocation: area plus list
@@ -225,41 +232,42 @@ gives the design in which the area sample does not use the overlap.
 
 ``` r
 
-domains <- data.frame(domain = c("a", "ab", "b"),
-                      size = c(1500, 250, 50),
-                      mean = c(6, 30, 45), sd = c(5, 20, 35))
+domains <- tibble(domain = c("a", "ab", "b"),
+                  size = c(1500, 250, 50),
+                  mean = c(6, 30, 45), sd = c(5, 20, 35))
 df <- dual_frame_design(frame, "depot", model, domains, cost_b = 45, deff_a = deff$deff,
                         target_cv = 0.05, method = "euclidean", n_rep = 3, iterations = 60)
 df
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 878900: n_A = 56 (frame A, cost 169.4/unit),
-#> n_B = 117 (frame B, cost 45/unit), theta = 0.168 (optimised).
-#> Cost 14750; variance 875300 (frame A 647000, frame B 229000); CV 4.99% of the
+#> Minimum cost for target variance 878900: n_A = 74 (frame A, cost 167.9/unit),
+#> n_B = 131 (frame B, cost 45/unit), theta = 0.145 (optimised).
+#> Cost 18320; variance 877200 (frame A 685000, frame B 192000); CV 5% of the
 #> total 18750.
-#> Expected overlap units: 8 in the A sample, 97.5 in the B sample.
+#> Expected overlap units: 10.6 in the A sample, 109.2 in the B sample.
 df$history
 #> # A tibble: 3 × 7
 #>   round cost_a   n_a   n_b theta   cost variance
 #>   <int>  <dbl> <int> <int> <dbl>  <dbl>    <dbl>
-#> 1     1   190.    55   122 0.153 15946.  870584.
-#> 2     2   169.    56   117 0.168 14750.  875297.
-#> 3     3   169.    56   117 0.168 14750.  875304.
+#> 1     1   190.    73   136 0.161 19998.  875540.
+#> 2     2   168.    74   131 0.145 18318.  877192.
+#> 3     3   168.    74   131 0.145 18317.  877194.
 tidy(df)
 #> # A tibble: 2 × 8
-#>   frame     n cost_per_unit  cost  deff variance overlap_units weight_on_overlap
-#>   <chr> <int>         <dbl> <dbl> <dbl>    <dbl>         <dbl>             <dbl>
-#> 1 A        56          169. 9485. 0.528  646660.           8               0.168
-#> 2 B       117           45  5265  1      228645.          97.5             0.832
+#>   frame     n cost_per_unit   cost  deff variance overlap_units
+#>   <chr> <int>         <dbl>  <dbl> <dbl>    <dbl>         <dbl>
+#> 1 A        74          168. 12422. 0.753  685047.          10.6
+#> 2 B       131           45   5895  1      192148.         109. 
+#> # ℹ 1 more variable: weight_on_overlap <dbl>
 dual_frame_allocation(domains, cost_a = df$cost_a, cost_b = 45, deff_a = deff$deff,
                       theta = "screening", target_cv = 0.05)
 #> 
 #> ── Dual-frame allocation ───────────────────────────────────────────────────────
-#> Minimum cost for target variance 878900: n_A = 62 (frame A, cost 169.4/unit),
-#> n_B = 131 (frame B, cost 45/unit), theta = 0 (fixed).
-#> Cost 16400; variance 868400 (frame A 650000, frame B 219000); CV 4.97% of the
+#> Minimum cost for target variance 878900: n_A = 82 (frame A, cost 167.9/unit),
+#> n_B = 146 (frame B, cost 45/unit), theta = 0 (fixed).
+#> Cost 20330; variance 871300 (frame A 692000, frame B 179000); CV 4.98% of the
 #> total 18750.
-#> Expected overlap units: 8.9 in the A sample, 109.2 in the B sample.
+#> Expected overlap units: 11.7 in the A sample, 121.7 in the B sample.
 ```
 
 ## Estimating from both frames
@@ -284,33 +292,33 @@ estimator of each design.
 
 ``` r
 
-cells$domain <- ifelse(cells$intensity == "high" & runif(nrow(cells)) < 0.6, "ab", "a")
-cells$crop_est <- ifelse(cells$domain == "ab", 60, 12) + rnorm(nrow(cells), sd = 3)
-ab <- cells[cells$domain == "ab", ]   # the overlap: the same holdings, seen from the list
-list_frame <- data.frame(unit = c(paste0("l", seq_len(nrow(ab))), paste0("b", 1:12)),
-                         x = runif(nrow(ab) + 12), y = runif(nrow(ab) + 12),
-                         domain = rep(c("ab", "b"), c(nrow(ab), 12)),
-                         crop_est = c(ab$crop_est, 90 + rnorm(12, sd = 5)))
-sa <- select_units(cells, n = 40, strata = "intensity", seed = 3)
-sb <- select_units(list_frame, n = 20, method = "srs", seed = 4)
+cells <- cells |>
+  mutate(domain = if_else(intensity == "high" & runif(n()) < 0.6, "ab", "a"),
+         crop_est = if_else(domain == "ab", 60, 12) + rnorm(n(), sd = 3))
+overlap <- cells |> filter(domain == "ab")      # the same holdings, seen from the list
+list_frame <- bind_rows(overlap |> transmute(unit = paste0("l", row_number()), domain, crop_est),
+                        tibble(unit = paste0("b", 1:12), domain = "b", crop_est = 90 + rnorm(12, sd = 5))) |>
+  mutate(x = runif(n()), y = runif(n()))
+sa <- cells |> select_units(n = 40, strata = "intensity", seed = 3)
+sb <- list_frame |> select_units(n = 20, method = "srs", seed = 4)
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain")
 #> # A tibble: 1 × 13
-#>    total variance    se     cv estimator theta theta_fixed    y_a y_ab_a y_ab_b
-#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>        <dbl>  <dbl>  <dbl>
-#> 1 18802.  217013.  466. 0.0248 hartley   0.157 FALSE       10021.  5475.  8584.
+#>    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
+#> 1 20084.  176231.  420. 0.0209 hartley   0.227 FALSE       9797. 10005.  9470.
 #> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", theta = "screening")
 #> # A tibble: 1 × 13
-#>    total variance    se     cv estimator theta theta_fixed    y_a y_ab_a y_ab_b
-#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>        <dbl>  <dbl>  <dbl>
-#> 1 19292.  345814.  588. 0.0305 hartley       0 TRUE        10021.  5475.  8584.
+#>    total variance    se     cv estimator theta theta_fixed   y_a y_ab_a y_ab_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>     <dbl> <lgl>       <dbl>  <dbl>  <dbl>
+#> 1 19962.  437619.  662. 0.0331 hartley       0 TRUE        9797. 10005.  9470.
 #> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
 dual_frame_estimator(sa, sb, y = "crop_est", domain = "domain", estimator = "fuller-burmeister")
 #> # A tibble: 1 × 13
-#>    total variance    se     cv estimator      beta_1 beta_2    y_a y_ab_a y_ab_b
-#>    <dbl>    <dbl> <dbl>  <dbl> <chr>           <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
-#> 1 18802.  215797.  465. 0.0247 fuller-burmei…  0.386  -13.9 10021.  5475.  8584.
-#> # ℹ 3 more variables: y_b <dbl>, n_a <int>, n_b <int>
+#>    total variance    se     cv estimator beta_1 beta_2   y_a y_ab_a y_ab_b   y_b
+#>    <dbl>    <dbl> <dbl>  <dbl> <chr>      <dbl>  <dbl> <dbl>  <dbl>  <dbl> <dbl>
+#> 1 20091.  174005.  417. 0.0208 fuller-b… 0.0700   9.68 9797. 10005.  9470.  695.
+#> # ℹ 2 more variables: n_a <int>, n_b <int>
 ```
 
 The selection scales to national frames: the local pivotal method and
@@ -331,12 +339,12 @@ weights.
 d <- as_svydesign(sa)
 survey::svytotal(~crop_est, d)
 #>          total     SE
-#> crop_est 15496 1828.3
+#> crop_est 19802 1632.6
 survey::svyby(~crop_est, ~intensity, d, survey::svytotal)
-#>      intensity crop_est        se
-#> low        low 5046.943  300.3568
-#> mid        mid 3494.187  151.6314
-#> high      high 6954.904 1797.0785
+#>      intensity  crop_est        se
+#> low        low  4873.614  212.3148
+#> mid        mid  3815.881  160.8595
+#> high      high 11112.423 1610.7470
 ```
 
 ## Auxiliaries: the ratio estimator and balanced samples
@@ -353,19 +361,23 @@ Voronoi measure: zero is perfect).
 
 ``` r
 
-cells$farmland <- cells$size * runif(nrow(cells), 15, 35)
-cells$crop_r <- 0.5 * cells$farmland + rnorm(nrow(cells), sd = 3)
-s_lpm <- select_units(cells, n = 40, strata = "intensity", seed = 5)
-ratio_estimator(s_lpm, y = "crop_r", x = "farmland")[, c("total", "se", "variance", "variance_ht")]
+cells <- cells |> mutate(farmland = size * runif(n(), 15, 35), crop_r = 0.5 * farmland + rnorm(n(), sd = 3))
+s_lpm <- cells |> select_units(n = 40, strata = "intensity", seed = 5)
+ratio_estimator(s_lpm, y = "crop_r", x = "farmland") |> select(total, se, variance, variance_ht)
 #> # A tibble: 1 × 4
 #>    total    se variance variance_ht
 #>    <dbl> <dbl>    <dbl>       <dbl>
-#> 1 22495.  391.  152859.    1266972.
-s_cube <- select_units(cells, n = 40, strata = "intensity", method = "cube", balance = "farmland", seed = 5)
-c(lpm = spatial_balance(s_lpm), cube = spatial_balance(s_cube),
-  srs = spatial_balance(select_units(cells, n = 40, strata = "intensity", method = "srs", seed = 5)))
-#>       lpm      cube       srs 
-#> 0.1117390 0.4083660 0.3075266
+#> 1 23722.  415.  172067.     877010.
+s_cube <- cells |> select_units(n = 40, strata = "intensity", method = "cube", balance = "farmland", seed = 5)
+s_srs <- cells |> select_units(n = 40, strata = "intensity", method = "srs", seed = 5)
+tibble(design = c("lpm", "cube", "srs"),
+       balance = c(spatial_balance(s_lpm), spatial_balance(s_cube), spatial_balance(s_srs)))
+#> # A tibble: 3 × 2
+#>   design balance
+#>   <chr>    <dbl>
+#> 1 lpm      0.129
+#> 2 cube     0.368
+#> 3 srs      0.275
 ```
 
 ## References
