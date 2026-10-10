@@ -27,3 +27,5 @@
 ^src/rust/target$
 ^src/Makevars$
 ^src/Makevars\.win$
+^vignettes/.*\.Rmd\.orig$
+^tools/precompute-vignettes\.R$

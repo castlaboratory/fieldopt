@@ -7,9 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-<!-- Generated from validation.Rmd.orig by tools/precompute-vignettes.R; edit the .orig file. -->
-
-
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 6.5, fig.height = 4.5, dpi = 96)
+library(fieldopt)
+```
 
 This vignette records how the package was checked: the routing solver
 against public benchmark instances and other solvers, and the estimators by
@@ -18,10 +19,9 @@ the scripts of the `fieldopt-core` repository; the small ones run here.
 
 ## The routing solver
 
-<div class="figure">
-<img src="figures/solver.svg" alt="Inside route_fieldwork: exact dynamic programme, hybrid genetic search, split, local search, penalties, bounds and certificate" width="100%" />
-<p class="caption">Figure of the chunk unnamed-chunk-2</p>
-</div>
+```{r, echo = FALSE, out.width = "100%", fig.alt = "Inside route_fieldwork: exact dynamic programme, hybrid genetic search, split, local search, penalties, bounds and certificate"}
+knitr::include_graphics("figures/solver.svg")
+```
 
 Instances with rounded Euclidean distances, as the libraries define them,
 one core of a laptop, one seed:
@@ -57,22 +57,16 @@ defects before release.
 Small Monte Carlo checks, run here, of the unbiasedness of the main
 estimators.
 
-
-``` r
+```{r mc-points}
 set.seed(4)
 cells <- expand.grid(x = 1:15, y = 1:15); cells$unit <- paste0("c", 1:225)
 areas <- do.call(rbind, lapply(cells$unit, function(u) data.frame(unit = u, establishment = paste0(u, "-", 1:3),
                                                                  area = 0.3, y = rlnorm(3, 2, 0.5))))
 deff <- point_design_effect(cells, areas, n = 25, points_per_cell = 6, cell_size = 1, n_sim = 60, seed = 2)
 deff[, c("bias", "variance", "mean_variance_estimate", "deff")]
-#> # A tibble: 1 × 4
-#>    bias variance mean_variance_estimate  deff
-#>   <dbl>    <dbl>                  <dbl> <dbl>
-#> 1  56.1  158401.                170292.  1.47
 ```
 
-
-``` r
+```{r mc-dual}
 set.seed(7)
 cells$domain <- ifelse(runif(225) < 0.2, "ab", "a"); cells$yv <- ifelse(cells$domain == "ab", 80, 10) + rnorm(225, sd = 3)
 ab <- cells[cells$domain == "ab", ]
@@ -85,11 +79,7 @@ est <- t(sapply(1:40, function(k) {
     fb = dual_frame_estimator(sa, sb, "yv", "domain", estimator = "fuller-burmeister")$total)
 }))
 round(c(truth = truth, colMeans(est)))
-#>   truth hartley      fb 
-#>    6187    6224    6249
 round(100 * (colMeans(est) - truth) / truth, 2)   # relative bias in percent
-#> hartley      fb 
-#>    0.59    1.00
 ```
 
 Further checks live in the test suite: the Hartley allocation against a

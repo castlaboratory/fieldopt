@@ -7,9 +7,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-<!-- Generated from fieldopt.Rmd.orig by tools/precompute-vignettes.R; edit the .orig file. -->
-
-
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 6.5, fig.height = 4.5, dpi = 96)
+```
 
 A survey that goes to the field has two costs that textbooks keep apart: the
 statistical cost, the variance of the estimator for a given sample size, and
@@ -24,21 +24,13 @@ census block) and its coordinates. One row is the depot, the office the teams
 leave from and return to. Here the frame is synthetic: forty segments in a
 10 x 10 km square, with a crop area that trends from west to east.
 
-
-``` r
+```{r setup}
 library(fieldopt)
 set.seed(2026)
 frame <- data.frame(unit = c("depot", paste0("s", 1:40)),
                     x = c(5, runif(40, 0, 10)), y = c(5, runif(40, 0, 10)))
 frame$crop <- c(NA, 20 + 3 * frame$x[-1] + rnorm(40, sd = 2))
 head(frame)
-#>    unit        x         y     crop
-#> 1 depot 5.000000 5.0000000       NA
-#> 2    s1 6.986735 3.7120180 38.64570
-#> 3    s2 5.565305 8.7477840 38.25191
-#> 4    s3 1.401400 4.3459731 21.79576
-#> 5    s4 2.857233 4.4013678 29.18513
-#> 6    s5 5.553690 0.8195683 34.99375
 ```
 
 A real frame usually starts as a spatial object: `as_frame()` turns an `sf`
@@ -54,24 +46,19 @@ planar coordinates, as here, Euclidean distances. A matrix computed on a road
 network (for example with OSRM) can be passed through the `matrix` argument
 and is the better input when it exists.
 
-
-``` r
+```{r travel}
 m <- travel_matrix(frame, method = "euclidean")
 m
-#> Travel matrix: 41 units, euclidean (distance); mean off-diagonal 4.886.
 ```
 
 `field_cost_model()` turns a routing solution into money: a cost per unit of
 travel, a fixed cost per visited unit (access, setting up) and a cost per
 interview.
 
-
-``` r
+```{r cost}
 model <- field_cost_model(per_travel = 2, per_unit = 30, per_interview = 10,
                           interviews_per_unit = 4, currency = "BRL")
 model
-#> Field cost model (BRL): 2 per travel unit, 0 per route, 30 per visited unit, 10
-#> per interview.
 ```
 
 ## Select, route, estimate
@@ -83,28 +70,10 @@ variance of totals of spatially structured variables; it also spreads the
 units over the territory, which is exactly what makes the field work longer.
 Making that tension explicit is the point of the package.
 
-
-``` r
+```{r select}
 units <- frame[frame$unit != "depot", ]
 s <- select_units(units, n = 12)
 s[s$sampled, c("unit", "x", "y", "pi")]
-#> Warning: Unknown or uninitialised column: `sampled`.
-#> Sample of 0 units from 12 by "lpm".
-#> # A tibble: 12 × 4
-#>    unit       x     y    pi
-#>    <chr>  <dbl> <dbl> <dbl>
-#>  1 s3    1.40   4.35    0.3
-#>  2 s6    0.251  0.346   0.3
-#>  3 s8    8.61   2.95    0.3
-#>  4 s11   0.0593 9.72    0.3
-#>  5 s12   6.92   6.33    0.3
-#>  6 s15   1.54   5.23    0.3
-#>  7 s21   3.42   2.98    0.3
-#>  8 s22   3.43   8.96    0.3
-#>  9 s27   4.11   6.30    0.3
-#> 10 s35   5.86   1.86    0.3
-#> 11 s36   4.26   6.33    0.3
-#> 12 s40   4.47   9.00    0.3
 ```
 
 `route_fieldwork()` routes the field work from the depot through the selected
@@ -114,23 +83,12 @@ day. The solver is a GRASP heuristic with local search and an optimal split of
 the tour, and reports the gap to a lower bound so that the quality of the
 solution is visible.
 
-
-``` r
+```{r route}
 r <- route_fieldwork(m, units = s$unit[s$sampled], depot = "depot",
                      max_stops = 5, cost_model = model)
 r
-#> 
-#> ── Field routes ────────────────────────────────────────────────────────────────
-#> 3 routes from "depot" through 12 units: total travel 42.62 distance (proven
-#> optimal).
-#> Route 1 (17.81): s3 > s15 > s11 > s22 > s40
-#> Route 2 (21.56): s21 > s6 > s35 > s8 > s12
-#> Route 3 (3.254): s36 > s27
-#> Cost (BRL): travel 85.24 + routes 0 + units 360 + interviews 480 = 925.2.
 autoplot(r)
 ```
-
-![Figure of the chunk route](figures/fieldopt-route-1.png)
 
 `design_variance()` gives the Horvitz-Thompson estimate of the total of `crop`
 and its variance by the local-mean estimator of Grafström and Schelin (2014),
@@ -138,15 +96,9 @@ which suits spatially balanced samples and needs no joint inclusion
 probabilities. The variance the same sample size would give under simple
 random sampling is shown for comparison.
 
-
-``` r
+```{r estimate}
 design_variance(s, y = "crop")
-#> # A tibble: 1 × 8
-#>   total variance    se     cv variance_srs     n     N variance_method
-#>   <dbl>    <dbl> <dbl>  <dbl>        <dbl> <int> <int> <chr>          
-#> 1 1218.    3295.  57.4 0.0471        6196.    12    40 local-mean
 sum(frame$crop, na.rm = TRUE)
-#> [1] 1241.481
 ```
 
 ## The cost-variance frontier
@@ -156,27 +108,14 @@ A design is chosen by its sample size, its routing limits and its cost model.
 grid of sample sizes and returns the mean cost and the mean variance at each
 size: the frontier a survey planner faces.
 
-
-``` r
+```{r frontier}
 f <- cost_variance_frontier(frame, depot = "depot", cost_model = model,
                             n_grid = c(6, 9, 12, 16, 20, 24), y = "crop",
                             method = "euclidean", max_stops = 5,
                             n_rep = 8, iterations = 60)
 f
-#> # A tibble: 6 × 9
-#>       n cost_mean cost_sd cost_per_unit travel_mean routes_mean variance_mean
-#> * <dbl>     <dbl>   <dbl>         <dbl>       <dbl>       <dbl>         <dbl>
-#> 1     6      475.   6.08           79.2        27.6           2        20214.
-#> 2     9      701.   4.64           77.9        35.5           2         6631.
-#> 3    12      925.   8.47           77.1        42.7           3         3205.
-#> 4    16     1218.   6.22           76.1        48.9           4         1632.
-#> 5    20     1517.   0.949          75.9        58.7           4          947.
-#> 6    24     1810.   3.69           75.4        65.1           5          554.
-#> # ℹ 2 more variables: cv_mean <dbl>, n_rep <dbl>
 autoplot(f)
 ```
-
-![Figure of the chunk frontier](figures/fieldopt-frontier-1.png)
 
 The frontier makes two questions answerable with numbers: how much the next
 unit of precision costs in the field, and how much a different field
