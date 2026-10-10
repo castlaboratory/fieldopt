@@ -81,3 +81,46 @@ test_that("routed designs iterate the cost and converge", {
   expect_equal(sum(tidy(a)$variance), attr(a, "variance"))
   expect_equal(glance(a)$n, sum(a$n))
 })
+
+test_that("the cost curve fit recovers c0 + a n + b sqrt(n) and stays concave", {
+  pts <- tibble::tibble(n = c(10, 20, 40, 80, 160), cost_mean = 500 + 30 * n + 200 * sqrt(n))
+  co <- fit_cost_curve(pts)
+  expect_equal(unname(co), c(500, 30, 200), tolerance = 1e-8)
+  expect_equal(curve_Gprime(co, 100), 30 + 200 / 20)
+  # a convex set of points is fitted without a negative sqrt term
+  co2 <- fit_cost_curve(tibble::tibble(n = c(10, 20, 40), cost_mean = c(100, 250, 700)))
+  expect_gte(co2[["b"]], 0)
+  expect_gte(co2[["a"]], 0)
+})
+
+test_that("the routed designs use the marginal cost and reach the optimum on their curve", {
+  set.seed(4)
+  cells <- expand.grid(x = 1:15, y = 1:15)
+  cells$unit <- paste0("c", seq_len(nrow(cells)))
+  frame <- rbind(data.frame(unit = "depot", x = 8, y = 8), cells)
+  model <- field_cost_model(per_travel = 3, per_unit = 40, per_interview = 20, interviews_per_unit = 1)
+  ts <- two_stage_design(frame, "depot", model,
+    m_secondary = 12, s2_between = 9, s2_within = 40,
+    target_cv = 0.05, mean = 10, method = "euclidean", n_rep = 2, iterations = 10
+  )
+  expect_true(ts$converged)
+  expect_lt(ts$c1, ts$c1_average)
+  expect_equal(ts$c1, curve_Gprime(ts$cost_coef, ts$n))
+  expect_equal(ts$cost, curve_G(ts$cost_coef, ts$n) + 20 * ts$n * ts$m)
+  # brute force over (n, m) on the same curve
+  N <- 225
+  M <- 12
+  tv <- (0.05 * 10 * N * M)^2 / (N * M)^2
+  g <- expand.grid(n = 2:N, m = 1:M)
+  g$v <- (1 - g$n / N) * 9 / g$n + pmax(0, 1 - g$m / M) * 40 / (g$n * g$m)
+  g$cost <- curve_G(ts$cost_coef, g$n) + 20 * g$n * g$m
+  best <- g[g$v <= tv, ][which.min(g$cost[g$v <= tv]), ]
+  expect_lte(ts$cost, best$cost * 1.01)
+  tb <- two_stage_design(frame, "depot", model,
+    m_secondary = 12, s2_between = 9, s2_within = 40,
+    budget = ts$cost, method = "euclidean", n_rep = 2, iterations = 10
+  )
+  expect_lte(tb$cost, ts$cost + 1e-6)
+  expect_gte(tb$cost, 0.97 * ts$cost)
+  expect_equal(tb$mode, "budget")
+})

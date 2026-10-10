@@ -18,7 +18,7 @@ dual_frame_design(
   budget = NULL,
   interviews_per_unit = NULL,
   cost_a_start = NULL,
-  max_iter = 6,
+  max_iter = 8,
   size = NULL,
   strata = NULL,
   selection = c("lpm", "systematic", "srs"),
@@ -79,22 +79,29 @@ coordinates otherwise).}
 
 \item{max_length, max_stops}{Route limits passed to \code{\link[=route_fieldwork]{route_fieldwork()}}.}
 
-\item{n_rep}{Routed samples per round.}
+\item{n_rep}{Routed samples per sample size of the cost curve.}
 
 \item{iterations}{GRASP iterations per routing.}
 
 \item{seed}{Seed.}
 }
 \value{
-The final \code{fieldopt_dual_frame} allocation with \code{history} (one row
-per round: \code{round}, \code{cost_a}, \code{n_a}, \code{n_b}, \code{theta}, \code{cost}, \code{variance}).
+The final \code{fieldopt_dual_frame} allocation, with \code{cost} the routed
+cost \verb{G(n_a) + cost_b n_b}, \code{cost_a} the marginal cost used,
+\code{cost_a_average} (\code{G(n_a)/n_a}), \code{cost_curve}, \code{cost_coef}, \code{history}
+(one row per round: \code{round}, \code{cost_a}, \code{cost_a_average}, \code{n_a}, \code{n_b},
+\code{theta}, \code{cost}, \code{variance}) and \code{converged}.
 }
 \description{
 \code{\link[=dual_frame_allocation]{dual_frame_allocation()}} needs the cost per unit of the area frame, which
-depends on how many area units are visited. This function iterates between
-the allocation and the routing of a sample of \code{n_a} area units until
-\code{n_a} stabilises. The cost model prices the area units; \code{cost_b} is the
-list cost per unit.
+is not a constant: the routed cost \code{G(n_a)} of visiting \code{n_a} area units
+grows like \verb{c0 + a n_a + b sqrt(n_a)}. As \code{\link[=two_stage_design]{two_stage_design()}}, this
+function measures that curve by routing samples at a few sizes, fits it,
+and re-allocates with the \strong{marginal} cost \verb{G'(n_a)} as \code{cost_a}, which
+sets the split between the frames and \code{theta}; under a budget the sample
+sizes then come from the fitted curve, keeping that split, so the design
+spends the budget at its real routed cost. The cost model prices the area
+units (visits, interviews and travel); \code{cost_b} is the list cost per unit.
 }
 \examples{
 set.seed(3)

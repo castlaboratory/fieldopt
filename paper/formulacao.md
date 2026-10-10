@@ -203,8 +203,8 @@ classical allocation with a routed `c_1` is enough and the package is the contri
 | §2 cost | `field_cost_model()`, `cost()` | per route, travel, unit, interview |
 | §2 routing | `route_fieldwork()`, `schedule_fieldwork()`, `schedule_calendar()` | HGS with penalties, exact to 13 units, certificate; multi-depot; ILP calendar |
 | §2 expected cost | `cost_variance_frontier()`, `routed_unit_cost()` | Monte Carlo over `R` samples |
-| §5.1 | `two_stage_allocation()`, `two_stage_design()` | classical; loop with the average cost (to be revised after E2, §5.1) |
-| §5.2 | `dual_frame_allocation()`, `dual_frame_design()` | Hartley with optimal or screening θ; loop with the average cost |
+| §5.1 | `two_stage_allocation()`, `two_stage_design()` | classical; loop with the marginal cost of the fitted curve `c0 + a n + b √n` (since 2026-10-10, after E2) |
+| §5.2 | `dual_frame_allocation()`, `dual_frame_design()` | Hartley with optimal or screening θ; loop with the marginal cost |
 | §5.3 | `cost_variance_frontier()`, `autoplot()` | frontier by design |
 | §7 | `design_variance()`, `dual_frame_estimator()`, `ratio_estimator()`, `as_svydesign()` | |
 

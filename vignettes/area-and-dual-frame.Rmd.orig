@@ -169,8 +169,13 @@ tracks the empirical variance; the design effect is what enters `deff_a`.
 With the between-cell and within-cell variance components (from a pilot or
 from the frame) and the costs per cell and per point, Cochran's rule gives
 the number of points per cell and then the number of cells for a target
-precision. `two_stage_design()` measures the cost per cell by routing a
-sample of the allocated size and iterates until the number of cells settles.
+precision. The cost per cell is not a constant: a route shares its travel
+among the cells it visits, so the routed cost of `n` cells grows like
+`c0 + a n + b sqrt(n)`. `two_stage_design()` routes samples at a few sizes,
+fits that curve and allocates with the **marginal** cost of a cell, which is
+what Cochran's rule needs when the cost is not linear (the average cost per
+cell would give too few cells), iterating until the number of cells settles.
+The history shows the marginal cost used in each round next to the average.
 
 ```{r twostage}
 ts <- two_stage_design(
@@ -182,6 +187,7 @@ ts <- two_stage_design(
 )
 ts
 ts$history
+ts$cost_curve
 ```
 
 ## Dual-frame allocation: area plus list
@@ -191,8 +197,8 @@ frame (the overlap `ab`); small establishments are on the area frame only
 (`a`); a few specialised units are on the list only (`b`). Given the sizes,
 means and standard deviations of the three domains, the cost per list unit
 and the design effect from the simulation, `dual_frame_design()` runs
-Hartley's allocation with the area cost measured by routing, iterating until
-the area sample size settles; `theta = "screening"` gives the design in
+Hartley's allocation with the marginal routed cost of an area unit, in the
+same way, iterating until the area sample size settles; `theta = "screening"` gives the design in
 which the area sample does not use the overlap.
 
 ```{r dualframe}
