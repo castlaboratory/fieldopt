@@ -10,6 +10,10 @@
 #                    39-41, 46-48, 62), pasture (15), mosaic of uses (21),
 #                    native vegetation (3-6, 11-13, 49, 50) and urban area (24)
 #   elev             Copernicus DEM GLO-30, mean altitude (m)
+#   urban18, agri18, mosaic18
+#                    the same MapBiomas shares in 2018: auxiliary information
+#                    available before the survey, for stratification and size
+#                    measures (experiment E1c)
 #
 # Usage:  Rscript experiments/data/build_f4_ipojuca.R
 # Writes experiments/data/f4_ipojuca_cells.parquet (tracked, small). The
@@ -62,6 +66,14 @@ shares <- ex |>
     native = mean(class %in% native), urban = mean(class == 24), .groups = "drop"
   )
 
+# the same classes in 2018, for auxiliary information
+mb18 <- rast("/vsicurl/https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_10/lulc/coverage/brazil_coverage_2018.tif")
+ex18 <- terra::extract(crop(mb18, win), v)
+names(ex18) <- c("id", "class")
+shares18 <- ex18 |>
+  group_by(id) |>
+  summarise(urban18 = mean(class == 24), agri18 = mean(class %in% agri), mosaic18 = mean(class == 21), .groups = "drop")
+
 # Copernicus DEM GLO-30, tiles covering the window
 tiles <- expand.grid(lat = floor(bb[["ymin"]]):floor(bb[["ymax"]]), lon = floor(bb[["xmin"]]):floor(bb[["xmax"]]))
 tile_url <- function(lat, lon) {
@@ -80,7 +92,8 @@ out <- cells |>
   mutate(id = row_number(), lon = xy[, 1], lat = xy[, 2]) |>
   left_join(shares, by = "id") |>
   left_join(elev, by = "id") |>
-  select(unit, lat, lon, pop, households, agri, pasture, mosaic, native, urban, elev)
+  left_join(shares18, by = "id") |>
+  select(unit, lat, lon, pop, households, agri, pasture, mosaic, native, urban, elev, urban18, agri18, mosaic18)
 arrow::write_parquet(out, "experiments/data/f4_ipojuca_cells.parquet")
 print(summary(out[, -1]))
 message("wrote experiments/data/f4_ipojuca_cells.parquet")
