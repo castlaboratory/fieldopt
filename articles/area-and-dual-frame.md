@@ -152,7 +152,7 @@ routed_unit_cost(frame, "depot", model, n = sum(n_h), method = "euclidean",
 #> # A tibble: 1 × 6
 #>       n cost_per_unit travel_per_unit cost_mean routes_mean n_rep
 #>   <dbl>         <dbl>           <dbl>     <dbl>       <dbl> <dbl>
-#> 1   100          167.            2.67    16667.           1     3
+#> 1   100          167.            2.67    16666.           1     3
 ```
 
 ## The design effect of point sampling

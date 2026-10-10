@@ -145,6 +145,9 @@ autoplot(f)
 
 ## How it works
 
+![Life cycle of a field survey with fieldopt and the packages it talks
+to](reference/figures/lifecycle.svg)
+
 ![Architecture of fieldopt: R package, extendr bindings and the
 fieldopt-core Rust crate](reference/figures/architecture.svg)
 
